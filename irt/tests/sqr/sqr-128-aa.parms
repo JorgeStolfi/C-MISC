@@ -1,0 +1,17 @@
+proc_name sqr
+arithmetic AA
+matte_color      0.20 0.70 0.10
+background_color 0.00 0.20 0.50
+image_width 128
+image_height 128
+observer 30.0 80.0  70.0
+focus     0.0  0.0   0.0 
+up        0.0  0.0   1.0
+light_source
+  position  30.0  100  200
+  color      0.7  0.5  0.5
+end_light
+light_source
+  position -30.0  100   50
+  color      0.5  0.7  0.7
+end_light

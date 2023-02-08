@@ -1,0 +1,8 @@
+(
+  (GIVEN w x y z)
+    (= ax (- (ABS x) w))
+    (= ay (- (ABS y) w))
+    (= az (- (ABS z) w))
+  (RETURN (MAX (MAX ax ay) az))
+)
+  

@@ -1,0 +1,29 @@
+# Last edited on 2013-03-24 22:33:57 by stolfi
+
+IRT - A ray tracer that can use either plain floating point,
+interval arithmetic (IA) or affine arithmetic (AA).
+
+The files are my own work and are hereby placed in the public domain.
+
+Code is provided "as is" for contemplation purposes only. As of
+2013-03-24 it compiled and ran on J.Stolfi's Linux environment, but
+your mileage may vary. No guarantees are expressed, stated, affirmed,
+supported, honored, implied, or even vaguely suggested in a sort of
+hypothetically subliminal way. Any losses or damages that may result
+from use of this software are yours to keep.
+
+Documentation is almost non-existent and the code was never fully
+debugged. The "tests" subdirectory has a Makefile that runs it on some
+test scenes. 
+
+The input scene is specified as a 3-argument formula that defines an
+implicit surface. A ".parms" file specifies camera view, light and
+other basic parameters. The formula is given in a separate file, in a
+specific pseudo-machine code (".pcode"). The Lisp program
+"expr-to-pcode.lsp" converts a formula written in a legible notation
+(".expr") to that pseudocode format.
+
+The tracer does not support reflections, transparency, or any other
+fancy effects.  I mean, not *intentionally*.
+
+J.Stolfi, 2013-03-24 

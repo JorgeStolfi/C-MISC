@@ -1,0 +1,13 @@
+proc_name plane
+arithmetic IA
+matte_color      0.20 0.70 0.10
+background_color 0.30 0.00 0.00
+image_width 64
+image_height 64
+observer 25.0  5.0  20.0
+focus     0.0  0.0   0.0 
+up        0.0  1.0   0.0
+light_source
+  position    100 -20 200
+  color      1.0  1.0  1.0
+end_light

@@ -1,0 +1,3002 @@
+
+==========================================
+Only in progs: .msg
+
+==========================================
+Only in progs: .msg~
+
+==========================================
+Only in progs: .xxx
+
+==========================================
+Only in progs: .xxx~
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: 2003-07-04-211501-save.tgz
+
+==========================================
+diff -r progs/Makefile /home/simoleo/ra014852/projeto/programs/Makefile
+
+  --- 1c1 -----------------------
+  < # Last edited on 2003-07-08 12:55:59 by stolfi
+
+  > # Last edited on 2003-07-05 21:40:26 by ra014852
+
+  --- 6c6 -----------------------
+  < # Where the project's ".h" files will reside:
+
+  > # Where the ".h" files will reside:
+
+  --- 9,10c9,10 -----------------------
+  < # Where the project's ".a" files (libraries) will reside:
+  < LIB = ../lib/${PLATFORM}
+
+  > # Where the ".a" files (libraries) will reside:
+  > LIB = ../lib
+
+  --- 13c13 -----------------------
+  < BIN = ../bin/${PLATFORM}
+
+  > BIN = ../bin
+
+  --- 15a16 -----------------------
+  > PLATFORM := i686-Linux-2.2
+
+  --- 25d25 -----------------------
+  < 
+
+  --- 26a27 -----------------------
+  >   SOIntegral.h \
+
+  --- 29d29 -----------------------
+  <   SOIntegral.h \
+
+  --- 55a56 -----------------------
+  >   SOIntegral.c \
+
+  --- 58d58 -----------------------
+  <   SOIntegral.c \
+
+  --- 94,109c94,105 -----------------------
+  < 
+  < PROGS := \
+  <   SOPlotFunction \
+  <   SOMakeProcFunction
+  <   
+  < PROGS_LATER := \
+  <   SOTestTentFunction \
+  <   SOTestIntegral \
+  <   SOComputeApprox \
+  <   SOComputeErrorMap \
+  <   SOUniSolve \
+  <   SOMakeWaveBasis \
+  <   SOTestGrid \
+  <   SOMakeGrid \
+  <   SOFindTentBasis \
+  <   SOComputeMatrices
+
+  > PROGCFILES := \
+  >   SOTestTentFunction.c \
+  >   SOTestProcFunction.c \
+  >   SOTestIntegral.c \
+  >   SOComputeApprox.c \
+  >   SOComputeErrorMap.c \
+  >   SOUniSolve.c \
+  >   SOMakeWaveBasis.c \
+  >   SOTestGrid.c \
+  >   SOMakeGrid.c \
+  >   SOFindTentBasis.c \
+  >   SOComputeMatrices.c
+
+  --- 111,118c107,111 -----------------------
+  < PROGS_NOT_YET := \
+  <   SOCompareMatrices \
+  <   SOComputeMatrices \
+  <   SOExtractBasis \
+  <   SOMakePolyBasis
+  < 
+  < # Names of sources of main programs:
+  < PROGCFILES := ${addsuffix .c,${PROGS}}
+
+  > PROGCFILESXX := \
+  >   SOCompareMatrices.c \
+  >   SOComputeMatrices.c \
+  >   SOExtractBasis.c \
+  >   SOMakePolyBasis.c
+
+  --- 121c114,117 -----------------------
+  < PROGOFILES := ${addsuffix .o,${PROGS}}
+
+  > PROGOFILES := ${subst .c,.o,${PROGCFILES}}
+  > 
+  > # Names of the executable files for the main programs:
+  > PROGS := ${subst .c,,${PROGCFILES}} 
+
+  --- 146,147c142,147 -----------------------
+  < # "make progs" makes all executables:
+  < progs: ${PROGS}
+
+  > # "make progs" is a loop that makes each executable in turn:
+  > progs: ${LIBHOFILES} ${LIBFILE}
+  > 	for p in ${PROGS} ; do \
+  > 	  ${MAKE} PROG=$$p prog-single ; \
+  >         done
+  > 
+
+  --- 179,183d178 -----------------------
+  < # Generic rule to make an executable file from a ".o" source:
+  < SO%: SO%.o ${LIBFILE} ${OTHERLIBS}
+  < 	gcc ${GCCFLAGS} -o SO$* SO$*.o ${LIBFILE} ${OTHERLIBS} \
+  < 	  -lm 
+  < 
+
+  --- 186a182,204 -----------------------
+  > 
+  > #######################################################################
+  > # Rules for recursive "make" -- must define ${PROG}
+  > 
+  > PROG := PROG.IS.UNDEFINED
+  > 
+  > ifneq "${PROG}" "PROG.IS.UNDEFINED"
+  > 
+  > # "make PROG=foo prog-single" builds and exports the executable "foo":
+  > prog-single: installlib ${BIN}/${PROG}
+  > 
+  > # Rule to build the executable and copy it to the export dir: 
+  > ${BIN}/${PROG}: ${PROG}
+  > 	cp -vup ${PROG} ${BIN}
+  > 
+  > # Rule to build the executable: 
+  > ${PROG}: ${PROG}.o ${LIB}/${LIBFILE} ${OTHERLIBS}
+  > 	gcc ${GCCFLAGS} -o ${PROG} ${PROG}.o ${LIB}/${LIBFILE} ${OTHERLIBS} \
+  > 	  -lm 
+  > 
+  > endif
+  > #
+  > ######################################################################
+
+  --- 204a223 -----------------------
+  > SOPlotParams.ho: SOPlotParams.h SOParams.ho SOBasic.ho
+
+  --- 211c230 -----------------------
+  <   SOPlot.ho ${JSINC}/ps.ho
+
+  >   SOPlot.ho SOPlotParams.ho ${JSINC}/ps.ho
+
+  --- 245a265,266 -----------------------
+  > SOPlotParams.o: SOPlotParams.c SOPlotParams.ho \
+  >   SOParams.ho SOBasic.ho SOPlot.ho
+
+  --- 248c269 -----------------------
+  <   SO2DPlot.ho SOPlotParams.ho
+
+  >   SOPlotParams.ho
+
+  --- 255c276 -----------------------
+  <   SOBasic.ho SOGrid.ho SOPlot.ho \
+
+  >   SOBasic.ho SOGrid.ho SOPlot.ho SOPlotParams.ho \
+
+  --- 265,272d285 -----------------------
+  < SOMakeProcFunction.o: SOMakeProcFunction.c \
+  <   SOFunction.ho SOProcFunction.ho \
+  <   SOParams.ho
+  < 
+  < SOPlotFunction.o: SOPlotFunction.c \
+  <   SOGrid.ho SOFunction.ho SOIntegral.ho \
+  <   SOParams.ho SOPlotParams.ho SOBasic.ho SO2DPlot.ho SOApprox.ho
+  < 
+
+  --- 469a483,487 -----------------------
+  > # SOPlotFunction.o: SOPlotFunction.c \
+  > #   SOTriang.ho SOFunction.ho SOSpline.ho \
+  > #   SOPlot.ho SOIntegral.ho SOParams.ho SOPlotParams.ho SOBasic.ho \
+  > #   ${JSINC}/r3.ho ${JSINC}/r4.ho ${JSINC}/r3x3.ho SOH3.ho
+  > # 
+
+==========================================
+diff -r progs/SO2DPlot.c /home/simoleo/ra014852/projeto/programs/SO2DPlot.c
+
+  --- 2c2 -----------------------
+  < /* Last edited on 2003-07-08 13:33:52 by stolfi */ 
+
+  > /* Last edited on 2003-07-05 22:37:34 by ra014852 */ 
+
+  --- 36a37,39 -----------------------
+  > /* Width of isolines in mm: */
+  > #define ISOLINE_WIDTH 0.15
+  > 
+
+  --- 46,50d48 -----------------------
+  <   
+  < static double isolineWidth = 0.15; /* Thickness of isolines in mm. */
+  < /* This global variable should become unnecessary once the 
+  <   setting of line width gets separated from the
+  <   setting of line color in {ps.h}. */
+
+  --- 54,55c52,53 -----------------------
+  < /* The procedures {SO2DPlot_ValuesInRectangle} and
+  <   {SO2DPlot_ValuesInTriangle} plot only those isolines with indices
+
+  > /* The procedures {SO2DPlot_IsolinesInRectangle} and
+  >   {SO2DPlot_IsolinesInTriangle} plot only those isolines with indices
+
+  --- 63,64c61,62 -----------------------
+  < void SO2DPlot_ValuesInRectangle
+  <   ( SOPlot_File *psf,    /* Plot file. */
+
+  > void SO2DPlot_IsolinesInRectangle
+  >   ( SOPlot_File *psf,    /* Descriptor of Postscript file. */
+
+  --- 80,81c78,79 -----------------------
+  < void SO2DPlot_ValuesInTriangle
+  <   ( SOPlot_File *psf,                /* Plot file. */
+
+  > void SO2DPlot_IsolinesInTriangle
+  >   ( SOPlot_File *psf,                /* Descriptor of Postscript file. */
+
+  --- 137,153d134 -----------------------
+  < void SO2DPlot_Subtree
+  <   ( FILE *psf, 
+  <     SOGrid_Node *p, 
+  <     SOGrid_Index k,
+  <     SOGrid_Rank rank,
+  <     double minR[2],
+  <     double maxR[2],
+  <     int maxDepth
+  <   );
+  <   /* Draws the cells of the dyadic grid rooted at node {p}, which is
+  <     assumed to correspond to a cell {C} of index {k} and given {rank}.
+  <     The boundary of {C} must be drawn by the client. The drawing is 
+  <     clipped to the rectangle with corners {minR} and {maxR} (in 
+  <     cell-root-relative coordinates).  Cells at level higher than 
+  <     {maxDepth} are ignored, i.e. the subtree is implicitly truncated
+  <     at level {maxDepth}. */
+  < 
+
+  --- 156,157c137,138 -----------------------
+  < void SO2DPlot_Values
+  <   ( SOPlot_File *psf,   /* Plot file. */
+
+  > void SO2DPlot_Isolines
+  >   ( SOPlot_File *psf,   /* Descriptor of Postscript file. */
+
+  --- 159,161c140,142 -----------------------
+  <     SOGrid_Tree *tree,  /* Reference grid for adaptive domain subdivision. */ 
+  <     double minR[2],     /* Low corner in root-relative coordinates. */
+  <     double maxR[2],     /* High corner in root-relative coordinates. */
+
+  >     SOGrid_Tree *tree,  /* Reference grid for domain subdivision. */ 
+  >     double minR[2],      /* Lower left corner in Client coordinates. */
+  >     double maxR[2],      /* Upper right corner in Client coordinates. */
+
+  --- 165d145 -----------------------
+  <     double lineWidth,   /* Line width for isoline plotting. */
+
+  --- 170c150 -----------------------
+  <     bool isolines,      /* TRUE draws the isolines, FALSE omits them. */ 
+
+  >     bool lines,         /* TRUE draws the isolines, FALSE omits them. */ 
+
+  --- 182c162 -----------------------
+  <     int layer; /* 0 = bands, 1 = isolines; */
+
+  >     int layer; /* 0 = bands, 1 = lines; */
+
+  --- 184,187c164 -----------------------
+  <     /* Set isoline width for internal procs. */
+  <     isolineWidth = lineWidth;
+  < 
+  <     auto void SO2DPlot_ValuesInCell
+
+  >     auto void SO2DPlot_IsolinesInCell
+
+  --- 201c178 -----------------------
+  <     void SO2DPlot_ValuesInCell
+
+  >     void SO2DPlot_IsolinesInCell
+
+  --- 208,210d184 -----------------------
+  <         int locMinDepth = lastRank + extraDepth;
+  <         // DEBUG fprintf (stderr, "+InCell cell = %ld rank = %d", k, rank); 
+  <         
+
+  --- 213,224c187,192 -----------------------
+  <         
+  <         // DEBUG fprintf (stderr, "  X = [%8.6f _ %8.6f]", minC[X], maxC[X]);
+  <         // DEBUG fprintf (stderr, "  Y = [%8.6f _ %8.6f]", minC[Y], maxC[Y]);
+  <         // DEBUG fprintf (stderr, "\n");
+  <         
+  <         /* Skip if cell lies outside the desired rectangle. */
+  <         if ((minC[X] >= maxR[X]) || (maxC[X] <= minR[X])) { return; }
+  <         if ((minC[Y] >= maxR[Y]) || (maxC[Y] <= minR[Y])) { return; }
+  <         
+  <         /* Subdivide and recurse, or plot undivided: */
+  <         
+  <         if ((rank < maxDepth) && ((rank < minDepth) || (rank < locMinDepth)))
+
+  >         if 
+  >           ( (minC[X] >= maxR[X]) || (maxC[X] <= minR[X]) || 
+  >             (minC[Y] >= maxR[Y]) || (maxC[Y] <= minR[Y])
+  >           )
+  >           { /* Skip - cell lies outside the desired rectangle. */ }
+  >         else if ((rank < maxDepth) && (rank < lastRank + extraDepth))
+
+  --- 228,229c196,197 -----------------------
+  <             SO2DPlot_ValuesInCell(2*k,   rank+1, nd0, lastRank + (nd0 != NULL));
+  <             SO2DPlot_ValuesInCell(2*k+1, rank+1, nd1, lastRank + (nd1 != NULL));
+
+  >             SO2DPlot_IsolinesInCell(2*k,   rank+1, nd0, lastRank + (nd0 != 0));
+  >             SO2DPlot_IsolinesInCell(2*k+1, rank+1, nd1, lastRank + (nd1 != 0));
+
+  --- 239c207 -----------------------
+  <             SO2DPlot_ValuesInRectangle
+
+  >             SO2DPlot_IsolinesInRectangle
+
+  --- 242c210 -----------------------
+  <                 layer, fObsMin, fObsMax
+
+  >                 layer, fObsMax, fObsMin
+
+  --- 245d212 -----------------------
+  <         // DEBUG fprintf (stderr, "-InCell cell = %ld rank = %d\n", k, rank); 
+
+  --- 248,250c215 -----------------------
+  <     // DEBUG fprintf (stderr, "  minDepth = %d extraDepth = %d maxDepth = %d\n", minDepth, extraDepth, maxDepth); 
+  <         
+  <     if (! (isolines || bands)) { return; }
+
+  >     if (! (lines || bands)) { return; }
+
+  --- 259c224 -----------------------
+  <         SO2DPlot_ValuesInCell (1, 0, (tree ? tree->root : NULL), 0);
+
+  >         SO2DPlot_IsolinesInCell (1, 0, (tree ? tree->root : NULL), 0);
+
+  --- 262c227 -----------------------
+  <     if (isolines) 
+
+  >     if (lines) 
+
+  --- 264c229 -----------------------
+  <         SO2DPlot_ValuesInCell (1, 0, (tree ? tree->root : NULL), 0);
+
+  >         SO2DPlot_IsolinesInCell (1, 0, (tree ? tree->root : NULL), 0);
+
+  --- 267c232 -----------------------
+  <       "SO2DPlot_Values: fObsMin = %26.16e, fObsMax =  %26.16e\n",
+
+  >       "SO2DPlot_Isolines: fObsMin = %26.16e, fObsMax =  %26.16e\n",
+
+  --- 272,276c237,238 -----------------------
+  < /* Number of sample points in each rectangle (either 4 or 8): */
+  < #define NSAMPLES 8
+  < 
+  < void SO2DPlot_ValuesInRectangle
+  <   ( SOPlot_File *psf,    /* Plot file. */
+
+  > void SO2DPlot_IsolinesInRectangle
+  >   ( SOPlot_File *psf,   /* Descriptor of Postscript file. */
+
+  --- 278,279c240,241 -----------------------
+  <     double minR[2],      /* Low corner of rectangle {C} rel. root cell. */
+  <     double maxR[2],      /* High corner of rectangle {C} rel. root cell. */
+
+  >     double minR[2], /* Low corner of rectangle {C} rel. root cell. */
+  >     double maxR[2], /* High corner of rectangle {C} rel. root cell. */
+
+  --- 288,293c250,251 -----------------------
+  <     double p[(NSAMPLES+1)*2]; /* Sampling points, root-relative coords. */
+  <     /* Samples {[0..NSAMPLES-1]} lie around the perimeter of {C}, */
+  <     /* in CCW order; sample {[NSAMPLES]} is the center of the rectangle. */
+  <     double fp[NSAMPLES+1];    /* Sampled function values: {fp[i] = f(p[i])}. */
+  < 
+  <     double *ctr = &(p[NSAMPLES*2]);
+
+  >     double pRel[5*2]; /* Coordinates of sampling points relative to root cell. */
+  >     /* Samples {pRel[0..3]} are corners of {C} in CCW order, {pRel[4] ==} is center. */
+
+  --- 295c253,254 -----------------------
+  <     double fpMin, fpMax;   /* Min and max of {fp[0..4]}. */
+
+  >     double fp[5];        /* Sampled function values: {fp[i] = f(pRel[i])}. */
+  >     double fpMin, fpMax; /* Min and max of {fp[0..4]}. */
+
+  --- 299,312c258,265 -----------------------
+  <     // DEBUG fprintf (stderr, "+InRectangle\n"); 
+  < 
+  <     /* Coordinates of rectangle center: */
+  <     ctr[X] = (minR[X]+maxR[X])/2.0;
+  <     ctr[Y] = (minR[Y]+maxR[Y])/2.0;
+  <     
+  <     /* Gets coordinates and function values of corners and mid-edges: */
+  <     /* Important: {fp[0..7]} must be in counterclockwise order. */
+  <     for (i = 0; i < NSAMPLES; i++)
+  <       { double *pi = &(p[i*2]);
+  <         if (NSAMPLES == 4)
+  <           {  /* Samples are corners only. */
+  <             pi[X] = ((i==0) || (i==3) ? minR[X] : maxR[X]);
+  <             pi[Y] = ((i==0) || (i==1) ? minR[Y] : maxR[Y]);
+
+  >     /* Gets coordinates and function values of rectangle corners and center: */
+  >     /* Important: {fp[0..3]} must be in counterclockwise order. */
+  >     for (i = 0; i < 5; i++)
+  >       { double *pi = &(pRel[i*2]);
+  >         if (i == 4) 
+  >           { /* Rectangle center: */
+  >             pi[X] = (minR[X]+maxR[X])/2.0;
+  >             pi[Y] = (minR[Y]+maxR[Y])/2.0;
+
+  --- 315,325c268,270 -----------------------
+  <           { /* Samples are corners and mid-edges. */
+  <             if (i % 2 == 0)
+  <               { /* Corner number {i/2}: */
+  <                 pi[X] = ((i==0) || (i==6) ? minR[X] : maxR[X]);
+  <                 pi[Y] = ((i==0) || (i==2) ? minR[Y] : maxR[Y]);
+  <               }
+  <             else
+  <               { /* Mid-edge between corners {i} and {i+1}: */
+  <                 pi[X] = ((i==1) || (i==5) ? ctr[X] : (i==7 ? minR[X] : maxR[X]));
+  <                 pi[Y] = ((i==7) || (i==3) ? ctr[Y] : (i==1 ? minR[Y] : maxR[Y]));
+  <               }
+
+  >           { /* Corner number {i}: */
+  >             pi[X] = ((i == 0) || (i == 3) ? minR[X] : maxR[X]);
+  >             pi[Y] = ((i == 0) || (i == 1) ? minR[Y] : maxR[Y]);
+
+  --- 327,332d271 -----------------------
+  <        
+  <         /* Pull sample point slightly inside the cell, for discntinuous splines: */
+  <         pi[X] = 0.9999999 * pi[X] + 0.0000001 * ctr[X];
+  <         pi[Y] = 0.9999999 * pi[Y] + 0.0000001 * ctr[Y];
+  <         
+  <         /* Evaluate function at sample point: */
+
+  --- 334d272 -----------------------
+  <         // DEBUG fprintf (stderr, "    f(%8.6f,%8.6f) = %10.6f\n", pi[X], pi[Y], fp[i]); 
+
+  --- 336,338d273 -----------------------
+  <     /* The center value: */
+  <     f->m->eval(f, ctr, &fp[NSAMPLES]);
+  <     // DEBUG fprintf (stderr, "    f(%8.6f,%8.6f) = %10.6f\n", ctr[X], ctr[Y], fp[NSAMPLES]); 
+
+  --- 340c275 -----------------------
+  <     /* Find min and max among those sampled values: */
+
+  >     /* Find min and max among those 5 values: */
+
+  --- 342c277 -----------------------
+  <     for(i = 1; i < NSAMPLES+1; i++)
+
+  >     for(i = 1; i < 5; i++)
+
+  --- 352,353c287,292 -----------------------
+  <     kpMin = (int)(ceil(fpMin/fStep - 0.4999999));
+  <     kpMax = (int)(floor(fpMax/fStep - 0.5000001));
+
+  >     kpMin = (int)(ceil(fpMin/fStep + 0.4999999));
+  >     kpMax = (int)(floor(fpMin/fStep + 0.5000001));
+  >     
+  >     /* Restrict to specified isoline range: */
+  >     if (kpMin < kPlotMin) { kpMin = kPlotMin; }
+  >     if (kpMax > kPlotMax) { kpMax = kPlotMax; }
+
+  --- 356,366c295,299 -----------------------
+  <     if ((kpMin > kPlotMax) || (kpMax < kPlotMin) || (kpMin > kpMax))
+  <       { /* No. */
+  <         if (layer == 0)
+  <           { /* Paint whole rectangle with uniform color. */
+  <             Color *cBand;
+  <             int kBand = kpMin;
+  <             if (kpMin > kPlotMax) { kBand = kPlotMax + 1; }
+  <             if (kpMax < kPlotMin) { kBand = kPlotMin; }
+  <             cBand = &(bandColor[kBand - kPlotMin]);
+  <             SO2DPlot_PaintRectangle(psf, minR, maxR, cBand);
+  <           }
+
+  >     if (kpMin > kpMax)
+  >       { /* No, paint whole rectangle with uniform color: */
+  >         int kBand = (kpMax < kPlotMin ? kPlotMin : kPlotMax + 1); /* Upper isoline. */
+  >         Color *cBand = &(bandColor[kBand - kPlotMin]);
+  >         SO2DPlot_PaintRectangle(psf, minR, maxR, cBand);
+
+  --- 370,374c303,308 -----------------------
+  <         for (i = 0; i < NSAMPLES; i++)
+  <           { int j = (i + 1) % NSAMPLES;
+  <             double *pi = &(p[2*i]);
+  <             double *pj = &(p[2*j]);
+  <             SO2DPlot_ValuesInTriangle
+
+  >         double *ctr = &(pRel[4*2]);
+  >         for (i = 0; i < 4; i++)
+  >           { int j = (i + 1) % 4;
+  >             double *pi = &(pRel[2*i]);
+  >             double *pj = &(pRel[2*j]);
+  >             SO2DPlot_IsolinesInTriangle
+
+  --- 376c310 -----------------------
+  <                 ctr[X], ctr[Y], fp[NSAMPLES],
+
+  >                 ctr[X], ctr[Y], fp[4],
+
+  --- 384,385d317 -----------------------
+  < 
+  <     // DEBUG fprintf (stderr, "-InRectangle\n"); 
+
+  --- 388,389c320,321 -----------------------
+  < void SO2DPlot_ValuesInTriangle
+  <   ( SOPlot_File *psf,   /* Plot file. */
+
+  > void SO2DPlot_IsolinesInTriangle
+  >   ( SOPlot_File *psf,   /* Descriptor of Postscript file. */
+
+  --- 402,403d333 -----------------------
+  <     // DEBUG fprintf (stderr, "+InTriangle\n"); 
+  < 
+
+  --- 412,414c342,344 -----------------------
+  <       { temp = Qx; Qx = Rx; Rx = temp;
+  <         temp = Qy; Qy = Ry; Ry = temp;
+  <         temp = Qf; Qf = Rf; Rf = temp; 
+
+  >       { temp= Qx; Qx = Rx; Rx = temp;
+  >         temp= Qy; Qy = Ry; Ry = temp;
+  >         temp= Qf; Qf = Rf; Rf = temp; 
+
+  --- 426,427c356,357 -----------------------
+  <     kMin = (int)(ceil(Pf/fStep - 0.4999999));
+  <     kMax = (int)(floor(Rf/fStep - 0.5000001));
+
+  >     kMin = (int)(ceil(Pf/fStep + 0.4999999));
+  >     kMax = (int)(floor(Rf/fStep + 0.5000001));
+
+  --- 429c359,361 -----------------------
+  <     // DEBUG fprintf(stderr, "  Pf = %10.8f  kMin = %d  Rf = %10.8f  kMax = %d\n", Pf, kMin, Rf, kMax); 
+
+  >     /* Restrict to specified isoline range: */
+  >     if (kMin < kPlotMin) { kMin = kPlotMin; }
+  >     if (kMax > kPlotMax) { kMax = kPlotMax; }
+
+  --- 431,443c363,369 -----------------------
+  <     /* Do any isolines enter the triangle? */
+  <     if ((kMin > kPlotMax) || (kMax < kPlotMin) || (kMin > kMax))
+  <       { /* No. */
+  <         // DEBUG fprintf(stderr, "  kPlotMin = %d  kPlotMax = %d\n", kPlotMin, kPlotMax);
+  <         if (layer == 0)
+  <           { /* Paint whole triangle with color: */
+  <             Color *cBand;
+  <             int kBand = kMin;
+  <             if (kMin > kPlotMax) { kBand = kPlotMax + 1; }
+  <             if (kMax < kPlotMin) { kBand = kPlotMin; }
+  <             cBand = &(bandColor[kBand - kPlotMin]);
+  <             SO2DPlot_PaintTriangle(psf, Px, Py, Qx, Qy, Rx, Ry, cBand);
+  <           }
+
+  >     /* Do any isolines enter the rectangle? */
+  >     if (kMin > kMax)
+  >       { /* No, paint whole triangle with uniform color. */
+  >         /* Determine index of upper isoline: */
+  >         Isoline kBand = (kMax < kPlotMin ? kPlotMin : kPlotMax + 1); 
+  >         Color *cBand = &(bandColor[kBand - kPlotMin]);
+  >         SO2DPlot_PaintTriangle(psf, Px, Py, Qx, Qy, Rx, Ry, cBand);
+
+  --- 453,456d378 -----------------------
+  <         /* Restrict to specified isoline range: */
+  <         if (kMin < kPlotMin) { kMin = kPlotMin; }
+  <         if (kMax > kPlotMax) { kMax = kPlotMax; }
+  < 
+
+  --- 474,475d395 -----------------------
+  <             // DEBUG fprintf(stderr, "    k = %d  Hf = %10.6f\n", k, Hf);
+  < 
+
+  --- 499c419 -----------------------
+  <             if (layer == 1)
+
+  >             if (layer == 0)
+
+  --- 541,544d460 -----------------------
+  < 
+  <             LUx = HUx; LUy = HUy;
+  <             LVx = HVx; LVy = HVy;
+  <             Lf = Hf; Lsame = Hsame;
+
+  --- 547,554d462 -----------------------
+  < 
+  <     // ps_set_pen(psf, 0.0, 0.0, 0.0, 0.10, 0.0,0.0);
+  <     // ps_draw_segment(psf, Px, Py*YSCALE, Qx, Qy*YSCALE);
+  <     // ps_draw_segment(psf, Qx, Qy*YSCALE, Rx, Ry*YSCALE);
+  <     // ps_draw_segment(psf, Rx, Ry*YSCALE, Px, Py*YSCALE);
+  < 
+  <     // DEBUG fprintf (stderr, "-InTriangle\n"); 
+  < 
+
+  --- 598c506 -----------------------
+  <       { ps_set_pen(psf, R, G, B, isolineWidth, 0.0,0.0);
+
+  >       { ps_set_pen(psf, R, G, B, ISOLINE_WIDTH, 0.0,0.0);
+
+  --- 625c533 -----------------------
+  <             double s = ((double)k)/((double)kPlotMax);
+
+  >             double s = ((double)(k-1))/((double)kPlotMax);
+
+  --- 633,695d540 -----------------------
+  < void SO2DPlot_Tree(
+  <   SOPlot_File *psf,   /* Plot file. */
+  <     SOGrid_Tree *tree,  /* The grid to plot. */
+  <     double minR[2],     /* Low corner of region to plot. */
+  <     double maxR[2],     /* High corner of region to plot. */
+  <     double lineWidth,   /* Line width for grid cell boundaries. */
+  <     int maxDepth        /* Omit cells below this depth. */
+  <   )
+  <   {
+  <     ps_set_pen(psf, 0.0, 0.0, 0.0, lineWidth, 0.0, 0.0);
+  <     ps_draw_rectangle(psf, minR[X], maxR[X], YSCALE*minR[Y], YSCALE*maxR[Y]);
+  <     if (tree == NULL) { return; }
+  <     assert(tree->d == 2, "wrong tree dimension");
+  <     SO2DPlot_Subtree(psf, tree->root, 1, 0, minR, maxR, maxDepth);
+  <   }
+  <   
+  < void SO2DPlot_Subtree
+  <   ( FILE *psf, 
+  <     SOGrid_Node *p, 
+  <     SOGrid_Index k,
+  <     SOGrid_Rank rank,
+  <     double minR[2],
+  <     double maxR[2],
+  <     int maxDepth
+  <   )
+  <   {
+  <     double minC[2], maxC[2];
+  < 
+  <     /* Ignore cells at levels below {maxDepth}: */
+  <     if (rank >= maxDepth) { return; } 
+  < 
+  <     /* If cell is childless, there is nothing to do: */
+  <     if ((p == NULL) || ((p->c[0] == NULL) && (p->c[1] == NULL))) { return; }
+  < 
+  <     SOGrid_cell_coords(k, rank, 2, minC, maxC);
+  < 
+  <     /* Skip plot if cell lies outside the region of interest: */
+  <     if ((minC[X] >= maxR[X]) || (maxC[X] <= minR[X])) { return; }
+  <     if ((minC[Y] >= maxR[Y]) || (maxC[Y] <= minR[Y])) { return; }
+  < 
+  <     // ps_fill_dot(psf, (minC[X]+maxC[X])/2, (minC[Y]+maxC[Y])/2, 0.5, 0, 0, 0);
+  < 
+  <     /* Draw the interior of daughter cells first: */
+  <     SO2DPlot_Subtree(psf, p->c[0], 2*k, rank + 1,   minR, maxR, maxDepth);
+  <     SO2DPlot_Subtree(psf, p->c[1], 2*k+1, rank + 1, minR, maxR, maxDepth);
+  < 
+  <     /* Now draw the boundary between the two daughter cells: */
+  <     if ((rank % 2) == 0)
+  <       { /* Longest axis is {X}: */
+  <         double xMid = (minC[X]+maxC[X])/2;
+  <         double yMin = YSCALE * (minC[Y] < minR[Y] ? minR[Y] : minC[Y]);
+  <         double yMax = YSCALE * (maxC[Y] > maxR[Y] ? maxR[Y] : maxC[Y]);
+  <         ps_draw_segment(psf, xMid, yMin, xMid, yMax);
+  <       }
+  <     else
+  <       { /* Longest axis is {Y}: */
+  <         double yMid = YSCALE * (minC[Y]+maxC[Y])/2;
+  <         double xMin = (minC[X] < minR[X] ? minR[X] : minC[X]);
+  <         double xMax = (maxC[X] > maxR[X] ? maxR[X] : maxC[X]);
+  <         ps_draw_segment(psf, xMin, yMid, xMax, yMid);
+  <       }
+  <   }
+  < 
+
+  --- 697c542 -----------------------
+  <   ( SOPlot_File *psf,          /* Plot file (or NULL). */
+
+  >   ( SOPlot_File *psf,          /* Postscript file (or NULL). */
+
+  --- 702,710d546 -----------------------
+  <     double fPlotMin,           /* Nominal minimum {f} value, for color scale. */
+  <     double fPlotMax,           /* Nominal maximum {f} value, for color scale. */
+  <     double fStep,              /* Value step for isolines and color bands. */
+  <     double isolineWidth,       /* Line width for isoline plotting. */
+  <     double gridWidth,          /* Line width for grid drawing. */
+  <     int meshDepth,             /* Depth of bisection recursion for plotting. */
+  <     bool bands,                /* TRUE plots color bands. */ 
+  <     bool isolines,             /* TRUE draws isolines. */ 
+  <     bool grid,                 /* TRUE plots the tree */
+
+  --- 711a548 -----------------------
+  >     PlotOptions *plt,          /* Plotting parameters. */
+
+  --- 718,721c555,559 -----------------------
+  <     int maxDepthIsoline = meshDepth;
+  <     int minDepthIsoline = meshDepth - 6;
+  <     int extraDepthIsoline = 2;
+  <     int maxDepthTree = meshDepth - 2;
+
+  >     int meshDepth = (int)ceil(2*log(plt->figSize/plt->meshSize)/log(2));
+  >     int maxIsolineDepth = meshDepth;
+  >     int minIsolineDepth = meshDepth - 6;
+  >     int extraIsolineDepth = 2;
+  >     int maxTreeDepth = meshDepth - 2;
+
+  --- 727,728c565,566 -----------------------
+  <     if (isolines || bands) 
+  <       { SO2DPlot_Values
+
+  >     if (! (plt->noBands && plt->noIsolines)) 
+  >       { SO2DPlot_Isolines
+
+  --- 730,732c568,570 -----------------------
+  <             fPlotMin, fPlotMax, fStep, isolineWidth,
+  <             minDepthIsoline, extraDepthIsoline, maxDepthIsoline,
+  <             bands, isolines,
+
+  >             -(plt->fRange), (plt->fRange), plt->fStep,
+  >             minIsolineDepth, extraIsolineDepth, maxIsolineDepth,
+  >             plt->noBands, plt->noIsolines,
+
+  --- 736,737c574,575 -----------------------
+  <     if (grid && (tree != NULL))
+  <       { SO2DPlot_Tree(psf, tree, minR, maxR, gridWidth, maxDepthTree); }
+
+  >     if ((tree != NULL) && (! plt->noGrid))
+  >       { SO2DPlot_Tree(psf, tree, minR, maxR, maxTreeDepth); }
+
+  --- 741,742c579,580 -----------------------
+  < /* Limits to avoid excessive plotting for bad choices of {fStep}: */
+  < /* Should make them consistent with internal limits of {SO2DPlot_Values}. */
+
+  > /* Limits to avoid excessive plotting for bad choices of {plt->fStep}: */
+  > /* Should make them consistent with internal limits of {SO2DPlot_Isolines}. */
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SO2DPlot.c.save
+
+==========================================
+diff -r progs/SO2DPlot.h /home/simoleo/ra014852/projeto/programs/SO2DPlot.h
+
+  --- 2c2 -----------------------
+  < /* Last edited on 2003-07-08 13:36:06 by stolfi */
+
+  > /* Last edited on 2003-07-05 22:35:22 by ra014852 */
+
+  --- 10a11 -----------------------
+  > #include <SOPlotParams.h>
+
+  --- 16,17c17,18 -----------------------
+  < void SO2DPlot_Values
+  <   ( SOPlot_File *psf,   /* Plot file. */
+
+  > void SO2DPlot_Isolines
+  >   ( SOPlot_File *psf,   /* Descriptor of Postscript file. */
+
+  --- 19c20 -----------------------
+  <     SOGrid_Tree *tree,  /* Reference grid for adaptive domain subdivision. */ 
+
+  >     SOGrid_Tree *tree,  /* Reference grid for domain subdivision. */ 
+
+  --- 25d25 -----------------------
+  <     double lineWidth,   /* Line width for isoline plotting. */
+
+  --- 30c30 -----------------------
+  <     bool isolines,      /* TRUE draws the isolines, FALSE omits them. */ 
+
+  >     bool lines,         /* TRUE draws the isolines, FALSE omits them. */ 
+
+  --- 70,75c70,74 -----------------------
+  <   ( SOPlot_File *psf,   /* Plot file. */
+  <     SOGrid_Tree *tree,  /* The grid to plot. */
+  <     double minR[2],     /* Low corner of region to plot. */
+  <     double maxR[2],     /* High corner of region to plot. */
+  <     double lineWidth,   /* Line width for grid cell boundaries. */
+  <     int maxDepth        /* Omit cells below this depth. */
+
+  >   ( SOPlot_File *psf, 
+  >     SOGrid_Tree *tree, 
+  >     double minR[2],
+  >     double maxR[2],
+  >     int maxDepth
+
+  --- 83c82 -----------------------
+  <   ( SOPlot_File *fps,          /* Plot file (or NULL). */
+
+  >   ( SOPlot_File *fps,          /* Postscript file (or NULL). */
+
+  --- 88,96d86 -----------------------
+  <     double fPlotMin,           /* Nominal minimum {f} value, for color scale. */
+  <     double fPlotMax,           /* Nominal maximum {f} value, for color scale. */
+  <     double fStep,              /* Value step for isolines and color bands. */
+  <     double isolineWidth,       /* Line width for isoline plotting. */
+  <     double gridWidth,          /* Line width for grid drawing. */
+  <     int meshDepth,             /* Depth of bisection recursion for plotting. */
+  <     bool bands,                /* TRUE plots color bands. */ 
+  <     bool isolines,             /* TRUE draws isolines. */ 
+  <     bool grid,                 /* TRUE plots the tree */
+
+  --- 97a88 -----------------------
+  >     PlotOptions *plt,          /* Plotting parameters. */
+
+  --- 106c97 -----------------------
+  <     {f} in that figure with {SO2DPlot_Values} and {SO2DPlot_Tree}. */
+
+  >     {f} in that figure with {SO2DPlot_Isolines}. */
+
+==========================================
+Binary files progs/SO2DPlot.ho and /home/simoleo/ra014852/projeto/programs/SO2DPlot.ho differ
+
+==========================================
+Binary files progs/SO2DPlot.o and /home/simoleo/ra014852/projeto/programs/SO2DPlot.o differ
+
+==========================================
+diff -r progs/SOApprox.c /home/simoleo/ra014852/projeto/programs/SOApprox.c
+
+  --- 2c2 -----------------------
+  < /* Last edited on 2003-07-08 12:49:09 by stolfi */
+
+  > /* Last edited on 2003-07-04 22:03:28 by ra014852 */
+
+  --- 5,8d4 -----------------------
+  < 
+  < #include <SOBasic.h>
+  < #include <SOGrid.h>
+  < #include <SOFunction.h>
+
+  --- 10c6 -----------------------
+  < #include <SOBasisMatrices.h>
+
+  > #include <SOFunction.h>
+
+  --- 12,13c8,14 -----------------------
+  < #include <SOPlotParams.h>
+  < #include <SO2DPlot.h>
+
+  > #include <SOBasisMatrices.h>
+  > #include <SOGrid.h>
+  > #include <SOBasic.h>
+  > 
+  > //#include <SOSpline.h>
+  > //#include <SORange.h>
+  > 
+
+  --- 14a16,17 -----------------------
+  > #include <SO2DPlot.h>
+  > #include <SOPlotParams.h>
+
+  --- 21d23 -----------------------
+  < #include <string.h>
+
+  --- 25,35d26 -----------------------
+  < SOGrid_Tree *SOApprox_ReadTree(char *fileName)
+  <   { if (strcmp(fileName, "") == 0)
+  <       { return NULL; }
+  <     else
+  <       { FILE *rd = (strcmp(fileName, "-") != 0 ? open_read(fileName) : stdin);
+  <         SOGrid_Tree * tree = SOGrid_Tree_read(rd);
+  <         if (rd != stdin) { fclose(rd); }
+  <         return tree;
+  <       }
+  <   } 
+  < 
+
+  --- 37,44c28,31 -----------------------
+  <   { if (strcmp(fileName, "") == 0)
+  <       { return NULL; }
+  <     else
+  <       { FILE *rd = (strcmp(fileName, "-") != 0 ? open_read(fileName) : stdin);
+  <         SOFunction *f = SOFunction_Read(rd);
+  <         if (rd != stdin) { fclose(rd); }
+  <         return f;
+  <       }
+
+  >   { FILE *rd = open_read(fileName);
+  >     SOFunction *f = SOFunction_Read(rd);
+  >     fclose(rd);
+  >     return f;
+
+  --- 48c35 -----------------------
+  <   { FILE *rd = (strcmp(fileName, "-") != 0 ? open_read(fileName) : stdin);
+
+  >   { FILE *rd = open_read(fileName);
+
+  --- 50c37 -----------------------
+  <     if (rd != stdin) { fclose(rd); }
+
+  >     fclose(rd);
+
+  --- 55c42 -----------------------
+  <   { FILE *rd = (strcmp(fileName, "-") != 0 ? open_read(fileName) : stdin);
+
+  >   { FILE *rd = open_read(fileName);
+
+  --- 57c44 -----------------------
+  <     if (rd != stdin) { fclose(rd); }
+
+  >     fclose(rd);
+
+  --- 249c236 -----------------------
+  <     FILE *wr = open_write(txtcat(solName, "-app.fun"));
+
+  >     FILE *wr = open_write(txtcat(solName, "-app.sfn"));
+
+  --- 338a326 -----------------------
+  > /* Added on 2003-07-04 by stolfi */
+
+  --- 343,345c331,332 -----------------------
+  <     PlotOptions *plt,
+  <     double *fObsMin,    /* (IN/OUT) Min value seen during plot. */ 
+  <     double *fObsMax     /* (IN/OUT) Max value seen during plot. */ 
+
+  >     double fMax, 
+  >     PlotOptions *plt  //SOPlotParams *plt
+
+  --- 351d337 -----------------------
+  <     double minR[2], maxR[2];     /* Rectangle to plot. */
+
+  --- 354c340,344 -----------------------
+  <     int meshDepth = (int)ceil(2*log(plt->figSize/plt->meshSize)/log(2));
+
+  > 
+  >     /* Root-relative coordinates of the image. */
+  >     double min[2] = {0.0, 0.0}, max[2] = {1.0, 1.0};
+  >     double fObsMin = 0, fObsMax = fMax; 
+  > 
+
+  --- 360,362d349 -----------------------
+  <     minR[X] = 0.0;  maxR[X] = 1.0;
+  <     minR[Y] = 0.0;  maxR[Y] = 1.0;
+  <     /* Perhaps here we should fix the range according to {plt->autoRange}? */
+
+  --- 364,370c351,356 -----------------------
+  <       ( NULL, f, tree,   
+  <         minR, maxR, 
+  <         -plt->fRange, +plt->fRange, plt->fStep,
+  <         plt->isolineWidth, plt->gridWidth, meshDepth,
+  <         (! plt->noBands), (! plt->noIsolines), (! plt->noGrid), 
+  <         pgs, fName, fName,
+  <         fObsMin, fObsMax
+
+  >       ( NULL,
+  >         f, tree, 
+  >         min, max,
+  >         pgs, plt, 
+  >         fName, fName,   
+  >         &fObsMin, &fObsMax
+
+==========================================
+diff -r progs/SOApprox.h /home/simoleo/ra014852/projeto/programs/SOApprox.h
+
+  --- 1,2c1,2 -----------------------
+  < /* SOApprox.h -- tools for function approximation. */
+  < /* Last edited on 2003-07-08 12:50:40 by stolfi */
+
+  > /* SOApprox.h -- tools for least-squares approximation */
+  > /* Last edited on 2003-07-05 21:12:34 by ra014852 */
+
+  --- 9d8 -----------------------
+  < #include <SOPlotParams.h>
+
+  --- 12,13c11 -----------------------
+  < 
+  < //#include <SOPlot.h>
+
+  > #include <SOPlotParams.h>
+
+  --- 18,34c16,19 -----------------------
+  < /* The procedures in this interface are mostly wrappers for procedures
+  <   in other interfaces, such as {SOMatrix.h}, {SOFunction.h}, with some
+  <   additional facilities for measuring, printing, and plotting the
+  <   approximation errors. */ 
+  <   
+  < /* READING THINGS FROM FILES */
+  < 
+  < /* The procedures in this section read some object from the file
+  <   {fileName}. The file name must include the extension; see {addext}
+  <   in {js.h}.
+  <   
+  <   If {fileName == "-"}, these procedures will read from {stdin}. They
+  <   fail with error if the file does not exist. Procedures that return
+  <   pointers will return NULL if {fileName == ""}. */
+  <   
+  < SOGrid_Tree *SOApprox_ReadTree(char *fileName);
+  <   /* Reads a dyadic grid. Returns NULL if {fileName == ""}. */
+
+  > /* These procedures are mostly wrappers for procedures in
+  >   other interfaces, such as {SOMatrix.h}, {SOFunction.h}, 
+  >   with some additional facilities for measuring, printing,
+  >   and plotting the approximation errors. */ 
+
+  --- 37c22 -----------------------
+  <   /* Reads a function. Returns NULL if {fileName == ""}. */
+
+  >   /* Reads a   function from the given file. Bombs if no such file.*/
+
+  --- 40c25 -----------------------
+  <   /* Reads a function basis.*/
+
+  >   /* Reads a   function basis from the given file. Bombs if no such file.*/
+
+  --- 43,45c28 -----------------------
+  <   /* Reads an {SOMatrix}. */
+  < 
+  < /* OBTAINING RIGIDITY MATRICES */
+
+  >   /* Reads an {SOMatrix} from file {fileName}. Bombs if no such file. */
+
+  --- 217c200 -----------------------
+  <     given {solName} extended with "-g.fun") and compares it
+
+  >     given {solName} extended with "-g.sfn") and compares it
+
+  --- 225,227c208,209 -----------------------
+  <     PlotOptions *plt,
+  <     double *fObsMin,    /* (IN/OUT) Min value seen during plot. */ 
+  <     double *fObsMax     /* (IN/OUT) Max value seen during plot. */ 
+
+  >     double fMax, 
+  >     PlotOptions *plt //  PlotParams *plt;
+
+  --- 231,233c213 -----------------------
+  <   Uses {SO2DPlot_FunctionFigure}. The parameters {} and {}
+  <   must be initialized by the client, and are updated with the 
+  <   maximum and minimum values of {f} found during the plot. */ 
+
+  >   Uses {SO2DPlot_FunctionFigure}. */ 
+
+==========================================
+Binary files progs/SOApprox.ho and /home/simoleo/ra014852/projeto/programs/SOApprox.ho differ
+
+==========================================
+Binary files progs/SOApprox.o and /home/simoleo/ra014852/projeto/programs/SOApprox.o differ
+
+==========================================
+Binary files progs/SOBasic.ho and /home/simoleo/ra014852/projeto/programs/SOBasic.ho differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOBasic.h~
+
+==========================================
+Binary files progs/SOBasic.o and /home/simoleo/ra014852/projeto/programs/SOBasic.o differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOBasisMatrices.c~
+
+==========================================
+Binary files progs/SOBasisMatrices.ho and /home/simoleo/ra014852/projeto/programs/SOBasisMatrices.ho differ
+
+==========================================
+Binary files progs/SOBasisMatrices.o and /home/simoleo/ra014852/projeto/programs/SOBasisMatrices.o differ
+
+==========================================
+diff -r progs/SOComputeApprox.c /home/simoleo/ra014852/projeto/programs/SOComputeApprox.c
+
+  --- 2c2 -----------------------
+  < /* Last edited on 2003-07-08 12:49:26 by stolfi */
+
+  > /* Last edited on 2003-07-05 21:12:48 by ra014852 */
+
+  --- 44c44 -----------------------
+  <   { char *funcName;       /* Filename of function to approximate (minus ".fun"). */
+
+  >   { char *funcName;       /* Filename of function to approximate (minus ".sfn"). */
+
+  --- 148,150c148,150 -----------------------
+  <       SOApprox_PlotFunction(f, txtcat(o->outName, "-sol"), fPlotMax, o->plt);
+  <       SOApprox_PlotFunction(g, txtcat(o->outName, "-apr"), fPlotMax, o->plt);
+  <       SOApprox_PlotFunction(e, txtcat(o->outName, "-err"), ePlotMax, o->plt);
+
+  >       SOApprox_PlotFunction(f, tree, txtcat(o->outName, "-sol"), fPlotMax, o->plt);
+  >       SOApprox_PlotFunction(g, tree, txtcat(o->outName, "-apr"), fPlotMax, o->plt);
+  >       SOApprox_PlotFunction(e, tree, txtcat(o->outName, "-err"), ePlotMax, o->plt);
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOComputeApprox.o
+
+==========================================
+diff -r progs/SOComputeErrorMap.c /home/simoleo/ra014852/projeto/programs/SOComputeErrorMap.c
+
+  --- 2c2 -----------------------
+  < /* Last edited on 2003-07-08 13:46:19 by stolfi */
+
+  > /* Last edited on 2003-07-03 19:57:26 by ra014852 */
+
+  --- 136,140c136,143 -----------------------
+  <     
+  <     !!! Deve usar SOApprox_PlotFunction, é mais fácil
+  <     plot_file := SO2DPlot_FunctionFigure(e, plot_file, min, max, tree, -1, 6, MAX_PLOT_STEPS,0, MAX_PLOT_DEPTH);
+  <     
+  <     if ()
+
+  >     SO2DPlot_Begin_Figure( plot_file, min, max );    
+  >  
+  >     SO2DPlot_Isolines(e, plot_file, tree, -1, 6, MAX_PLOT_STEPS,0);
+  >  
+  >     SO2DPlot_Plot_Tree( plot_file, tree, min, max, MAX_PLOT_DEPTH );
+  > 
+  >     SO2DPlot_End_Figure(plot_file);
+  >      
+
+==========================================
+diff -r progs/SOComputeErrorMap.c~ /home/simoleo/ra014852/projeto/programs/SOComputeErrorMap.c~
+
+  --- 2c2 -----------------------
+  < /* Last edited on 2003-07-03 19:57:26 by ra014852 */
+
+  > /* Last edited on 2003-05-07 18:35:47 by ra014852 */
+
+  --- 126,128c126,127 -----------------------
+  <     SOFunction *e = (SOFunction *)SOErrorFunction_Make(
+  <       m, n, "testbas.bas", "appbas.bas", testbas, appbas, weight
+  <     );
+
+  >     SOErrorFunction *e = SOErrorFunction_Make
+  >                        ( m, n, "testbas.bas", "appbas.bas", testbas, appbas, weight);
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOComputeErrorMap.o
+
+==========================================
+Binary files progs/SOComputeMatrices and /home/simoleo/ra014852/projeto/programs/SOComputeMatrices differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOComputeMatrices.c~
+
+==========================================
+Binary files progs/SOComputeMatrices.o and /home/simoleo/ra014852/projeto/programs/SOComputeMatrices.o differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOErrorFunction.c~
+
+==========================================
+Binary files progs/SOErrorFunction.ho and /home/simoleo/ra014852/projeto/programs/SOErrorFunction.ho differ
+
+==========================================
+Binary files progs/SOErrorFunction.o and /home/simoleo/ra014852/projeto/programs/SOErrorFunction.o differ
+
+==========================================
+diff -r progs/SOExtractBasis.c /home/simoleo/ra014852/projeto/programs/SOExtractBasis.c
+
+  --- 2c2 -----------------------
+  < /* Last edited on 2003-07-08 12:49:57 by stolfi */
+
+  > /* Last edited on 2002-12-29 19:58:24 by anamaria */
+
+  --- 40c40 -----------------------
+  <   /* Writes function {f} to the file {name} plus extension ".fun". */
+
+  >   /* Writes function {f} to the file {name} plus extension ".sfn". */
+
+  --- 108c108 -----------------------
+  <   { FILE *wr = open_write(txtcat(name, ".fun"));
+
+  >   { FILE *wr = open_write(txtcat(name, ".sfn"));
+
+==========================================
+Only in progs: SOExtractBasis.c~
+
+==========================================
+Binary files progs/SOFindTentBasis and /home/simoleo/ra014852/projeto/programs/SOFindTentBasis differ
+
+==========================================
+Binary files progs/SOFindTentBasis.o and /home/simoleo/ra014852/projeto/programs/SOFindTentBasis.o differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOFuncMap.c~
+
+==========================================
+Binary files progs/SOFuncMap.ho and /home/simoleo/ra014852/projeto/programs/SOFuncMap.ho differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOFuncMap.h~
+
+==========================================
+Binary files progs/SOFuncMap.o and /home/simoleo/ra014852/projeto/programs/SOFuncMap.o differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOFunction.c~
+
+==========================================
+Binary files progs/SOFunction.ho and /home/simoleo/ra014852/projeto/programs/SOFunction.ho differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOFunction.h~
+
+==========================================
+Binary files progs/SOFunction.o and /home/simoleo/ra014852/projeto/programs/SOFunction.o differ
+
+==========================================
+diff -r progs/SOGrid.c /home/simoleo/ra014852/projeto/programs/SOGrid.c
+
+  --- 2c2 -----------------------
+  < /* Last edited on 2003-07-08 00:22:35 by stolfi */
+
+  > /* Last edited on 2003-05-07 17:58:34 by ra014852 */
+
+  --- 175d174 -----------------------
+  <       int ax = (r+d+j-1)%d; /* The {+d} is needed if {r == 0}. */
+
+  --- 177,178c176,178 -----------------------
+  <       min[ax] = (double)jindex * jwidth; 
+  <       max[ax] = min[ax] + jwidth;     
+
+  >       //      min[j] = (double)jindex * jwidth; max[j] = min[j] + jwidth;     
+  >       min[(r+j-1)%d] = (double)jindex * jwidth; 
+  >       max[(r+j-1)%d] = min[(r+j-1)%d] + jwidth;     
+
+==========================================
+Only in progs: SOGrid.c~
+
+==========================================
+Binary files progs/SOGrid.ho and /home/simoleo/ra014852/projeto/programs/SOGrid.ho differ
+
+==========================================
+Binary files progs/SOGrid.o and /home/simoleo/ra014852/projeto/programs/SOGrid.o differ
+
+==========================================
+Binary files progs/SOIntegral.ho and /home/simoleo/ra014852/projeto/programs/SOIntegral.ho differ
+
+==========================================
+Binary files progs/SOIntegral.o and /home/simoleo/ra014852/projeto/programs/SOIntegral.o differ
+
+==========================================
+Binary files progs/SOLinCombFunction.ho and /home/simoleo/ra014852/projeto/programs/SOLinCombFunction.ho differ
+
+==========================================
+Binary files progs/SOLinCombFunction.o and /home/simoleo/ra014852/projeto/programs/SOLinCombFunction.o differ
+
+==========================================
+Binary files progs/SOMakeGrid and /home/simoleo/ra014852/projeto/programs/SOMakeGrid differ
+
+==========================================
+Binary files progs/SOMakeGrid.o and /home/simoleo/ra014852/projeto/programs/SOMakeGrid.o differ
+
+==========================================
+Only in progs: SOMakeProcFunction
+
+==========================================
+Only in progs: SOMakeProcFunction.c
+
+==========================================
+Only in progs: SOMakeProcFunction.c~
+
+==========================================
+Only in progs: SOMakeProcFunction.o
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOMakeWaveBasis.c~
+
+==========================================
+Binary files progs/SOMakeWaveBasis.o and /home/simoleo/ra014852/projeto/programs/SOMakeWaveBasis.o differ
+
+==========================================
+Binary files progs/SOMatrix.ho and /home/simoleo/ra014852/projeto/programs/SOMatrix.ho differ
+
+==========================================
+Binary files progs/SOMatrix.o and /home/simoleo/ra014852/projeto/programs/SOMatrix.o differ
+
+==========================================
+Binary files progs/SOParams.ho and /home/simoleo/ra014852/projeto/programs/SOParams.ho differ
+
+==========================================
+Binary files progs/SOParams.o and /home/simoleo/ra014852/projeto/programs/SOParams.o differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOPlot.c~
+
+==========================================
+Binary files progs/SOPlot.ho and /home/simoleo/ra014852/projeto/programs/SOPlot.ho differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOPlot.h~
+
+==========================================
+Binary files progs/SOPlot.o and /home/simoleo/ra014852/projeto/programs/SOPlot.o differ
+
+==========================================
+Only in progs: SOPlotFunction
+
+==========================================
+diff -r progs/SOPlotFunction.c /home/simoleo/ra014852/projeto/programs/SOPlotFunction.c
+
+  --- 2c2 -----------------------
+  < /* Last edited on 2003-07-08 12:50:23 by stolfi */
+
+  > /* Last edited on 2003-07-04 19:05:57 by ra014852 */
+
+  --- 7a8,10 -----------------------
+  >     
+  >     
+  > ???
+
+  --- 11c14 -----------------------
+  < #include <SOIntegral.h>
+
+  > #include <SOApprox.h>
+
+  --- 13d15 -----------------------
+  < #include <SOPlotParams.h>
+
+  --- 16d17 -----------------------
+  < #include <SOApprox.h>
+
+  --- 32,34c33,35 -----------------------
+  <   { char *funcName;   /* Filename of function to approximate (minus ".fun"). */
+  <     char *treeName;   /* Filename of grid tree (minus ".tree"), or "". */
+  <     char *outName;    /* Prefix for output file names. */
+
+  >   { char *funcName;       /* Filename of function to approximate (minus ".sfn"). */
+  >     char *treeName;       /* Filename of grid tree (minus ".tree"), or "". */
+  >     char *outName;        /* Prefix for output file names. */
+
+  --- 36c37 -----------------------
+  <     PlotOptions plt;  /* Plot format and style options. */
+
+  >     //    PlotOptions plt;      /* Plot format and style options. */
+
+  --- 40c41 -----------------------
+  < SOGrid_Tree *ReadTree(char *treeName);
+
+  > SOTree *ReadTree(char *treeName);
+
+  --- 45,46c46,59 -----------------------
+  <     SOFunction *f = SOApprox_ReadFunction(addext(o->funcName, ".fun")); 
+  <     SOGrid_Tree *tree = SOApprox_ReadTree(addext(o->treeName, ".tree"));
+
+  >     SOFunction *f = SOApprox_ReadFunction(txtcat(o->funcName, ".fun")); 
+  >     SOGrid_Tree *tree = ReadTree(o->treeName);
+  > 
+  >     int m = f->d->pDim;
+  >     int n = f->d->fDim;
+  >    
+  >     double fMax[n], eMax[n];
+  >     
+  >     /* Initial values for 2D plotting */
+  >     double min[2], max[2];
+  >     FILE *psf = open_write(txtcat(o->outName, ".eps"));
+  > 
+  >     min[X] = 0.0; max[X] = 1.0;
+  >     min[Y] = 0.0; max[Y] = (double)sqrt(2.0)/2;
+
+  --- 48d60 -----------------------
+  <     double fMin = MAXDOUBLE, fMax = -MAXDOUBLE;
+
+  --- 50,51c62 -----------------------
+  <     assert(f->d->pDim == 2, "function domain must be two-dimensional");
+  <     assert(f->d->fDim == 1, "function must return scalar result");
+
+  >     assert(n == 1, "function must return scalar result");
+
+  --- 55c66,73 -----------------------
+  <     SOApprox_PlotFunction(f, tree, o->outName, &(o->plt), &fMin, &fMax);
+
+  >     SO2DPlot_Begin_Figure( psf, min, max );    
+  > 
+  >     SO2DPlot_Isolines( f, psf, tree, -1.0, 1.0, MAX_PLOT_STEPS, 0);
+  > 
+  >     if (tree != NULL)
+  >       { SO2DPlot_Plot_Tree( psf, tree, min, max, MAX_PLOT_DEPTH ); }
+  > 
+  >     SO2DPlot_End_Figure(psf);
+
+  --- 57,60d74 -----------------------
+  <     fprintf(stderr, "observed function extrema:");
+  <     fprintf(stderr, " min = %16.12f max = %16.12f\n", fMin, fMax);
+  <     fprintf(stderr, "\n");
+  <     
+
+  --- 63a78,85 -----------------------
+  > SOTree *ReadTree(char *treeName)
+  >   {
+  >     if (strcmp(treeName, "") != 0)
+  >       { return SOGrid_Tree_read(open_read(txtcat(treeName, ".tree"))); }
+  >     else
+  >       { return NULL; }
+  >   } 
+  > 
+
+  --- 75c97 -----------------------
+  <     PPUSAGE(pp, SOPlotParams_FunctionHelp " \n");
+
+  >     //    PPUSAGE(pp, SOPlotParams_FunctionHelp " \n");
+
+  --- 90c112 -----------------------
+  <     o->plt = SOPlotParams_FunctionParse(pp);
+
+  >     // o->plt = SOPlotParams_FunctionParse(pp);
+
+==========================================
+diff -r progs/SOPlotFunction.c~ /home/simoleo/ra014852/projeto/programs/SOPlotFunction.c~
+
+  --- 2c2 -----------------------
+  < /* Last edited on 2003-07-04 19:05:57 by ra014852 */
+
+  > /* Last edited on 2003-07-04 17:34:03 by ra014852 */
+
+  --- 9,11d8 -----------------------
+  <     
+  < ???
+  < 
+
+  --- 29a27 -----------------------
+  > #define MAX_PLOT_DEPTH 40
+
+  --- 41d38 -----------------------
+  < SOTree *ReadTree(char *treeName);
+
+  --- 44c41,42 -----------------------
+  <   { 
+
+  >   { SOGrid_Tree *tree;
+  >     SOFunction *w = (SOFunction *)NULL; 
+
+  --- 47d44 -----------------------
+  <     SOGrid_Tree *tree = ReadTree(o->treeName);
+
+  --- 52,53d48 -----------------------
+  <     double fMax[n], eMax[n];
+  <     
+
+  --- 56c51 -----------------------
+  <     FILE *psf = open_write(txtcat(o->outName, ".eps"));
+
+  >     FILE *plot_file = open_write(txtcat(o->outName, ".eps"));
+
+  --- 57a53,56 -----------------------
+  >     char *treeFile = txtcat(o->basisName, ".tree");
+  >     FILE *rd = open_read(treeFile);
+  >     
+  >     tree = SOGrid_Tree_read(rd);
+
+  --- 61a61,70 -----------------------
+  >     nat dim = bas.nel;
+  >     double_vec u = double_vec_new(n * dim);
+  >     double_vec b = double_vec_new(n * dim); // to receive <basis | f>, f's results on R^fDim
+  >     double_vec uj = double_vec_new(dim); // Column {j} of {u}.
+  >     double_vec bj = double_vec_new(dim); // Column {j} of {b}.
+  >     double_vec y = double_vec_new(dim);
+  >     /* double_vec v = double_vec_new(dim); */
+  >     
+  >     FuncMap NoMap = IdentityMap(n, m);
+  >     
+
+  --- 64,66c73 -----------------------
+  <     SOIntegral_GaussOrder = 6; 
+  < 
+  <     SO2DPlot_Begin_Figure( psf, min, max );    
+
+  >     SOIntegral_GaussOrder = o->gaussOrder; 
+
+  --- 68c75 -----------------------
+  <     SO2DPlot_Isolines( f, psf, tree, -1.0, 1.0, MAX_PLOT_STEPS, 0);
+
+  >     { int i; for (i = 0; i < b.nel; i++) { b.el[i] = 0.0; } } 
+
+  --- 70,73c77,130 -----------------------
+  <     if (tree != NULL)
+  <       { SO2DPlot_Plot_Tree( psf, tree, min, max, MAX_PLOT_DEPTH ); }
+  < 
+  <     SO2DPlot_End_Figure(psf);
+
+  >     SOApprox_ComputeRightHandSide(f, &NoMap, bas, w, tree, b, TRUE); 
+  >  
+  >     if (o->cholesky)
+  >       { 
+  >         SOMatrix GL = SOApprox_GetBasisMatrix(o->matName, TRUE);
+  >         SOApprox_CholeskySolve(GL, n, b, u, bj, uj, y, TRUE);
+  >       }
+  >     /* 
+  >     else if (o->conjGrad)
+  >       { SOMatrix G = SOApprox_GetBasisMatrix(o->matName, FALSE);
+  >         SOApprox_GuessSol(v);
+  >         SOApprox_ConjugateGradientSolve(G, b, v, u, bj, uj, TRUE);
+  >       }
+  >     else if (o->gaussSeidel)
+  >       { SOMatrix G = SOApprox_GetBasisMatrix(o->matName, FALSE);
+  >         SOApprox_GuessSol(v);
+  >         SOApprox_GaussSeidelSolve
+  >           ( G, b, 
+  >             o->omega, o->maxIter, o->absTol, o->relTol,
+  >             v, u, bj, uj, TRUE
+  >           );
+  >       }
+  >     */
+  >     else
+  >       { assert(FALSE , "unspecified/invalid solution method"); }
+  >     
+  >     /* Output final solution: */
+  >     { SOFunction *g = SOApprox_BuildFunction(bas, u, o->outName, basName, f);
+  >       double fMax[n], eMax[n];
+  >       SOApprox_PrintMaxErrorValues(f, g, fMax, eMax);
+  > 
+  >     /* 2D Plotting */
+  >       Basis error_bas = SOFunctionRef_vec_new(2);
+  >       double_vec errc = double_vec_new(2); errc.el[0] = 1; errc.el[1] = -1;
+  >       error_bas.el[0] = (SOFunction *)f; error_bas.el[1] = (SOFunction *)g;
+  >       SOFunction *errorf = 
+  >         (SOFunction *)SOLinCombFunction_Make(m, n,"Errorf.bas", error_bas, errc);
+  > 
+  >       SO2DPlot_Begin_Figure( plot_file, min, max );    
+  >       SO2DPlot_Begin_Figure( plot_file_approx, min, max );    
+  >       SO2DPlot_Begin_Figure( plot_file_error, min, max );    
+  >   
+  >       SO2DPlot_Isolines( f, plot_file, tree, -1.0, 1.0, MAX_PLOT_STEPS, 0);
+  >       SO2DPlot_Isolines( g, plot_file_approx, tree, -1.0, 1.0, MAX_PLOT_STEPS, 0);
+  >       SO2DPlot_Isolines( errorf, plot_file_error, tree, -0.04, 0.03, MAX_PLOT_STEPS, 0);
+  > 
+  >       SO2DPlot_Plot_Tree( plot_file, tree, min, max, MAX_PLOT_DEPTH );
+  >       SO2DPlot_Plot_Tree( plot_file_approx, tree, min, max, MAX_PLOT_DEPTH );
+  >       SO2DPlot_Plot_Tree( plot_file_error, tree, min, max, MAX_PLOT_DEPTH );
+  > 
+  >       SO2DPlot_End_Figure(plot_file);
+  >       SO2DPlot_End_Figure(plot_file_approx);
+  >       SO2DPlot_End_Figure(plot_file_error);
+  >     } 
+
+  --- 78,85d134 -----------------------
+  < SOTree *ReadTree(char *treeName)
+  <   {
+  <     if (strcmp(treeName, "") != 0)
+  <       { return SOGrid_Tree_read(open_read(txtcat(treeName, ".tree"))); }
+  <     else
+  <       { return NULL; }
+  <   } 
+  < 
+
+  --- 108a158,191 -----------------------
+  >                                                  
+  >     o->cholesky = SOParams_KeywordPresent(pp, "-cholesky");
+  >     o->gaussSeidel = SOParams_KeywordPresent(pp, "-gaussSeidel");
+  >     o->conjGrad = SOParams_KeywordPresent(pp, "-conjGrad");
+  >     if (! (o->cholesky || o->gaussSeidel || o->conjGrad))
+  >       { SOParams_Error(pp, "must specify a linear solution method"); }
+  >     else if ((o->cholesky + o->gaussSeidel + o->conjGrad) > 1)
+  >       { SOParams_Error(pp, "please specify only one linear solution method"); }
+  > 
+  >     if (o->gaussSeidel)
+  >       { 
+  >         if (SOParams_KeywordPresent(pp, "-omega"))
+  >           { o->omega = SOParams_GetNextDouble(pp, 0.0, MAXDOUBLE); }
+  >         else
+  >           { o->omega = 1.0; }
+  > 
+  >         if (SOParams_KeywordPresent(pp, "-maxIter"))
+  >           { o->maxIter = SOParams_GetNextInt(pp, 0, INT_MAX); }
+  >         else
+  >           { o->maxIter = 20; }
+  > 
+  >         if (SOParams_KeywordPresent(pp, "-absTol"))
+  >           { o->absTol = SOParams_GetNextDouble(pp, 0.0, MAXDOUBLE); }
+  >         else
+  >           { o->absTol = 0.0; }
+  > 
+  >         if (SOParams_KeywordPresent(pp, "-relTol"))
+  >           { o->relTol = SOParams_GetNextDouble(pp, 0.0, MAXDOUBLE); }
+  >         else
+  >           { o->relTol = 0.0; }
+  >       }
+  > 
+  >     SOParams_GetKeyword(pp, "-gaussOrder");
+  >     o->gaussOrder = SOParams_GetNextInt(pp, 1, INT_MAX);
+
+  --- 111a195 -----------------------
+  >     // o->plot = SOParams_KeywordPresent(pp, "-plot");
+
+==========================================
+Only in progs: SOPlotFunction.o
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOPlotParams.c~
+
+==========================================
+Binary files progs/SOPlotParams.ho and /home/simoleo/ra014852/projeto/programs/SOPlotParams.ho differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOPlotParams.h~
+
+==========================================
+Binary files progs/SOPlotParams.o and /home/simoleo/ra014852/projeto/programs/SOPlotParams.o differ
+
+==========================================
+diff -r progs/SOProcFunction.c /home/simoleo/ra014852/projeto/programs/SOProcFunction.c
+
+  --- 2c2 -----------------------
+  < /* Last edited on 2003-07-08 12:59:16 by stolfi */
+
+  > /* Last edited on 2003-07-04 19:05:40 by ra014852 */
+
+  --- 49,58d48 -----------------------
+  < /* SPECIFIC FUNCTIONS */
+  < 
+  < /* Unless said otherwise, these functions set all components of the
+  <   result vector to the same value.
+  <   
+  <   Unless said otherwise, the descriptions assume root-relative
+  <   coordinates (where the root cell is the square {[0 _ 1] × [0 _ 1]}.
+  <   A few functions use world-relative coordinates, where the root cell
+  <   has length {(1/2)^{i/d}} along axis {i}. */
+  < 
+
+  --- 61,62d50 -----------------------
+  < /* The constant "1" as a function. */
+  < 
+
+  --- 85,86d72 -----------------------
+  < /* A linear ramp in the {X} direction, with unit slope. */
+  < 
+
+  --- 109,110d94 -----------------------
+  < /* A linear ramp in the {Y} direction, with unit slope. */
+  < 
+
+  --- 131a116,117 -----------------------
+  >     
+  > /*** cubsum(p) **********************************/
+
+  --- 133c119,121 -----------------------
+  < /*** linz(p) **********************************/
+
+  > static char *CubsumDesc = "x^3 + y^3 + 6 * x + 6 * y";
+  > static char *CubsumType = "SOF.Proc.cubsum.";
+  > static SOProcFunction_Methods *CubsumMths = NULL;
+
+  --- 135c123,140 -----------------------
+  < /* A linear ramp in the {Z} direction, with unit slope. */
+
+  > void CubsumEval(T *f, double *p, double *fp);
+  > void CubsumGrad(T *f, double *p, double *dfp);
+  > void CubsumHess(T *f, double *p, double *ddfp);
+  > 
+  > void CubsumEval(T *f, double *p, double *fp)
+  >   { nat fDim = f->d->fn.fDim;
+  >     int i;
+  >     for (i = 0; i < fDim; i++) 
+  >       { fp[i] = (double) p[0]*p[0]*p[0] + (double) p[1]*p[1]*p[1]; }
+  >   }
+  >   
+  > void CubsumGrad(T *f, double *p, double *dfp)
+  >   { assert(FALSE, "not implemented yet"); }
+  > 
+  > void CubsumHess(T *f, double *p, double *ddfp)
+  >   { assert(FALSE, "not implemented yet"); }
+  > 
+  > /*** linz(p) **********************************/
+
+  --- 159,214d163 -----------------------
+  < /*** lind(p) **********************************/
+  < 
+  < /* A linear ramp in the (1,1) direction (world), with unit slope. */
+  < 
+  < static char *LindDesc = "(x/sqrt(2)+y/2)";
+  < static char *LindType = "SOF.Proc.lind.";
+  < static SOProcFunction_Methods *LindMths = NULL;
+  < 
+  < void LindEval(T *f, double *p, double *fp);
+  < void LindGrad(T *f, double *p, double *dfp);
+  < void LindHess(T *f, double *p, double *ddfp);
+  < 
+  < void LindEval(T *f, double *p, double *fp)
+  <   { nat pDim = f->d->fn.pDim;
+  <     nat fDim = f->d->fn.fDim;
+  <     assert(pDim >= 2, "domain dimension too small");
+  <     double x = p[0]; 
+  <     double y = p[1];
+  <     double d = (x*SQRTHALF + y*0.5);
+  <     int i;
+  <     for (i = 0; i < fDim; i++) { fp[i] = d; }
+  <   }
+  <   
+  < void LindGrad(T *f, double *p, double *dfp)
+  <   { assert(FALSE, "not implemented yet"); }
+  < 
+  < void LindHess(T *f, double *p, double *ddfp)
+  <   { assert(FALSE, "not implemented yet"); }
+  <     
+  < /*** cbsm(p) **********************************/
+  < 
+  < /* A cubic function of {x,y} for ODE testing */
+  < 
+  < static char *CbsmDesc = "x^3+y^3+6*x+6*y";
+  < static char *CbsmType = "SOF.Proc.cbsm.";
+  < static SOProcFunction_Methods *CbsmMths = NULL;
+  < 
+  < void CbsmEval(T *f, double *p, double *fp);
+  < void CbsmGrad(T *f, double *p, double *dfp);
+  < void CbsmHess(T *f, double *p, double *ddfp);
+  < 
+  < void CbsmEval(T *f, double *p, double *fp)
+  <   { nat pDim = f->d->fn.pDim;
+  <     nat fDim = f->d->fn.fDim;
+  <     int i;
+  <     assert(pDim >= 2, "domain dimension too small");
+  <     for (i = 0; i < fDim; i++) 
+  <       { fp[i] = (double) p[0]*p[0]*p[0] + (double) p[1]*p[1]*p[1]; }
+  <   }
+  <   
+  < void CbsmGrad(T *f, double *p, double *dfp)
+  <   { assert(FALSE, "not implemented yet"); }
+  < 
+  < void CbsmHess(T *f, double *p, double *ddfp)
+  <   { assert(FALSE, "not implemented yet"); }
+  <     
+
+  --- 217,218d165 -----------------------
+  < /* A parabolic ramp in the {X} direction. */
+  < 
+
+  --- 239,358c186 -----------------------
+  < /*** para(p) **********************************/
+  < 
+  < /* An isotropic paraboloid centered at {(1/2,1/2,...)}: */
+  < 
+  < static char *ParaDesc = "|p-CTR|^2";
+  < static char *ParaType = "SOF.Proc.para.";
+  < static SOProcFunction_Methods *ParaMths = NULL;
+  < 
+  < void ParaEval(T *f, double *p, double *fp);
+  < void ParaGrad(T *f, double *p, double *dfp);
+  < void ParaHess(T *f, double *p, double *ddfp);
+  < 
+  < void ParaEval(T *f, double *p, double *fp)
+  <   { nat pDim = f->d->fn.pDim;
+  <     nat fDim = f->d->fn.fDim;
+  <     int i;
+  <     double r2 = 0.0;
+  <     for (i = 0; i < pDim; i++) { double dxi = p[i] - 0.5; r2 += dxi*dxi; }
+  <     for (i = 0; i < fDim; i++) { fp[i] = r2; }
+  <   }
+  <   
+  < void ParaGrad(T *f, double *p, double *dfp)
+  <   { assert(FALSE, "not implemented yet"); } 
+  < 
+  < void ParaHess(T *f, double *p, double *ddfp)
+  <   { assert(FALSE, "not implemented yet"); }
+  < 
+  < /*** gaus(p) **********************************/
+  < 
+  < /* A unit-height Gaussian hump centered at {(1/2,1/2,...)}: */
+  < 
+  < #define GAUSS_SIGMA 0.20
+  < 
+  < static char *GausDesc = "exp(-|p-CTR|^2/SGM^2)";
+  < static char *GausType = "SOF.Proc.gaus.";
+  < static SOProcFunction_Methods *GausMths = NULL;
+  < 
+  < void GausEval(T *f, double *p, double *fp);
+  < void GausGrad(T *f, double *p, double *dfp);
+  < void GausHess(T *f, double *p, double *ddfp);
+  < 
+  < void GausEval(T *f, double *p, double *fp)
+  <   { nat pDim = f->d->fn.pDim;
+  <     nat fDim = f->d->fn.fDim;
+  <     int i;
+  <     double s2 = GAUSS_SIGMA*GAUSS_SIGMA;
+  <     double r2 = 0.0;
+  <     for (i = 0; i < pDim; i++) { double dxi = p[i] - 0.5; r2 += dxi*dxi; }
+  <     double e2 = r2/s2;
+  <     double ga = exp(-e2);
+  <     for (i = 0; i < fDim; i++) { fp[i] = ga; }
+  <   }
+  <   
+  < void GausGrad(T *f, double *p, double *dfp)
+  <   { assert(FALSE, "not implemented yet"); } 
+  < 
+  < void GausHess(T *f, double *p, double *ddfp)
+  <   { assert(FALSE, "not implemented yet"); }
+  < 
+  < /*** dgdx(p) **********************************/
+  < 
+  < /* The {x}-derivative of the Gaussian hump {gaus(p)}: */
+  < 
+  < static char *DgDxDesc = "-2*(x-0.5)/SGM^2*exp(-|p-CTR|^2/SGM^2)";
+  < static char *DgDxType = "SOF.Proc.dgdx.";
+  < static SOProcFunction_Methods *DgDxMths = NULL;
+  < 
+  < void DgDxEval(T *f, double *p, double *fp);
+  < void DgDxGrad(T *f, double *p, double *dfp);
+  < void DgDxHess(T *f, double *p, double *ddfp);
+  < 
+  < void DgDxEval(T *f, double *p, double *fp)
+  <   { nat pDim = f->d->fn.pDim;
+  <     nat fDim = f->d->fn.fDim;
+  <     int i;
+  <     double s2 = GAUSS_SIGMA*GAUSS_SIGMA;
+  <     double r2 = 0.0;
+  <     for (i = 0; i < pDim; i++) { double dxi = p[i] - 0.5; r2 += dxi*dxi; }
+  <     double e2 = r2/s2;
+  <     double dg = -2*(p[0]-0.5)*exp(-e2)/s2;
+  <     for (i = 0; i < fDim; i++) { fp[i] = dg; }
+  <   }
+  <   
+  < void DgDxGrad(T *f, double *p, double *dfp)
+  <   { assert(FALSE, "not implemented yet"); } 
+  < 
+  < void DgDxHess(T *f, double *p, double *ddfp)
+  <   { assert(FALSE, "not implemented yet"); }
+  < 
+  < /*** mhat(p) **********************************/
+  < 
+  < /* The Laplacian of the Gaussian hump {gaus(p)}. */
+  < 
+  < static char *MHatDesc = "(Lapl(gaus))(p)";
+  < static char *MHatType = "SOF.Proc.mhat.";
+  < static SOProcFunction_Methods *MHatMths = NULL;
+  < 
+  < void MHatEval(T *f, double *p, double *fp);
+  < void MHatGrad(T *f, double *p, double *dfp);
+  < void MHatHess(T *f, double *p, double *ddfp);
+  < 
+  < void MHatEval(T *f, double *p, double *fp)
+  <   { nat pDim = f->d->fn.pDim;
+  <     nat fDim = f->d->fn.fDim;
+  <     int i;
+  <     double s2 = GAUSS_SIGMA*GAUSS_SIGMA;
+  <     double r2 = 0.0;
+  <     for (i = 0; i < pDim; i++) { double dxi = p[i] - 0.5; r2 += dxi*dxi; }
+  <     double e2 = r2/s2;
+  <     double mh = (2.0/s2)*exp(-e2)*(2.0*e2 - ((double)pDim));
+  <     for (i = 0; i < fDim; i++) { fp[i] = mh; }
+  <   }
+  <   
+  < void MHatGrad(T *f, double *p, double *dfp)
+  <   { assert(FALSE, "not implemented yet"); } 
+  < 
+  < void MHatHess(T *f, double *p, double *ddfp)
+  <   { assert(FALSE, "not implemented yet"); }
+  < 
+  < /*** hump ********************************/
+
+  > /*** sumprod ********************************/
+
+  --- 360c188,190 -----------------------
+  < /* A multi-quadratic hump centered at {(1/2,1/2,...)} */
+
+  > static char *SumprodDesc = "x*(1-x)*y*(1-y)";
+  > static char *SumprodType = "SOF.Proc.sumprod.";
+  > static SOProcFunction_Methods *SumprodMths = NULL;
+
+  --- 362,364c192,194 -----------------------
+  < static char *HumpDesc = "2*x*(1-x)*y*(1-y)*···";
+  < static char *HumpType = "SOF.Proc.hump.";
+  < static SOProcFunction_Methods *HumpMths = NULL;
+
+  > void SumprodEval(T *f, double *p, double *fp);
+  > void SumprodGrad(T *f, double *p, double *dfp);
+  > void SumprodHess(T *f, double *p, double *ddfp);
+
+  --- 366,372c196,197 -----------------------
+  < void HumpEval(T *f, double *p, double *fp);
+  < void HumpGrad(T *f, double *p, double *dfp);
+  < void HumpHess(T *f, double *p, double *ddfp);
+  < 
+  < void HumpEval(T *f, double *p, double *fp)
+  <   { nat pDim = f->d->fn.pDim;
+  <     nat fDim = f->d->fn.fDim;
+
+  > void SumprodEval(T *f, double *p, double *fp)
+  >   { nat fDim = f->d->fn.fDim;
+
+  --- 374,376c199 -----------------------
+  <     double h = 1.0;
+  <     for (i = 0; i < pDim; i++) { double xi = p[i]; h *= 2.0*xi*(1-xi); }
+  <     for (i = 0; i < fDim; i++) { fp[i] = h; }
+
+  >     for (i = 0; i < fDim; i++) { fp[i] = (double)p[0]*(1 - p[0])*p[1]*(1 - p[1]); }
+
+  --- 379c202 -----------------------
+  < void HumpGrad(T *f, double *p, double *dfp)
+
+  > void SumprodGrad(T *f, double *p, double *dfp)
+
+  --- 382c205 -----------------------
+  < void HumpHess(T *f, double *p, double *ddfp)
+
+  > void SumprodHess(T *f, double *p, double *ddfp)
+
+  --- 572a396,421 -----------------------
+  > // /*** qtrz(p) **********************************/
+  > // 
+  > // static char *QrtzDesc = "z^4";
+  > // static char *QrtzType = "SOF.Proc.qrtz.";
+  > // static SOProcFunction_Methods *QrtzMths = NULL;
+  > // 
+  > // void QrtzEval(T *f, double *p, double *fp);
+  > // void QrtzGrad(T *f, double *p, double *dfp);
+  > // void QrtzHess(T *f, double *p, double *ddfp);
+  > // 
+  > // void QrtzEval(T *f, double *p, double *fp)
+  > //   { double s = f->d->scale, z = p->c[2];
+  > //     double z2 = z*z;
+  > //     return s*z2*z2;
+  > //   }
+  > //   
+  > // void QrtzGrad(T *f, double *p, double *dfp)
+  > //   { double s = f->d->scale, z = p->c[2];
+  > //     return (r3_t){{0.0, 0.0,4.0*s*z*z*z}};
+  > //   }
+  > // 
+  > // void QrtzHess(T *f, double *p, double *ddfp)
+  > //   { double s = f->d->scale, z = p->c[2];
+  > //     return (R3Hessian){{0.0, 0.0, 0.0, 0.0, 0.0, s*12.0*z*z}};
+  > //   }
+  > // 
+
+  --- 597a447,499 -----------------------
+  > // /*** loca(p) **********************************/
+  > // 
+  > // static char *LocaDesc = "x*(2x^2-1)*(3x^2-2)";
+  > // static char *LocaType = "SOF.Proc.loca.";
+  > // static SOProcFunction_Methods *LocaMths = NULL;
+  > // 
+  > // void LocaEval(T *f, double *p, double *fp);
+  > // void LocaGrad(T *f, double *p, double *dfp);
+  > // void LocaHess(T *f, double *p, double *ddfp);
+  > // 
+  > // void LocaEval(T *f, double *p, double *fp)
+  > //   { double s = f->d->scale, x = p->c[0];
+  > //     double x2 = x*x;
+  > //     return s*x*(2.0*x2 - 1.0)*(3.0*x2 - 2.0);
+  > //   }
+  > //   
+  > // void LocaGrad(T *f, double *p, double *dfp)
+  > //   { double s = f->d->scale, x = p->c[0];
+  > //     double x2 = x*x, x4 = x2*x2;
+  > //     return (r3_t){{s*(30.0*x4 - 21.0*x2 + 2.0), 0.0, 0.0}};
+  > //   }
+  > // 
+  > // void LocaHess(T *f, double *p, double *ddfp)
+  > //   { double s = f->d->scale, x = p->c[0];
+  > //     double x3 = x*x*x;
+  > //     return (R3Hessian){{s*(120.0*x3 - 42.0*x), 0.0, 0.0, 0.0, 0.0, 0.0}};
+  > //   }
+  > // 
+  > // /*** fxyz(p) **********************************/
+  > // 
+  > // static char *FxyzDesc = "x*y*z";
+  > // static char *FxyzType = "SOF.Proc.fxyz.";
+  > // static SOProcFunction_Methods *FxyzMths = NULL;
+  > // 
+  > // void FxyzEval(T *f, double *p, double *fp);
+  > // void FxyzGrad(T *f, double *p, double *dfp);
+  > // void FxyzHess(T *f, double *p, double *ddfp);
+  > // 
+  > // void FxyzEval(T *f, double *p, double *fp)
+  > //   { double s = f->d->scale, x = p->c[0], y = p->c[1], z = p->c[2];
+  > //     return s*x*y*z;
+  > //   }
+  > //   
+  > // void FxyzGrad(T *f, double *p, double *dfp)
+  > //   { double s = f->d->scale, x = p->c[0], y = p->c[1], z = p->c[2];
+  > //     return (r3_t){{s*y*z, s*x*z, s*x*y}};
+  > //   }
+  > // 
+  > // void FxyzHess(T *f, double *p, double *ddfp)
+  > //   { double s = f->d->scale, x = p->c[0], y = p->c[1], z = p->c[2];
+  > //     return (R3Hessian){{0.0, s*z, 0.0, s*y, s*x, 0.0}};
+  > //   }
+  > // 
+
+  --- 622a525,549 -----------------------
+  > // /*** expz(p) **********************************/
+  > // 
+  > // static char *ExpzDesc = "exp(z)";
+  > // static char *ExpzType = "SOF.Proc.expz.";
+  > // static SOProcFunction_Methods *ExpzMths = NULL;
+  > // 
+  > // void ExpzEval(T *f, double *p, double *fp);
+  > // void ExpzGrad(T *f, double *p, double *dfp);
+  > // void ExpzHess(T *f, double *p, double *ddfp);
+  > // 
+  > // void ExpzEval(T *f, double *p, double *fp)
+  > //   { double s = f->d->scale,z = p->c[2];
+  > //     return s*exp(z);
+  > //   }
+  > //   
+  > // void ExpzGrad(T *f, double *p, double *dfp)
+  > //   { double s = f->d->scale, z = p->c[2];
+  > //     return (r3_t){{0.0, 0.0, s*exp(z)}};
+  > //   }
+  > // 
+  > // void ExpzHess(T *f, double *p, double *ddfp)
+  > //   { double s = f->d->scale, z = p->c[2];
+  > //     return (R3Hessian){{0.0, 0.0, 0.0,  0.0, 0.0, s*exp(z)}};
+  > //   }  
+  > // 
+
+  --- 625,627c552 -----------------------
+  < /* A single cycle of a sinusoidal wave in the {X} direction. */
+  < 
+  < static char *SinxDesc = "sin(2*PI*x)";
+
+  > static char *SinxDesc = "sin(x)";
+
+  --- 647,649c572 -----------------------
+  < /*** sinx(p)*siny(p) **************************/
+  < 
+  < /* A 2×2 array of sinusoidal humps with alternating signs. */
+
+  > /*** sinx(p)*cosx(p) **************************/
+
+  --- 651,653c574,576 -----------------------
+  < static char *SxSyDesc = "sin(2*PI*x)*sin(2*PI*y)";
+  < static char *SxSyType = "SOF.Proc.sxsy.";
+  < static SOProcFunction_Methods *SxSyMths = NULL;
+
+  > static char *Sinx_x_CosxDesc = "sin(x)_x_cos(x)";
+  > static char *Sinx_x_CosxType = "SOF.Proc.sinx_x_cosx.";
+  > static SOProcFunction_Methods *Sinx_x_CosxMths = NULL;
+
+  --- 655,657c578,580 -----------------------
+  < void SxSyEval(T *f, double *p, double *fp);
+  < void SxSyGrad(T *f, double *p, double *dfp);
+  < void SxSyHess(T *f, double *p, double *ddfp);
+
+  > void Sinx_x_CosxEval(T *f, double *p, double *fp);
+  > void Sinx_x_CosxGrad(T *f, double *p, double *dfp);
+  > void Sinx_x_CosxHess(T *f, double *p, double *ddfp);
+
+  --- 659,661c582,583 -----------------------
+  < void SxSyEval(T *f, double *p, double *fp)
+  <   { nat pDim = f->d->fn.pDim;
+  <     nat fDim = f->d->fn.fDim;
+
+  > void Sinx_x_CosxEval(T *f, double *p, double *fp)
+  >   { nat fDim = f->d->fn.fDim;
+
+  --- 663,667c585 -----------------------
+  <     assert(pDim >= 2, "domain dimension too small");
+  <     double x = p[0]; 
+  <     double y = p[1];
+  <     double v = sin(TWOPI*x)*sin(TWOPI*y);
+  <     for (i = 0; i < fDim; i++){ fp[i] = v; }
+
+  >     for (i = 0; i < fDim; i++){ fp[i] = (double)sin(TWOPI*p[0])*cos(TWOPI*p[0]); }
+
+  --- 670c588 -----------------------
+  < void SxSyGrad(T *f, double *p, double *dfp)
+
+  > void Sinx_x_CosxGrad(T *f, double *p, double *dfp)
+
+  --- 673c591 -----------------------
+  < void SxSyHess(T *f, double *p, double *ddfp)
+
+  > void Sinx_x_CosxHess(T *f, double *p, double *ddfp)
+
+  --- 676,682c594 -----------------------
+  < /*** sxcy(p) **************************/
+  < 
+  < /* Like {sxsy}, but shifted by a quarter-wave in {Y}. */
+  < 
+  < static char *SxCyDesc = "sin(2*PI*x)*cos(2*PI*y)";
+  < static char *SxCyType = "SOF.Proc.sxcy.";
+  < static SOProcFunction_Methods *SxCyMths = NULL;
+
+  > /*** sinx(p)*siny(p) **************************/
+
+  --- 684,686c596,602 -----------------------
+  < void SxCyEval(T *f, double *p, double *fp);
+  < void SxCyGrad(T *f, double *p, double *dfp);
+  < void SxCyHess(T *f, double *p, double *ddfp);
+
+  > static char *Sinx_x_SinyDesc = "sin(x)_x_sin(y)";
+  > static char *Sinx_x_SinyType = "SOF.Proc.sinx_x_siny.";
+  > static SOProcFunction_Methods *Sinx_x_SinyMths = NULL;
+  > 
+  > void Sinx_x_SinyEval(T *f, double *p, double *fp);
+  > void Sinx_x_SinyGrad(T *f, double *p, double *dfp);
+  > void Sinx_x_SinyHess(T *f, double *p, double *ddfp);
+
+  --- 688,691c604,605 -----------------------
+  < void SxCyEval(T *f, double *p, double *fp)
+  <   { nat pDim = f->d->fn.pDim;
+  <     nat fDim = f->d->fn.fDim;
+  <     assert(pDim >= 2, "domain dimension too small");
+
+  > void Sinx_x_SinyEval(T *f, double *p, double *fp)
+  >   { nat fDim = f->d->fn.fDim;
+
+  --- 693,696c607 -----------------------
+  <     double x = p[0]; 
+  <     double y = p[1];
+  <     double v = sin(TWOPI*x)*cos(TWOPI*y);
+  <     for (i = 0; i < fDim; i++){ fp[i] = v; }
+
+  >     for (i = 0; i < fDim; i++){ fp[i] = (double)sin(TWOPI*p[0])*sin(TWOPI*p[1]); }
+
+  --- 699c610 -----------------------
+  < void SxCyGrad(T *f, double *p, double *dfp)
+
+  > void Sinx_x_SinyGrad(T *f, double *p, double *dfp)
+
+  --- 702c613 -----------------------
+  < void SxCyHess(T *f, double *p, double *ddfp)
+
+  > void Sinx_x_SinyHess(T *f, double *p, double *ddfp)
+
+  --- 729a641,690 -----------------------
+  > // /*** lrry(p) **********************************/
+  > // 
+  > // static char *LrryDesc = "LarrysFn(p)";
+  > // static char *LrryType = "SOF.Proc.lrry.";
+  > // static SOProcFunction_Methods *LrryMths = NULL;
+  > // 
+  > // void LrryEval(T *f, double *p, double *fp);
+  > // void LrryGrad(T *f, double *p, double *dfp);
+  > // void LrryHess(T *f, double *p, double *ddfp);
+  > // 
+  > // /* Scale Larry's example func so that its range is inside [0 _ 1]: */
+  > // /* #define LrryMax 0.389056 */
+  > // #define LrrySup (0.4)
+  > // 
+  > // void LrryEval(T *f, double *p, double *fp)
+  > //   { double s = f->d->scale/LrrySup, x = p->c[0], y = p->c[1], z = p->c[2];
+  > //     double x2 = x*x, x4 = x2*x2, x8 = x4*x4;
+  > //     double y3 = y*y*y;
+  > //     double z2 = z*z;
+  > //     double fv = 1.0 + x8 + exp(2.0*y3) + exp(2.0*z2) + 10.0*x*y*z;
+  > //     return s*fv;
+  > //   }
+  > //   
+  > // void LrryGrad(T *f, double *p, double *dfp)
+  > //   { double s = f->d->scale, x = p->c[0], y = p->c[1], z = p->c[2];
+  > //     double x3 = x*x*x, x7 = x3*x3*x;
+  > //     double y2 = y*y, y3 = y2*y;
+  > //     double z2 = z*z;
+  > //     s /= LrrySup;
+  > //     return (r3_t)
+  > //       { { s*(8.0*x7 + 10.0*y*z),
+  > //           s*(6.0*y2*exp(2.0*y3) + 10.0*x*z),
+  > //           s*(4.0*z*exp(2.0*z2) + 10.0*x*y)
+  > //         }
+  > //       };
+  > //   }
+  > // 
+  > // void LrryHess(T *f, double *p, double *ddfp)
+  > //   { double s = f->d->scale/LrrySup, x = p->c[0], y = p->c[1], z = p->c[2];
+  > //     double x3 = x*x*x, x6 = x3*x3;
+  > //     double y3 = y*y*y, y4 = y3*y;
+  > //     double z2 = z*z;
+  > //     return (R3Hessian)
+  > //       { { s*56.0*x6, 
+  > //           s*10.0*z, s*(12.0*y + 36.0*y4)*exp(2.0*y3),
+  > //           s*10.0*y, s*10.0*x, s*(4.0 + 4.0*z2)*exp(2.0*z2)
+  > //         }
+  > //       };
+  > //   }  
+  >   
+
+  --- 814,817c775,776 -----------------------
+  <     else if (strcmp(name, "lind") == 0)
+  <       { f = MkFn(LindType, LindDesc, &LindMths, LindEval, LindGrad, LindHess); }
+  <     else if (strcmp(name, "cbsm") == 0)
+  <       { f = MkFn(CbsmType, CbsmDesc, &CbsmMths, CbsmEval, CbsmGrad, CbsmHess); }
+
+  >     else if (strcmp(name, "cubsum") == 0)
+  >       { f = MkFn(CubsumType, CubsumDesc, &CubsumMths, CubsumEval, CubsumGrad, CubsumHess); }
+
+  --- 822,831c781,809 -----------------------
+  <     else if (strcmp(name, "para") == 0)
+  <       { f = MkFn(ParaType, ParaDesc, &ParaMths, ParaEval, ParaGrad, ParaHess); }
+  <     else if (strcmp(name, "gaus") == 0)
+  <       { f = MkFn(GausType, GausDesc, &GausMths, GausEval, GausGrad, GausHess); }
+  <     else if (strcmp(name, "dgdx") == 0)
+  <       { f = MkFn(DgDxType, DgDxDesc, &DgDxMths, DgDxEval, DgDxGrad, DgDxHess); }
+  <     else if (strcmp(name, "mhat") == 0)
+  <       { f = MkFn(MHatType, MHatDesc, &MHatMths, MHatEval, MHatGrad, MHatHess); }
+  <     else if (strcmp(name, "hump") == 0)
+  <       { f = MkFn(HumpType, HumpDesc, &HumpMths, HumpEval, HumpGrad, HumpHess); }
+
+  >     else if (strcmp(name, "sumprod") == 0)
+  >       { f = MkFn(SumprodType, SumprodDesc, 
+  >         &SumprodMths, SumprodEval, SumprodGrad, SumprodHess); }
+  >     //else if (strcmp(name, "sqry") == 0)
+  >     //  { f = MkFn(SqryType, SqryDesc, &SqryMths, SqryEval, SqryGrad, SqryHess); }
+  >     //else if (strcmp(name, "cubx") == 0)
+  >     //  { f = MkFn(CubxType, CubxDesc, &CubxMths, CubxEval, CubxGrad, CubxHess); }
+  >     //else if (strcmp(name, "qtrx") == 0)
+  >     //  { f = MkFn(QrtxType, QrtxDesc, &QrtxMths, QrtxEval, QrtxGrad, QrtxHess); }
+  >     //else if (strcmp(name, "qtrz") == 0)
+  >     //  { f = MkFn(QrtzType, QrtzDesc, &QrtzMths, QrtzEval, QrtzGrad, QrtzHess); }
+  >     //else if (strcmp(name, "quix") == 0)
+  >     //  { f = MkFn(QuixType, QuixDesc, &QuixMths, QuixEval, QuixGrad, QuixHess); }
+  >     //else if (strcmp(name, "sexx") == 0)
+  >     //  { f = MkFn(SexxType, SexxDesc, &SexxMths, SexxEval, SexxGrad, SexxHess); }
+  >     //else if (strcmp(name, "sepx") == 0)
+  >     //  { f = MkFn(SepxDesc, SepxType, &SepxMths, SepxEval, SepxGrad, SepxHess); }
+  >     //else if (strcmp(name, "octx") == 0)
+  >     //  { f = MkFn(OctxType, OctxDesc, &OctxMths, OctxEval, OctxGrad, OctxHess); }
+  >     //else if (strcmp(name, "expx") == 0)
+  >     //  { f = MkFn(ExpxType, ExpxDesc, &ExpxMths, ExpxEval, ExpxGrad, ExpxHess); }
+  >     //else if (strcmp(name, "expz") == 0)
+  >     //  { f = MkFn(ExpzType, ExpzDesc, &ExpzMths, ExpzEval, ExpzGrad, ExpzHess); }
+  >     //else if (strcmp(name, "band") == 0)
+  >     //  { f = MkFn(BandType, BandDesc, &BandMths, BandEval, BandGrad, BandHess); }
+  >     //else if (strcmp(name, "loca") == 0)
+  >     //  { f = MkFn(LocaType, LocaDesc, &LocaMths, LocaEval, LocaGrad, LocaHess); }
+  >     //else if (strcmp(name, "fxyz") == 0)
+  >     //  { f = MkFn(FxyzType, FxyzDesc, &FxyzMths, FxyzEval, FxyzGrad, FxyzHess); }
+
+  --- 834,837c812,819 -----------------------
+  <     else if (strcmp(name, "sxcy") == 0)
+  <       { f = MkFn(SxCyType, SxCyDesc, &SxCyMths, SxCyEval, SxCyGrad, SxCyHess); }
+  <     else if (strcmp(name, "sxsy") == 0)
+  <       { f = MkFn(SxSyType, SxSyDesc, &SxSyMths, SxSyEval, SxSyGrad, SxSyHess); }
+
+  >     else if (strcmp(name, "sinx_x_cosx") == 0)
+  >       { f = MkFn(Sinx_x_CosxType, Sinx_x_CosxDesc, &Sinx_x_CosxMths, Sinx_x_CosxEval, Sinx_x_CosxGrad, Sinx_x_CosxHess); }
+  >     else if (strcmp(name, "sinx_x_siny") == 0)
+  >       { f = MkFn(Sinx_x_SinyType, Sinx_x_SinyDesc, &Sinx_x_SinyMths, Sinx_x_SinyEval, Sinx_x_SinyGrad, Sinx_x_SinyHess); }
+  >     //else if (strcmp(name, "cosx") == 0)
+  >     //  { f = MkFn(CosxType, CosxDesc, &CosxMths, CosxEval, CosxGrad, CosxHess); }
+  >     //else if (strcmp(name, "lrry") == 0)
+  >     //  { f = MkFn(LrryType, LrryDesc, &LrryMths, LrryEval, LrryGrad, LrryHess); }
+
+==========================================
+diff -r progs/SOProcFunction.c~ /home/simoleo/ra014852/projeto/programs/SOProcFunction.c~
+
+  --- 2c2 -----------------------
+  < /* Last edited on 2003-07-04 19:05:40 by ra014852 */
+
+  > /* Last edited on 2003-07-03 19:45:21 by ra014852 */
+
+  --- 12a13,14 -----------------------
+  > // #include <r3.h>
+  > // #include <r6.h>
+
+==========================================
+Binary files progs/SOProcFunction.ho and /home/simoleo/ra014852/projeto/programs/SOProcFunction.ho differ
+
+==========================================
+Binary files progs/SOProcFunction.o and /home/simoleo/ra014852/projeto/programs/SOProcFunction.o differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOTent.c~
+
+==========================================
+Binary files progs/SOTent.ho and /home/simoleo/ra014852/projeto/programs/SOTent.ho differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOTent.h~
+
+==========================================
+Binary files progs/SOTent.o and /home/simoleo/ra014852/projeto/programs/SOTent.o differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOTentFunction.c~
+
+==========================================
+Binary files progs/SOTentFunction.ho and /home/simoleo/ra014852/projeto/programs/SOTentFunction.ho differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOTentFunction.h~
+
+==========================================
+Binary files progs/SOTentFunction.o and /home/simoleo/ra014852/projeto/programs/SOTentFunction.o differ
+
+==========================================
+Binary files progs/SOTestGrid and /home/simoleo/ra014852/projeto/programs/SOTestGrid differ
+
+==========================================
+Binary files progs/SOTestGrid.o and /home/simoleo/ra014852/projeto/programs/SOTestGrid.o differ
+
+==========================================
+Binary files progs/SOTestIntegral and /home/simoleo/ra014852/projeto/programs/SOTestIntegral differ
+
+==========================================
+Binary files progs/SOTestIntegral.o and /home/simoleo/ra014852/projeto/programs/SOTestIntegral.o differ
+
+==========================================
+Binary files progs/SOTestProcFunction and /home/simoleo/ra014852/projeto/programs/SOTestProcFunction differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOTestProcFunction.c
+
+==========================================
+Binary files progs/SOTestProcFunction.o and /home/simoleo/ra014852/projeto/programs/SOTestProcFunction.o differ
+
+==========================================
+Binary files progs/SOTestTentFunction and /home/simoleo/ra014852/projeto/programs/SOTestTentFunction differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOTestTentFunction.c~
+
+==========================================
+Binary files progs/SOTestTentFunction.o and /home/simoleo/ra014852/projeto/programs/SOTestTentFunction.o differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOUniSolve.c~
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOUniSolve.o
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOWaveFunction.c~
+
+==========================================
+Binary files progs/SOWaveFunction.ho and /home/simoleo/ra014852/projeto/programs/SOWaveFunction.ho differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: SOWaveFunction.h~
+
+==========================================
+Binary files progs/SOWaveFunction.o and /home/simoleo/ra014852/projeto/programs/SOWaveFunction.o differ
+
+==========================================
+Binary files progs/SOeps.ho and /home/simoleo/ra014852/projeto/programs/SOeps.ho differ
+
+==========================================
+Binary files progs/SOeps.o and /home/simoleo/ra014852/projeto/programs/SOeps.o differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: bas
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: bkp
+
+==========================================
+Only in progs: dummy.c
+
+==========================================
+Only in progs: dummy.h
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: extra
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: isolines
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: junk
+
+==========================================
+diff -r progs/junk.c /home/simoleo/ra014852/projeto/programs/junk.c
+
+  --- 1c1 -----------------------
+  < /* Last edited on 2003-07-07 14:19:27 by stolfi */
+
+  > /* Last edited on 2003-07-05 20:47:09 by ra014852 */
+
+==========================================
+diff -r progs/junk.c~ /home/simoleo/ra014852/projeto/programs/junk.c~
+
+  --- 1c1 -----------------------
+  < /* Last edited on 2003-07-05 20:47:09 by ra014852 */
+
+  > /* Last edited on 2003-07-04 22:21:19 by ra014852 */
+
+  --- 3,13d2 -----------------------
+  <     
+  <     /* ** DEBUG ** */
+  <     //    if(evalv[0] > 1)printf(" DEBUG!-> X: %16g Y: %16g \n", point[X], point[Y]);
+  <     //    if(evalv[1] > 1)printf(" DEBUG!-> X: %16g Y: %16g \n", point[X], point[Y]);
+  <     //    if(evalv[2] > 1)printf(" DEBUG!-> X: %16g Y: %16g \n", point[X], point[Y]);
+  <     //    if(evalv[3] > 1)printf(" DEBUG!-> X: %16g Y: %16g \n", point[X], point[Y]);
+  <     //    if(evalv[4] > 1)printf(" DEBUG!-> X: %16g Y: %16g \n", point[X], point[Y]);
+  < /*     if((min[X] < 0.35)||(max[X] > 0.65))return; */
+  < /*     if((min[Y] < 0.35)||(max[Y] > 0.65))return; */
+  < /*     if(rank == 9)if(k != 754 && k != 752)return;  */
+  < /*        printf(" DBG -> Index: %d Rank: %d \n", k, rank); */
+
+  --- 113,719d101 -----------------------
+  < 
+  < 
+  <           
+  < 
+  <     double temp, tri_x[3], tri_y[3], sqr_x[4], sqr_y[4];
+  <     double SPR, SRP, PRx, PRy, SQR, SRQ, QRx, QRy;
+  <     int c_ind;
+  < 
+  <   /*   printf(" DBG ### >> Qf: %f, Rf: %f, Pf: %f \n", Qf, Rf, Pf); */
+  <   /*   printf(" DBG ### >> stp_rng: %f, color_ind: %d \n", fStep, color_ind); */
+  < 
+  <     if(!((Pf < 0.0)&&(Rf > 0.0)))
+  <       { 
+  <         if(line)
+  <           {  if((Pf == 0.0)&&(Qf == 0.0))
+  <                eps_draw_segment(psf, Px, Py, Qx, Qy); 
+  < 
+  <              if((Qf == 0.0)&&(Rf == 0.0))
+  <                eps_draw_segment(psf, Qx, Qy, Rx, Ry); 
+  < 
+  <              if((Pf == 0.0)&&(Rf == 0.0))
+  <                eps_draw_segment(psf, Px, Py, Rx, Ry); 
+  <           }  
+  <         return;
+  <       }
+  < 
+  <     /* Now Pf must be negative and Rf must be positive */
+  < 
+  <     /* Swap q,r so that sign(Qf) != sign(Pf): */
+  < 
+  <     if( Qf < 0.0 )
+  <       {
+  <         temp = Rx; Rx = Px; Px = temp;
+  <         temp = Ry; Ry = Py; Py = temp;
+  <         temp = Rf; Rf = Pf; Pf = temp; 
+  <       }
+  < 
+  <     assert( Rf != 0.0, "Rf == 0.0" );
+  <     assert( Pf != 0.0, "Pf == 0.0" );
+  <     assert((Rf > 0.0) != (Pf > 0.0), "Rf sign == Pf sign" );
+  <     assert((Qf == 0.0)||(((Qf > 0.0) == (Rf > 0.0))&&((Qf > 0.0) != (Pf > 0.0))), "Qf sign == Pf sign" );
+  < 
+  <     if( Qf != 0.0 )
+  <       {
+  < 
+  <         SQR = (double)Pf / (Pf - Rf);
+  <         SRQ = (double)Rf / (Rf - Pf);
+  < 
+  <         QRx = (double)Rx * SQR + (double)Px * SRQ;
+  <         QRy = (double)Ry * SQR + (double)Py * SRQ;
+  < 
+  <         SPR = (double)Pf / (Pf - Qf);
+  <         SRP = (double)Qf / (Qf - Pf);
+  < 
+  <         PRx = (double)Qx * SPR + (double)Px * SRP;
+  <         PRy = (double)Qy * SPR + (double)Py * SRP;
+  < 
+  <         if(line){eps_draw_segment(psf, PRx, PRy, QRx, QRy); return;}
+  < 
+  <         int k;
+  <         for(k=-1; k < 2; k=k+2)
+  <           { 
+  <             if(k * Pf > 0)
+  <               {       
+  <                 if(Pf > 0.0) c_ind = color_ind + 1; else c_ind = color_ind; 
+  <   /*               if(c_ind < 0 || c_ind >= steps+2) */
+  <   /*                 {printf(" DBG!! c_ind: %d, color_ind: %d \n", c_ind, color_ind);  */
+  <   /*                  c_ind = steps+1;}            */
+  < 
+  <                 if((fabs(Pf) <= fStep)||((color_ind == 0)&&(Pf < 0)))
+  <                   {
+  <                     tri_x[0] = PRx; tri_x[1] = QRx; tri_x[2] = Px;
+  <                     tri_y[0] = PRy; tri_y[1] = QRy; tri_y[2] = Py;
+  <                     eps_fill_polygon(psf, tri_x, tri_y, 3, 
+  <                         colors[c_ind][0], colors[c_ind][1], colors[c_ind][2]);
+  <   /* 		  printf(" DBG 0>> Qf: %f, Rf: %f, Pf: %f \n", Qf, Rf, Pf); */
+  <                    }
+  <                 else
+  <                   { if(Pf < 0)
+  <                       { sqr_x[0] = PRx; sqr_x[1] = QRx; 
+  <                         sqr_x[2] = plot_p0[0]; sqr_x[3] = plot_p1[0];
+  <                         sqr_y[0] = PRy; sqr_y[1] = QRy; 
+  <                         sqr_y[2] = plot_p0[1]; sqr_y[3] = plot_p1[1];
+  <                         eps_fill_polygon(psf, sqr_x, sqr_y, 4, 
+  <                            colors[c_ind][0], colors[c_ind][1], colors[c_ind][2]); 
+  <   /*                       printf(" DBG 1>> Qf: %f, Rf: %f, Pf: %f \n", Qf, Rf, Pf); */
+  < 
+  <                         if((fabs(Rf) > fStep)&&(fabs(Qf) < fStep))
+  <                           { tri_x[0] = PRx; tri_x[1] = plot_p1[0]; tri_x[2] = Qx;
+  <                             tri_y[0] = PRy; tri_y[1] = plot_p1[1]; tri_y[2] = Qy;  
+  <                             eps_fill_polygon(psf, tri_x, tri_y, 3, 
+  <                                colors[c_ind][0], colors[c_ind][1], colors[c_ind][2]);
+  <   /*                           printf(" DBG 2>> Qf: %f, Rf: %f, Pf: %f \n", Qf, Rf, Pf); */
+  <                           }
+  <                       }    
+  <                     else
+  <                       { plot_p0[0] = QRx; plot_p1[0] = PRx;
+  <                         plot_p0[1] = QRy; plot_p1[1] = PRy;
+  <   /*                    printf(" DBG 3>> Qf: %.16g, Rf: %.16g, Pf: %.16g \n", Qf, Rf, Pf); */
+  <                       } 
+  <                   }            
+  <               }   
+  < 
+  <             if(k * Rf > 0) 
+  <               {   
+  <                 if(Rf > 0.0) c_ind = color_ind + 1; else c_ind = color_ind;
+  <   /*               if(c_ind < 0 || c_ind >= steps+2) */
+  <   /*                 {printf(" DBG!! c_ind: %d, color_ind: %d \n", c_ind, color_ind); */
+  <   /*                  c_ind = steps+1;} */
+  < 
+  <                 if(((fabs(Qf) <= fStep)&&(fabs(Rf) <= fStep))||((color_ind == 0)&&(Rf < 0)))
+  <                   { 
+  <                     sqr_x[0] = Qx; sqr_x[1] = Rx; sqr_x[2] = QRx; sqr_x[3] = PRx;
+  <                     sqr_y[0] = Qy; sqr_y[1] = Ry; sqr_y[2] = QRy; sqr_y[3] = PRy;
+  <                     eps_fill_polygon(psf, sqr_x, sqr_y, 4, 
+  <                         colors[c_ind][0], colors[c_ind][1], colors[c_ind][2]);
+  <   /*                   printf(" DBG 4>> Qf: %f, Rf: %f, Pf: %f \n", Qf, Rf, Pf); */
+  <                   }  
+  <                 else
+  <                   { if(Rf < 0)
+  <                       { sqr_x[0] = PRx; sqr_x[1] = QRx; 
+  <                         sqr_x[2] = plot_p0[0]; sqr_x[3] = plot_p1[0];
+  <                         sqr_y[0] = PRy; sqr_y[1] = QRy; 
+  <                         sqr_y[2] = plot_p0[1]; sqr_y[3] = plot_p1[1];
+  <                         eps_fill_polygon(psf, sqr_x, sqr_y, 4, 
+  <                             colors[c_ind][0], colors[c_ind][1], colors[c_ind][2]);
+  <   /*                       printf(" DBG 5>> Qf: %.16g, Rf: %.16g, Pf: %.16g \n", Qf, Rf, Pf); */
+  < 
+  <                         if((fabs(Rf) > fStep)&&(fabs(Qf) < fStep))
+  <                           { tri_x[0] = PRx; tri_x[1] = plot_p1[0]; tri_x[2] = Qx;
+  <                             tri_y[0] = PRy; tri_y[1] = plot_p1[1]; tri_y[2] = Qy;  
+  <                             eps_fill_polygon(psf, tri_x, tri_y, 3, 
+  <                                colors[c_ind][0], colors[c_ind][1], colors[c_ind][2]);
+  <   /*                           printf(" DBG 6>> Qf: %f, Rf: %f, Pf: %f \n", Qf, Rf, Pf); */
+  <                           } 
+  <                       }        
+  <                     else
+  <                       { plot_p0[0] = QRx; plot_p1[0] = PRx;                
+  <                         plot_p0[1] = QRy; plot_p1[1] = PRy;   
+  <   /*                       printf(" DBG 7>> Qf: %f, Rf: %f, Pf: %f \n", Qf, Rf, Pf); */
+  <                       } 
+  <                   }   
+  <               }
+  <           }     
+  <       }
+  <     else
+  <       { 
+  <         SQR = (double)Pf / (Pf - Rf);
+  <         SRQ = (double)Rf / (Rf - Pf);
+  <         QRx = (double)Rx * SQR + (double)Px * SRQ;
+  <         QRy = (double)Ry * SQR + (double)Py * SRQ;
+  < 
+  <         if(line){eps_draw_segment(psf, Qx, Qy, QRx, QRy); return;} 
+  < 
+  <         if(Pf > 0.0) c_ind = color_ind + 1; else c_ind = color_ind;
+  <   /*       if(c_ind < 0 || c_ind >= steps+2) */
+  <   /*         {printf(" DBG!! c_ind: %d, color_ind: %d \n", c_ind, color_ind); */
+  <   /*          c_ind = steps+1;} */
+  < 
+  <         if((fabs(Pf) <= fStep)||((color_ind == 0)&&(Pf < 0)))
+  <           {
+  <             tri_x[0] = Qx; tri_x[1] = Px; tri_x[2] = QRx;
+  <             tri_y[0] = Qy; tri_y[1] = Py; tri_y[2] = QRy;
+  <             eps_fill_polygon(psf, tri_x, tri_y, 3, 
+  <                colors[c_ind][0], colors[c_ind][1], colors[c_ind][2]);
+  <   /*           printf(" DBG 8>> Qf: %f, Rf: %f, Pf: %f \n", Qf, Rf, Pf); */
+  <           }
+  <         else
+  <           { if(Pf < 0)
+  <               { sqr_x[0] = Qx; sqr_x[1] = QRx; 
+  <                 sqr_x[2] = plot_p0[0]; sqr_x[3] = plot_p1[0];
+  <                 sqr_y[0] = Qy; sqr_y[1] = QRy; 
+  <                 sqr_y[2] = plot_p0[1]; sqr_y[3] = plot_p1[1];
+  <                 eps_fill_polygon(psf, sqr_x, sqr_y, 4, 
+  <                    colors[c_ind][0], colors[c_ind][1], colors[c_ind][2]);
+  <   /*               printf(" DBG 9>> Qf: %f, Rf: %f, Pf: %f \n", Qf, Rf, Pf); */
+  < 
+  <                 if((fabs(Rf) > fStep)&&(fabs(Qf) < fStep))
+  <                   { tri_x[0] = PRx; tri_x[1] = plot_p1[0]; tri_x[2] = Qx;
+  <                     tri_y[0] = PRy; tri_y[1] = plot_p1[1]; tri_y[2] = Qy;  
+  <                     eps_fill_polygon(psf, tri_x, tri_y, 3, 
+  <                        colors[c_ind][0], colors[c_ind][1], colors[c_ind][2]);
+  <   /*                   printf(" DBG 10>> Qf: %f, Rf: %f, Pf: %f \n", Qf, Rf, Pf); */
+  <                   }
+  <               }
+  <             else
+  <               { plot_p0[0] = QRx; plot_p1[0] = Qx;
+  <                 plot_p0[1] = QRy; plot_p1[1] = Qy; 
+  <   /*               printf(" DBG 11>> Qf: %f, Rf: %f, Pf: %f \n", Qf, Rf, Pf); */
+  <               }
+  <           }
+  < 
+  <         if(Rf > 0.0) c_ind = color_ind + 1; else c_ind = color_ind;
+  <   /*       if(c_ind < 0 || c_ind >= steps+2) */
+  <   /*         {printf(" DBG!! c_ind: %d, color_ind: %d \n", c_ind, color_ind); */
+  <   /*          c_ind = steps+1;} */
+  < 
+  <         if(fabs(Rf) <= fStep)
+  <           {
+  <             tri_x[0] = Qx; tri_x[1] = Rx; tri_x[2] = QRx;
+  <             tri_y[0] = Qy; tri_y[1] = Ry; tri_y[2] = QRy;
+  <             eps_fill_polygon(psf, tri_x, tri_y, 3, 
+  <                colors[c_ind][0], colors[c_ind][1], colors[c_ind][2]);
+  <   /*           printf(" DBG 12>> Qf: %f, Rf: %f, Pf: %f \n", Qf, Rf, Pf); */
+  <           }
+  <         else
+  <           { if(Rf < 0)
+  <               { sqr_x[0] = Qx; sqr_x[1] = QRx; 
+  <                 sqr_x[2] = plot_p0[0]; sqr_x[3] = plot_p1[0];
+  <                 sqr_y[2] = plot_p0[1]; sqr_y[3] = plot_p1[1];
+  <                 eps_fill_polygon(psf, sqr_x, sqr_y, 4, 
+  <                    colors[c_ind][0], colors[c_ind][1], colors[c_ind][2]);
+  <   /*               printf(" DBG 13>> Qf: %f, Rf: %f, Pf: %f \n", Qf, Rf, Pf); */
+  < 
+  <                 if((fabs(Rf) > fStep)&&(fabs(Qf) < fStep))
+  <                   { tri_x[0] = PRx; tri_x[1] = plot_p1[0]; tri_x[2] = Qx;
+  <                     tri_y[0] = PRy; tri_y[1] = plot_p1[1]; tri_y[2] = Qy;  
+  <                     eps_fill_polygon(psf, tri_x, tri_y, 3, 
+  <                        colors[c_ind][0], colors[c_ind][1], colors[c_ind][2]);
+  <   /*                   printf(" DBG 14>> Qf: %f, Rf: %f, Pf: %f \n", Qf, Rf, Pf); */
+  <                   }
+  <               }
+  <             else
+  <               { plot_p0[0] = QRx; plot_p1[0] = Qx;
+  <                 plot_p0[1] = QRy; plot_p1[1] = Qy;
+  <   /*               printf(" DBG 15>> Qf: %f, Rf: %f, Pf: %f \n", Qf, Rf, Pf); */
+  <               }
+  <           }
+  < 
+  <       }
+  <   }
+  < 
+  < 
+  < #define Rank_Inc 4
+  < #define Max_Rank 10
+  < #define Tri_Lines 15
+  < double Iso_min, Iso_max; /* minimun and maximun values of plotted function */
+  < 
+  < SO2DPlot_Triangle_vec SO2DPlot_Cell_Triangles
+  <   ( double *min,
+  <     double *max
+  <   );
+  <   /* Returns a vector of 8 triangles (SO2DPlot_Triangle_vec) 
+  <      for a given cell, each one with the center and 2 cell 
+  <      vertices points */
+  < 
+  < void SO2DPlot_Triangle_Plot
+  <   (
+  <     FILE* psf, 	
+  <     SO2DPlot_Triangle* tri
+  <   );
+  < 
+  < 
+  < void SO2DPlot_Triangle_0_Plot
+  <   (
+  <     FILE* psf, 		
+  <     double Px, double Py, double Pf,
+  <     double Qx, double Qy, double Qf,
+  <     double Rx, double Ry, double Rf,
+  <     int color_range,
+  <     int steps,                        /* Number of isolines between {fPlotMin} and {fPlotMax} */
+  <     bool line,
+  <     double fStep,
+  <     double *plot_p0, 
+  <     double *plot_p1 
+  <   );
+  <   /*
+  <     Given a triangle "P,Q,R" on the plane, and function values at its
+  <     vertices, interpolates a linear function through that data, and
+  <     plots the set of points where that function is zero. */
+  < 
+  <   
+  < void SO2DPlot_Plot_Subtree(
+  <   FILE *psf, 
+  <   SOGrid_Node *p, 
+  <   double *min,
+  <   double *max,
+  <   int long_axis,
+  <   int depth,
+  <   int max_depth
+  < );
+  <    
+  <     if(fPlotMin < 0)fsat = fPlotMin;
+  <     fvalue = fPlotMin; 
+  < 
+  <     while((fvalue < 0)&&(ind < (steps+1)))
+  <       { 
+  <         t = (double)fvalue / fsat;
+  < 
+  < /*         printf(" DBG: IND: %d, T: %.16g, fvalue: %.16g, fsat: %.16g, \n", ind, t, fvalue, fsat); */
+  < 
+  <         bandColor[ind][0] = fabs(1 - t);  /* red */
+  <         bandColor[ind][1] = fabs(1 - t);  /* green */
+  <         bandColor[ind][2] = 1;            /* blue */
+  < 
+  < /*         printf(" -> c0: %.16g, c1: %.16g, c2: %.16g \n\n", */
+  < /*            bandColor[ind][0],bandColor[ind][1],bandColor[ind][2]); */
+  < 
+  <         ind++; fvalue += fStep;
+  <       }
+  < 
+  <     if(fPlotMax >= 0)
+  <       { fsat = fPlotMax;
+  <         bandColor[ind][0] = 1; /* red */
+  <         bandColor[ind][1] = 1; /* green */
+  <         bandColor[ind][2] = 1; /* blue */
+  < 
+  < /*      printf("Zero-> DBG: IND: %d, T: %.16g, fvalue: %.16g, fsat: %.16g, \n", ind, t, fvalue, fsat); */
+  < /*      printf("Zero -> c0: %.16g, c1: %.16g, c2: %.16g \n\n", */
+  < /*              bandColor[ind][0],bandColor[ind][1],bandColor[ind][2]); */
+  < 
+  <         ind++; fvalue += fStep;
+  <       }
+  < 
+  <     while((fvalue > 0)&&(ind < (steps+1)))
+  <       { 
+  <         t = (double)fvalue / fsat;
+  < 
+  < /*         printf(" DBG: IND: %d, T: %.16g, fvalue: %.16g, fsat: %.16g, \n", ind, t, fvalue, fsat); */
+  < 
+  <         bandColor[ind][0] = 1;           /* red */
+  <         bandColor[ind][1] = fabs(1 - t); /* green */
+  <         bandColor[ind][2] = fabs(1 - t); /* blue */
+  < 
+  < /*         printf(" -> c0: %.16g, c1: %.16g, c2: %.16g \n\n", */
+  < /*         bandColor[ind][0],bandColor[ind][1],bandColor[ind][2]); */
+  < 
+  <         ind++; fvalue += fStep;
+  <       }
+  < 
+  < void SO2DPlot_Triangle_Plot
+  <   (
+  <     FILE* psf, 	
+  <     SO2DPlot_Triangle* tri
+  <   )
+  <   {
+  <     eps_set_pen(psf, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0);
+  < 
+  <     eps_draw_segment(psf, tri->P[X], tri->P[Y], tri->Q[X], tri->Q[Y]);
+  <     eps_draw_segment(psf, tri->P[X], tri->P[Y], tri->R[X], tri->R[Y]);
+  <     eps_draw_segment(psf, tri->R[X], tri->R[Y], tri->Q[X], tri->Q[Y]);
+  < 
+  <     eps_set_pen(psf, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  <    
+  <   }
+  < ========================================
+  < 
+  <     /* Plot coordinates: */
+  <     double minPlot[PDIM], maxPlot[PDIM]; /* Client plot ranges for {C}. */
+  < 
+  <     double minp, maxp, lineval;
+  <     double plot_p0[PDIM], plot_p1[PDIM]; 
+  <     SO2DPlot_Triangle_Val trival;   
+  <     int color_ind; 
+  < 
+  < 
+  < ====================
+  <             
+  <             
+  <         SO2DPlot_Triangle_vec tri_vec, tri_vecPlot; 
+  <         tri_vecPlot =  SO2DPlot_Cell_Triangles(minPlot, maxPlot);
+  <         tri_vec =  SO2DPlot_Cell_Triangles(minRel, maxRel);
+  < 
+  <         for(i = 0; i < tri_vec.nel; i++)
+  <           { 
+  <             /* Gets triangle values (for P Q R) */
+  <             f->m->eval(f, tri_vec.el[i].P, &trival.P); //if(trival.P < 0)trival.P = 0;
+  <             f->m->eval(f, tri_vec.el[i].Q, &trival.Q); //if(trival.Q < 0)trival.Q = 0; 
+  <             f->m->eval(f, tri_vec.el[i].R, &trival.R); //if(trival.R < 0)trival.R = 0; 
+  <  
+  < /*    	    if(k > 650) continue; */
+  < /*          if(rank != 9)continue; */
+  < /* 	    if(i != 0)continue; */
+  < 
+  <             minp = trival.P; 
+  <             if(trival.Q < minp)minp = trival.Q; if(trival.R < minp)minp = trival.R;        
+  <             maxp = trival.P; 
+  <             if(trival.Q > maxp)maxp = trival.Q; if(trival.R > maxp)maxp = trival.R;
+  < 
+  <             color_ind = (int)((minp - (fPlotMin + (double)fStep/2)) / fStep); 
+  <             if(color_ind < 0)color_ind = 0; if(color_ind >= steps)color_ind = steps-1;
+  <             lineval = (double)(color_ind * fStep) + (fPlotMin + (double)fStep/2);
+  < 
+  < /*             printf(" DBG## minp: %.16g, fPlotMin: %.16g, fStep: %.16g \n", */
+  < /*                      minp, fPlotMin, fStep); */
+  <             
+  < /*             printf("DBG lineval: %.16g, color_ind: %d \n", lineval, color_ind); */
+  < /*             printf("DBG Qf: %.16g, Rf: %.16g, Pf: %.16g \n\n", trival.P, trival.Q, trival.R); */
+  <             //printf(" DBG# steps: %d \n", steps);
+  < 
+  <             if((minp >= lineval)&&(maxp <= fStep + lineval) && !line)
+  <               { double tri_x[3], tri_y[3];
+  < 
+  < /* 		if(color_ind < 0 || color_ind >= steps+2) */
+  < /*              { printf(" DBG!! c_ind: %d, color_ind: %d steps: %d \n", c_ind, color_ind, steps); */
+  < /*                c_ind = steps+1; } */
+  < 
+  <                 tri_x[0] = tri_vec_corr.el[i].P[X];
+  <                 tri_x[1] = tri_vec_corr.el[i].Q[X];
+  <                 tri_x[2] = tri_vec_corr.el[i].R[X];
+  <                 tri_y[0] = tri_vec_corr.el[i].P[Y];
+  <                 tri_y[1] = tri_vec_corr.el[i].Q[Y];
+  <                 tri_y[2] = tri_vec_corr.el[i].R[Y];
+  < 
+  < /*                 printf(" DBG## color_ind: %d, steps: %d \n\n", color_ind, steps); */
+  < 
+  <                 eps_fill_polygon(psf, tri_x, tri_y, 3,
+  < 		    bandColor[color_ind+1][0], bandColor[color_ind+1][1], bandColor[color_ind+1][2]);
+  <              
+  < /* 		printf(" DBG!! c0: %.16g, c1: %.16g, c2: %.16g \n", */
+  < /* 		      bandColor[color_ind+1][0], bandColor[color_ind+1][1], bandColor[color_ind+1][2]); */
+  < 
+  <                 continue;
+  <               }
+  <    
+  < 	    if(maxp > fPlotMax)maxp = fPlotMax; j = 0;
+  < 
+  <             while((lineval <= maxp)&&(j < Tri_Lines))
+  <               {
+  <                 /* printf("\n\n"); */
+  < /*                 printf("DBG lineval: %.16g, j: %d, color_ind: %d \n", lineval, j, color_ind); */
+  < /*                 printf("DBG fPlotMin: %.16g, fPlotMax: %.16g step_rng: %.16g \n", fPlotMin, fPlotMax, fStep); */
+  < 
+  <                 eps_set_pen(psf, 1.0, 0.0, 0.0, 0.2, 0.0, 0.0);
+  <                 SO2DPlot_Triangle_0_Plot /* Plots zero line inside triangle */
+  <                   (
+  <                     psf,
+  <                     tri_vec_corr.el[i].P[X], tri_vec_corr.el[i].P[Y],trival.P - lineval,
+  <                     tri_vec_corr.el[i].Q[X], tri_vec_corr.el[i].Q[Y],trival.Q - lineval,
+  <                     tri_vec_corr.el[i].R[X], tri_vec_corr.el[i].R[Y],trival.R - lineval,
+  <                     color_ind, steps, line, fStep, plot_p0, plot_p1
+  <                     
+  <                   );
+  <                 eps_set_pen(psf, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  < 
+  <                 color_ind++; j++;
+  <                 /* lineval represents the value of the isoline to be plotted */
+  <                 lineval += fStep;
+  <               }  
+  <             //SO2DPlot_Triangle_Plot(psf, &tri_vec_corr.el[i]); /* Plots triangles */
+  <           }   
+  <       }
+  < 
+  <   }
+  < 
+  < 
+  < /* Returns a vector of 8 triangles (SO2DPlot_Triangle_vec) 
+  <    for a given cell, each one with the center and 2 cell 
+  <    vertices points */
+  < 
+  < SO2DPlot_Triangle_vec SO2DPlot_Cell_Triangles
+  <   ( double *min,
+  <     double *max
+  <   )
+  <   {
+  <     double center[PDIM];
+  <     SO2DPlot_Triangle_vec tri_vec = SO2DPlot_Triangle_vec_new(8);
+  < 
+  <     /* Gets the center point coordinates */
+  <     center[X] = (min[X] + max[X]) * 0.5;
+  <     center[Y] = (min[Y] + max[Y]) * 0.5;
+  <     
+  <     /* Sets the coordinates for triangle 1 */ 
+  <     tri_vec.el[0].P[X] = min[X]; 
+  <     tri_vec.el[0].P[Y] = min[Y];
+  < 
+  <     tri_vec.el[0].Q[X] = center[X];
+  <     tri_vec.el[0].Q[Y] = min[Y];
+  < 
+  <     tri_vec.el[0].R[X] = center[X];
+  <     tri_vec.el[0].R[Y] = center[Y];
+  < 
+  <     /* Sets the coordinates for triangle 2 */
+  <     tri_vec.el[1].P[X] = center[X];
+  <     tri_vec.el[1].P[Y] = min[Y];
+  < 
+  <     tri_vec.el[1].Q[X] = max[X];
+  <     tri_vec.el[1].Q[Y] = min[Y];
+  < 
+  <     tri_vec.el[1].R[X] = center[X];
+  <     tri_vec.el[1].R[Y] = center[Y];
+  < 
+  <     /* Sets the coordinates for triangle 3 */
+  <     tri_vec.el[2].P[X] = max[X];
+  <     tri_vec.el[2].P[Y] = min[Y];
+  < 
+  <     tri_vec.el[2].Q[X] = max[X];
+  <     tri_vec.el[2].Q[Y] = center[Y];
+  < 
+  <     tri_vec.el[2].R[X] = center[X];
+  <     tri_vec.el[2].R[Y] = center[Y];
+  < 
+  <     /* Sets the coordinates for triangle 4 */
+  <     tri_vec.el[3].P[X] = max[X];
+  <     tri_vec.el[3].P[Y] = center[Y];
+  < 
+  <     tri_vec.el[3].Q[X] = max[X];
+  <     tri_vec.el[3].Q[Y] = max[Y];
+  < 
+  <     tri_vec.el[3].R[X] = center[X];
+  <     tri_vec.el[3].R[Y] = center[Y];
+  < 
+  <     /* Sets the coordinates for triangle 5 */
+  <     tri_vec.el[4].P[X] = max[X];
+  <     tri_vec.el[4].P[Y] = max[Y];
+  < 
+  <     tri_vec.el[4].Q[X] = center[X];
+  <     tri_vec.el[4].Q[Y] = max[Y];
+  < 
+  <     tri_vec.el[4].R[X] = center[X];
+  <     tri_vec.el[4].R[Y] = center[Y];
+  < 
+  <     /* Sets the coordinates for triangle 6 */
+  <     tri_vec.el[5].P[X] = center[X];
+  <     tri_vec.el[5].P[Y] = max[Y];
+  < 
+  <     tri_vec.el[5].Q[X] = min[X];
+  <     tri_vec.el[5].Q[Y] = max[Y];
+  < 
+  <     tri_vec.el[5].R[X] = center[X];
+  <     tri_vec.el[5].R[Y] = center[Y];
+  <  
+  <     /* Sets the coordinates for triangle 7 */
+  <     tri_vec.el[6].P[X] = min[X];
+  <     tri_vec.el[6].P[Y] = max[Y];
+  < 
+  <     tri_vec.el[6].Q[X] = min[X];
+  <     tri_vec.el[6].Q[Y] = center[Y];
+  < 
+  <     tri_vec.el[6].R[X] = center[X];
+  <     tri_vec.el[6].R[Y] = center[Y];
+  < 
+  <     /* Sets the coordinates for triangle 8 */  
+  <     tri_vec.el[7].P[X] = min[X];
+  <     tri_vec.el[7].P[Y] = center[Y];
+  < 
+  <     tri_vec.el[7].Q[X] = min[X];
+  <     tri_vec.el[7].Q[Y] = min[Y];
+  < 
+  <     tri_vec.el[7].R[X] = center[X];
+  <     tri_vec.el[7].R[Y] = center[Y];
+  < 
+  <     return tri_vec;
+  < }
+  <   
+  < void SO2DPlot_Plot_Tree(
+  <   FILE *psf, 
+  <   SOGrid_Tree *tree, 
+  <   double *min,
+  <   double *max,
+  <   int max_depth
+  < )
+  < {
+  <   assert(tree->d == 2, "wrong tree dimension");
+  <   eps_set_pen(psf, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0);
+  <   eps_draw_rectangle(psf, min[X], max[X], min[Y], max[Y]);
+  <   SO2DPlot_Plot_Subtree(psf, tree->root, min, max, X, 1, max_depth);
+  < }
+  <   
+  < void SO2DPlot_Plot_Subtree(
+  <   FILE *psf, 
+  <   SOGrid_Node *p, 
+  <   double *min,
+  <   double *max,
+  <   int long_axis,
+  <   int depth,
+  <   int max_depth
+  < )
+  < {
+  <   double min_aux[PDIM], max_aux[PDIM];
+  < 
+  <   min_aux[X] = min[X];
+  <   max_aux[X] = max[X];
+  <   min_aux[Y] = min[Y];
+  <   max_aux[Y] = max[Y];
+  < 
+  <   if ((p != NULL) && ((p->c[0] != NULL) || (p->c[1] != NULL)) && depth < max_depth)
+  <     { 
+  <       double xmid = (max[X] + min[X])/2.0;
+  <       double ymid = (max[Y] + min[Y])/2.0;
+  < 
+  <       eps_set_pen(psf, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0);
+  <       //      eps_fill_dot(psf, xmid, ymid, 0.5, 0, 0, 0);
+  < 
+  <       if (long_axis == X)
+  <       { 
+  <           eps_draw_segment(psf, xmid, min[Y], xmid, max[Y]);
+  < 	  max_aux[X] = xmid;
+  <           SO2DPlot_Plot_Subtree(psf, p->c[0], min_aux, max_aux, Y, depth + 1, max_depth);
+  < 
+  < 	  max_aux[X] = max[X];
+  < 	  min_aux[X] = xmid;
+  <           SO2DPlot_Plot_Subtree(psf, p->c[1], min_aux, max_aux, Y, depth + 1, max_depth);
+  <       }
+  <       else
+  <       { 
+  <           eps_draw_segment(psf, min[X], ymid, max[X], ymid);
+  < 	  max_aux[Y] = ymid;
+  <           SO2DPlot_Plot_Subtree(psf, p->c[0], min_aux, max_aux, X, depth + 1, max_depth);
+  < 
+  < 	  max_aux[Y] = max[Y];
+  < 	  min_aux[Y] = ymid;
+  < 
+  <           SO2DPlot_Plot_Subtree(psf, p->c[1], min_aux, max_aux, X, depth + 1, max_depth);
+  <       }
+  <     }
+  < }
+
+==========================================
+Only in progs: junk.make
+
+==========================================
+Only in progs: junk.make~
+
+==========================================
+Binary files progs/libsimo.a and /home/simoleo/ra014852/projeto/programs/libsimo.a differ
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: mural.html~
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: sfn
+
+==========================================
+Only in /home/simoleo/ra014852/projeto/programs: tests

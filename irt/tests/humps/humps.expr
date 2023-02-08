@@ -1,0 +1,17 @@
+; homogeneous degree = -4
+(
+  (GIVEN w x y z)
+    (= wsq (sqr w))     ; w^2
+    (= wcb (* w wsq))   ; w^3
+    (= wfv (* wsq wcb)) ; w^5
+    
+    (= xa x)
+    (= ya (- y w))
+    (= fa (/ 2 (sqr (+ wsq (+ (sqr xa) (sqr ya))))))
+   
+    (= xb (- x (/ 2 w)))
+    (= yb (+ y (/ 3 w)))
+    (= fb (/ 3 (sqr (+ wsq (+ (sqr xb) (sqr yb))))))
+   
+  (RETURN (- (/ z wfv) (+ fa fb)))
+)

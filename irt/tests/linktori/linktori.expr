@@ -1,0 +1,44 @@
+( (GIVEN w x y z)
+    (= wsq (sqr w))
+    (= wsqasq (/ wsq 16))
+    (= whalf (/ w 2))
+    (= ysq (sqr y))
+    (= zsq (sqr z))
+    
+    ; Torus 1
+    (= z1 z)
+    (= z1sq zsq)
+    
+    (= x1 (+ x whalf))
+    (= x1sq (sqr x1))
+    
+    (= y1 y)
+    (= y1sq ysq)
+    
+    (= r1sq (+ x1sq y1sq))
+    (= u1 (- r1sq wsq))
+    (= v1 (+ r1sq wsq))
+    (= s1 (- z1sq wsqasq))
+    (= t1 (+ (+ (sqr u1) (* 2 (* v1 s1))) (sqr s1)))
+    
+    ; Torus 2
+    (= z2 y)
+    (= z2sq ysq)
+
+    (= x2 (- x whalf))
+    (= x2sq (sqr x2))
+
+    (= y2 z)
+    (= y2sq zsq)
+
+    (= r2sq (+ x2sq y2sq))
+    (= u2 (- r2sq wsq))
+    (= v2 (+ r2sq wsq))
+    (= s2 (- z2sq wsqasq))
+    (= t2 (+ (+ (sqr u2) (* 2 (* v2 s2))) (sqr s2)))
+    
+    ; Combine the two:
+    (= t (* t1 t2))
+
+  (RETURN t)
+)

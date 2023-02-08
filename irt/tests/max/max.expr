@@ -1,0 +1,16 @@
+(
+  (GIVEN w x y z)
+    (= f (- z (max x y))) ; deg = 1
+
+    ; Clipping planes:
+    
+    (= wt (+ w w))
+    
+    (= py (max (- y wt) (- wt y))) ; deg = 1
+    
+    (= px (max (- x wt) (- wt x))) ; deg = 1
+    
+    
+
+  (RETURN (max (max px py) (* f w)))
+)

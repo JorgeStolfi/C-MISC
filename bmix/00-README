@@ -1,0 +1,7 @@
+# Last edited on 2013-10-31 01:53:07 by stolfilocal
+
+"bmix": a program that reads and writes two data files, swapping bits according to a key file.
+
+Type "bmix -info" for the manual.
+
+See the "tests" sub-directory for examples.

@@ -1,0 +1,42 @@
+# Last edited on 2013-10-24 22:55:10 by stolfilocal
+
+This directory contains the source for "ioplot", a simple program to generate
+multi-level "ham slice" plots in Encapsulated Postscrip format.
+ 
+DOCUMENTATION
+
+  To get the manpage, execute "ioplot -info" (or "ioplot -help" for a short reminder).
+
+  Other examples of use can be found in tests/Makefile.
+
+  Samples of output plots can be found in tests/out-check
+
+BUILDING
+
+  The code and Makefile seem to work on Fedora GNU/Linux as installed on my machine.
+  They will probably need adjustments for other environments.  
+  
+  Executing "make" at the root directory will compile all modules and link the 
+  executable "ioplot".
+  
+  You may have to delete the file "Deps.make".
+  
+  Executing "make" in the "tests" sub-directory should run three examples and 
+  display the output Postscript files (in the "tests/out" sub-directory).
+  If all goes well, they should be identical to the files in "tests/out-check".
+  
+DISCLAIMERS
+
+  This software is provided "as is", WITHOUT ANY EXPLICIT OR
+  IMPLICIT WARRANTY, not even the implied warranties of merchantibility
+  and fitness for a particular purpose.
+
+  Permission to use, copy, modify, and redistribute this software and
+  its documentation for any purpose is hereby granted, royalty-free,
+  provided that: (1) the notices in the source files about copyright,
+  authorship, warranty and rights in all source files are retained or
+  replaced by completely free alternatives, such as the GNU Public
+  License (GPL); (2) no executable code derived from this file is
+  published or distributed without the corresponding source code; and
+  (3) these same rights are granted to any recipient of such code, under
+  the same conditions.

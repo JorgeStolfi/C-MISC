@@ -1,0 +1,23 @@
++250 Initial Cash Bal
+-35 Final Cash Bal
++50 Sales
++30 Gifts Received
+-80 Rent
+* Personel
+> -20 Lawyers
+> -10 Janitors
+* Services
+> +5 Consulting
+> -30 Royalties
+* Plots
+> * Color plots
+> > -20 Blue plots
+> > -30 Green plots
+> * B&W plots
+> > -20 Piecharts
+> > -20 Bargraphs
+> -30 Murky plots
+> +15 Plot refunds
+> +25 Plot sales
+-70 Food
+-10 Toner

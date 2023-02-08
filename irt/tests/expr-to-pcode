@@ -1,0 +1,19 @@
+#! /bin/csh -f
+
+# Converts a lisp-like expression to equivalent pseudocode.
+# See comments in ~stolfi/PUB/lisp/lib/expr-to-pcode.lsp
+
+if ( $#argv != 1 ) then
+  echo "Usage:"
+  echo "  $0 <exprname>"
+  echo "will read file \"<exprname>.expr\" and write \"<exprname>.pcode\""
+  exit 1
+endif
+
+set lsp = "${STOLFIHOME}/lib"
+
+/usr/lang/xlisp/bin/xlisp << EOF
+(setq *breakenable* nil)
+(load "${lsp}/expr-to-pcode.lsp")
+(parse "$1")
+EOF

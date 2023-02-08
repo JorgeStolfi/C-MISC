@@ -1,0 +1,27 @@
+[ # Left side walls:
+  BC0.W.s.1
+  BC1.W.s.1
+  BC2.W.s.1
+]
+[ # Right side walls:
+  BC0.W.s.2
+  BC1.W.s.2
+  BC2.W.s.2
+]
+[ # Bottoms and tops, chest 0:
+  @BC0.W.b.1
+  @BC0.W.t.1
+]
+[ # Bottoms and tops, chest 1:
+  @BC1.W.b.1
+  @BC1.W.t.1
+]
+[ # Bottoms and tops, chest 2:
+  BC2.W.b.1
+  BC2.W.t.1
+]
+[ # Rear walls:
+  BC0.W.r.1
+  BC1.W.r.1
+  BC2.W.r.1
+]

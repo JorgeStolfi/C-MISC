@@ -1,0 +1,18 @@
+; Test of mul and add
+(
+  (GIVEN w x y z)
+
+    (= f (- (* z w) (* x y))) ; deg = 2
+
+    ; Clipping planes:
+    
+    (= wt (+ w w))
+    
+    (= py (* (- y wt) (+ y wt))) ; deg = 2
+    
+    (= px (* (- x wt) (+ x wt))) ; deg = 2
+
+  (RETURN (max (max px py) f))
+)
+
+   

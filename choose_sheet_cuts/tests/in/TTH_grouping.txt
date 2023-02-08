@@ -1,0 +1,42 @@
+# Last edited on 2022-04-20 00:30:02 by stolfi
+# ----------------------------------------------------------------------
+
+@[
+  @HTop.1  
+  @HBas.1  
+  @HBot.1  
+  @LTop.1  
+  @LBot.1  
+  @[
+    LSid.1  
+    LSid.2  
+    HSid.1  
+    HSid.2 
+  ]
+]
+[
+  @HSep.1  
+  @HSep.2  
+  @HSep.3  
+  @HSep.4  
+  @HSep.5  
+  @HSep.6  
+  @HSep.7  
+  @HSep.8  
+  @HSep.9  
+  @HSep.10 
+  @HSep.11 
+  @HSep.12 
+  @HSep.13 
+  @HSep.14 
+  @HSep.15 
+  @HSep.16 
+  @HSep.17 
+  @HSep.18 
+  @HSep.19
+]
+LBak.1  
+@[
+  @HBak.1
+  @LFrn.1  
+]

@@ -1,0 +1,13 @@
+( (GIVEN w x y z)
+    (= w2 (sqr w))
+    (= x2 (sqr x))
+    (= y2 (sqr y))
+    (= z2 (sqr z))
+    (= r2 (+ x2 y2))
+    (= u (- r2 w2))
+    (= v (+ r2 w2))
+    (= s (- z2 (/ w2 4)))
+  (RETURN (+ (+ (sqr u) (* 2 (* v s))) (SQR s)))
+)
+
+           

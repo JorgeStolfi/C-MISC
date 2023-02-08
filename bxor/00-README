@@ -1,0 +1,7 @@
+# Last edited on 2013-10-31 01:51:41 by stolfilocal
+
+"bxor": a program that reads two files, writes their birwise XOR to standard output.
+
+Type "bxor -info" for the manual.
+
+See the "tests" sub-directory for examples.

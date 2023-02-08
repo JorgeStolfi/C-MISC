@@ -1,0 +1,91 @@
+#! /bin/bash 
+# Last edited on 2005-08-27 02:34:13 by stolfi
+
+cmd=${0##*/}
+usage="${cmd} [-show] FILE.inc"
+
+# Creates a file caled "pov-params.inc" with some POV-Ray definitions;
+# in particular, the name {modelfile} is set to the string
+# "{FILE}.inc".
+# 
+# Then runs POV-Ray on "pov-main.pov", that presumably include
+# "pov-params.inc" and other stuff, to generate an image called
+# "{FILE}.png" If "-show" is specified, displays that image.
+
+function error()
+{ 
+  echo "${cmd}: $1" >&2; 
+  echo "usage: ${usage}" >&2; 
+  exit 1;
+}
+
+show=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -show ) 
+      show=1; shift ;;
+    -* )
+      error "unrecognized option $1";
+      exit 1 ;;
+    * ) break;;
+  esac;
+done
+
+if [ $# -ne 1 ]; then
+  error "wrong number of parameters";
+fi
+
+infile="$1"; shift
+inname=${infile%.*}
+
+echo ${infile} ${inname} >&2; 
+
+######################################################################
+# Creating the POV-ray parameter file
+
+POVPARAMS="pov-params.inc"
+
+cat <<EOF > ${POVPARAMS}
+// THIS FILE iS CREATED AUTOMATICALLY - ANY EDITS WILL BE LOST
+// Created by pov-show
+
+#declare modelfile = "${infile}"
+
+// Camera parameters
+#declare camera_ctr = < 5000.0, 5000.0, 500.0 >;
+#declare camera_dir = < +5.000, +7.000, +1.500 >;
+#declare scene_radius = 5000;
+
+EOF
+
+######################################################################
+# Running POV-ray
+
+POVMAIN="pov-main.pov"
+
+PNGFILE="${inname}.png"
+
+WIDTH=400
+HEIGHT=400
+NRAYS=2
+
+POVPUB=${STOLFIHOME}/pkg/povray-3.50c-1/PUB
+POVRAY=${POVPUB}/i686-Linux-2.2/bin/povray
+POVINC=${POVPUB}/share/povray-3.5/include
+POVTTF=${STOLFIHOME}/PUB/povray/tt-fonts
+IMVIEW="display -title '%d/%f'"
+
+/bin/rm -f ${PNGFILE}
+nice ${POVRAY} \
+    +FN +Q9 \
+    +W${WIDTH} +H${HEIGHT} \
+    +AM1 +A0.0 +R${NRAYS} \
+    +D +SP32 +EP4 \
+    +L${POVINC} \
+    +L${POVTTF} \
+    +I${POVMAIN} \
+    +O${PNGFILE}
+
+if [ ${show} ]; then
+  ${IMVIEW} ${PNGFILE}
+fi

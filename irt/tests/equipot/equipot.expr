@@ -1,0 +1,29 @@
+; Homogeneous degree = -1
+(
+  (GIVEN w x y z)
+
+    (= sw (* w 3))
+
+    (= ax (- x (* +1 sw)))
+    (= ay (- y (* +1 sw)))
+    (= az (- z (* +1 sw)))
+    (= pa (/ +3 (sqrt (+ (+ (sqr ax) (sqr ay)) (sqr az)))))
+
+    (= bx (- x (* -1 sw)))
+    (= by (- y (* -1 sw)))
+    (= bz (- z (* +1 sw)))
+    (= pb (/ -1 (sqrt (+ (+ (sqr bx) (sqr by)) (sqr bz)))))
+
+    (= cx (- x (* +1 sw)))
+    (= cy (- y (* -1 sw)))
+    (= cz (- z (* -1 sw)))
+    (= pc (/ +2 (sqrt (+ (+ (sqr cx) (sqr cy)) (sqr cz)))))
+
+    (= dx (- x (* -1 sw)))
+    (= dy (- y (* +1 sw)))
+    (= dz (- z (* -1 sw)))
+    (= pd (/ -2 (sqrt (+ (+ (sqr dx) (sqr dy)) (sqr dz)))))
+
+  (RETURN (+ (+ pa pb) (+ pc pd)))
+)
+

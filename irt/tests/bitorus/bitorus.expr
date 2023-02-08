@@ -1,0 +1,27 @@
+(
+  (GIVEN w x y z)
+
+    (= w2 (sqr w))
+    (= x2 (sqr x))
+    (= y2 (sqr y))
+    (= z2 (sqr z))
+    
+    (= whalf (/ w 2))
+    
+    (= za2 (sqr (- z w)))
+    (= a (+ x2 za2))           ; deg = 2
+    
+    (= zb2 (sqr (+ z w)))
+    (= b (+ y2 zb2))            ; deg = 2
+    
+    (= c (+ (+ x2  y2) z2))     ; deg = 2
+    
+    (= f (- (* (+ a b) (* c w2)) (* (- (* 4 w2) (/ c 8)) (* a b)))) ; deg = 6
+  
+  (RETURN f)
+
+  ; (= w4 (sqr w2))
+  ; (= w5 (* w4 w))
+  ; (RETURN (max (* w5 y) f))   ; deg = 6
+)
+

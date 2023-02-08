@@ -1,0 +1,101 @@
+plywd C0.DR-1.f.1  569.0   14.0   10.0 # face plate
+plywd C0.DR00.b.1  453.0  495.0   10.0 # drawer bottom
+plywd C0.DR00.f.1  569.0  234.0   10.0 # face plate
+plywd C0.DR00.r.1  495.0  232.0   10.0 # drawer rear wall
+plywd C0.DR00.s.1  465.0  232.0   10.0 # drawer side walls
+plywd C0.DR00.s.2  465.0  232.0   10.0 # drawer side walls
+plywd C0.DR01.b.1  453.0  495.0   10.0 # drawer bottom
+plywd C0.DR01.f.1  569.0  163.5   10.0 # face plate
+plywd C0.DR01.r.1  495.0  161.5   10.0 # drawer rear wall
+plywd C0.DR01.s.1  465.0  161.5   10.0 # drawer side walls
+plywd C0.DR01.s.2  465.0  161.5   10.0 # drawer side walls
+plywd C0.DR02.b.1  453.0  495.0   10.0 # drawer bottom
+plywd C0.DR02.f.1  569.0  116.0   10.0 # face plate
+plywd C0.DR02.r.1  495.0  114.0   10.0 # drawer rear wall
+plywd C0.DR02.s.1  465.0  114.0   10.0 # drawer side walls
+plywd C0.DR02.s.2  465.0  114.0   10.0 # drawer side walls
+plywd C0.DR03.b.1  453.0  495.0   10.0 # drawer bottom
+plywd C0.DR03.f.1  569.0  107.0   10.0 # face plate
+plywd C0.DR03.r.1  495.0  105.0   10.0 # drawer rear wall
+plywd C0.DR03.s.1  465.0  105.0   10.0 # drawer side walls
+plywd C0.DR03.s.2  465.0  105.0   10.0 # drawer side walls
+plywd C0.DR04.f.1  569.0   14.5   10.0 # face plate
+plywd C0.W.b.1  475.0  540.0   15.0 # chest bottom wall
+plywd C0.W.r.1  655.0  540.0   15.0 # chest rear wall
+plywd C0.W.s.1  490.0  655.0   15.0 # chest side walls
+plywd C0.W.s.2  490.0  655.0   15.0 # chest side walls
+plywd C0.W.t.1  475.0  540.0   15.0 # chest top wall
+plywd C1.DR-1.f.1  569.0   14.0   10.0 # face plate
+plywd C1.DR00.b.1  453.0  495.0   10.0 # drawer bottom
+plywd C1.DR00.f.1  569.0  127.0   10.0 # face plate
+plywd C1.DR00.r.1  495.0  125.0   10.0 # drawer rear wall
+plywd C1.DR00.s.1  465.0  125.0   10.0 # drawer side walls
+plywd C1.DR00.s.2  465.0  125.0   10.0 # drawer side walls
+plywd C1.DR01.b.1  453.0  495.0   10.0 # drawer bottom
+plywd C1.DR01.f.1  569.0  106.0   10.0 # face plate
+plywd C1.DR01.r.1  495.0  104.0   10.0 # drawer rear wall
+plywd C1.DR01.s.1  465.0  104.0   10.0 # drawer side walls
+plywd C1.DR01.s.2  465.0  104.0   10.0 # drawer side walls
+plywd C1.DR02.b.1  453.0  495.0   10.0 # drawer bottom
+plywd C1.DR02.f.1  569.0   88.5   10.0 # face plate
+plywd C1.DR02.r.1  495.0   86.5   10.0 # drawer rear wall
+plywd C1.DR02.s.1  465.0   86.5   10.0 # drawer side walls
+plywd C1.DR02.s.2  465.0   86.5   10.0 # drawer side walls
+plywd C1.DR03.b.1  453.0  495.0   10.0 # drawer bottom
+plywd C1.DR03.f.1  569.0   74.0   10.0 # face plate
+plywd C1.DR03.r.1  495.0   72.0   10.0 # drawer rear wall
+plywd C1.DR03.s.1  465.0   72.0   10.0 # drawer side walls
+plywd C1.DR03.s.2  465.0   72.0   10.0 # drawer side walls
+plywd C1.DR04.b.1  453.0  495.0   10.0 # drawer bottom
+plywd C1.DR04.f.1  569.0   62.0   10.0 # face plate
+plywd C1.DR04.r.1  495.0   60.0   10.0 # drawer rear wall
+plywd C1.DR04.s.1  465.0   60.0   10.0 # drawer side walls
+plywd C1.DR04.s.2  465.0   60.0   10.0 # drawer side walls
+plywd C1.DR05.b.1  453.0  495.0   10.0 # drawer bottom
+plywd C1.DR05.f.1  569.0   53.0   10.0 # face plate
+plywd C1.DR05.r.1  495.0   51.0   10.0 # drawer rear wall
+plywd C1.DR05.s.1  465.0   51.0   10.0 # drawer side walls
+plywd C1.DR05.s.2  465.0   51.0   10.0 # drawer side walls
+plywd C1.DR06.b.1  453.0  495.0   10.0 # drawer bottom
+plywd C1.DR06.f.1  569.0   53.0   10.0 # face plate
+plywd C1.DR06.r.1  495.0   51.0   10.0 # drawer rear wall
+plywd C1.DR06.s.1  465.0   51.0   10.0 # drawer side walls
+plywd C1.DR06.s.2  465.0   51.0   10.0 # drawer side walls
+plywd C1.DR07.b.1  453.0  495.0   10.0 # drawer bottom
+plywd C1.DR07.f.1  569.0   53.0   10.0 # face plate
+plywd C1.DR07.r.1  495.0   51.0   10.0 # drawer rear wall
+plywd C1.DR07.s.1  465.0   51.0   10.0 # drawer side walls
+plywd C1.DR07.s.2  465.0   51.0   10.0 # drawer side walls
+plywd C1.DR08.f.1  569.0   14.5   10.0 # face plate
+plywd C1.W.b.1  475.0  540.0   15.0 # chest bottom wall
+plywd C1.W.r.1  655.0  540.0   15.0 # chest rear wall
+plywd C1.W.s.1  490.0  655.0   15.0 # chest side walls
+plywd C1.W.s.2  490.0  655.0   15.0 # chest side walls
+plywd C1.W.t.1  475.0  540.0   15.0 # chest top wall
+plywd C2.DR-1.f.1  569.0   14.0   10.0 # face plate
+plywd C2.DR00.b.1  453.0  495.0   10.0 # drawer bottom
+plywd C2.DR00.f.1  569.0  234.0   10.0 # face plate
+plywd C2.DR00.r.1  495.0  232.0   10.0 # drawer rear wall
+plywd C2.DR00.s.1  465.0  232.0   10.0 # drawer side walls
+plywd C2.DR00.s.2  465.0  232.0   10.0 # drawer side walls
+plywd C2.DR01.b.1  453.0  495.0   10.0 # drawer bottom
+plywd C2.DR01.f.1  569.0  163.5   10.0 # face plate
+plywd C2.DR01.r.1  495.0  161.5   10.0 # drawer rear wall
+plywd C2.DR01.s.1  465.0  161.5   10.0 # drawer side walls
+plywd C2.DR01.s.2  465.0  161.5   10.0 # drawer side walls
+plywd C2.DR02.b.1  453.0  495.0   10.0 # drawer bottom
+plywd C2.DR02.f.1  569.0  116.0   10.0 # face plate
+plywd C2.DR02.r.1  495.0  114.0   10.0 # drawer rear wall
+plywd C2.DR02.s.1  465.0  114.0   10.0 # drawer side walls
+plywd C2.DR02.s.2  465.0  114.0   10.0 # drawer side walls
+plywd C2.DR03.b.1  453.0  495.0   10.0 # drawer bottom
+plywd C2.DR03.f.1  569.0  107.0   10.0 # face plate
+plywd C2.DR03.r.1  495.0  105.0   10.0 # drawer rear wall
+plywd C2.DR03.s.1  465.0  105.0   10.0 # drawer side walls
+plywd C2.DR03.s.2  465.0  105.0   10.0 # drawer side walls
+plywd C2.DR04.f.1  569.0   14.5   10.0 # face plate
+plywd C2.W.b.1  475.0  540.0   15.0 # chest bottom wall
+plywd C2.W.r.1  655.0  540.0   15.0 # chest rear wall
+plywd C2.W.s.1  490.0  655.0   15.0 # chest side walls
+plywd C2.W.s.2  490.0  655.0   15.0 # chest side walls
+plywd C2.W.t.1  475.0  540.0   15.0 # chest top wall

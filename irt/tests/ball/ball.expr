@@ -1,0 +1,6 @@
+( 
+  (GIVEN w x y z)
+  (= r2 (+ (+ (SQR x) (SQR y)) (SQR z)))
+  (= w2 (SQR w))
+  (RETURN (- r2 w2))
+)

@@ -1,0 +1,13 @@
+proc_name torus
+arithmetic IA/DIFF
+matte_color      0.20 0.70 0.10
+background_color 0.00 0.20 0.50
+image_width 128
+image_height 128
+observer 35.0  7.0  28.0
+focus     0.0  0.0   0.0 
+up        0.0  0.0   1.0
+light_source
+  position   100  -20  200
+  color      1.0  1.0  1.0
+end_light

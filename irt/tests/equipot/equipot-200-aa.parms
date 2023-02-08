@@ -1,0 +1,13 @@
+proc_name equipot
+arithmetic AA
+matte_color      0.20 0.70 0.10
+background_color 0.00 0.20 0.50
+image_width 200
+image_height 200
+observer 100.0  20.0  80.0
+focus      0.0   0.0   0.0 
+up         0.0   0.0   1.0
+light_source
+  position   200  -40  200
+  color      1.0  1.0  1.0
+end_light

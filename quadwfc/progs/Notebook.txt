@@ -1,0 +1,30 @@
+# Last edited on 2009-02-11 14:42:05 by stolfi
+
+THINGS TO DO
+
+Wavefront modeling
+
+  Use a C1 model with bicubic patches.  In particular, use the
+  endpoint velocities and cubic interpolation when inserting 
+  new vertices in an edge.
+  
+  Store wave energy in triangles and manage it when breaking or contracting
+  edges.
+  
+Density control
+
+  Implement at least some cases of edge contraction, or use a different strategy.
+  
+  Detect crossover, i.e. degenerate {prox--curr} prisms.
+
+Plotting
+
+  Move mesh*.{h,c} to JSLIBS/libgeo or to a separate JSLIBS/libmesh package.
+  
+  Move plotwfc.c to ~/programs/c/geoplot, make it into a generic mesh plotter.
+  Add depth-sorting of trianglets, or (better) full visibility processing.
+  
+  Rename {ouput_wave} to {plot_wave}.
+  
+  Add {plot_model}, that outputs a mesh instead of the model itself.
+  

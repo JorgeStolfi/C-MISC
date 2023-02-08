@@ -1,0 +1,9 @@
+GIVEN 4
+LOAD 1
+LOAD 2
+LOAD 3
++
++
+LOAD 0
+-
+RETURN 1
