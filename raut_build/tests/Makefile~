@@ -1,0 +1,7 @@
+# Last edited on 2009-11-01 15:38:09 by stolfi
+
+PROG_TEST_DIRS := \
+  small_dic \
+  purtu_dic
+
+include ${STOLFIHOME}/programs/c/GENERIC-ROOT-DIR.make

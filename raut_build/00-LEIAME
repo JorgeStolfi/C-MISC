@@ -1,0 +1,8 @@
+# Last edited on 2009-11-01 15:34:25 by stolfi
+
+This is a C version of the Modula-3 program MaintainAutomaton 
+(Dicio project, IC-UNICAMP, 1992-1997).
+
+The program builds an acyclic finite automaton for a finite sets of
+strings, and checks given strings againts it.
+

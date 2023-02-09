@@ -1,0 +1,4 @@
+# Last edited on 2009-11-01 15:36:47 by stolfi
+
+Enumerates all simple paths in a directed graph.  Can be usedfor undirected graphs too.
+

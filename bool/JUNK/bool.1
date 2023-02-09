@@ -1,0 +1,146 @@
+.\" (****************************************************************************)
+.\" (* (C) Copyright 1992 Universidade Estadual de Campinas (UNICAMP)           *)
+.\" (*                    Campinas, SP, Brazil                                  *)
+.\" (*                                                                          *)
+.\" (* Authors:                                                                 *)
+.\" (*                                                                          *)
+.\" (*   Tomasz Kowaltowski  - CS Dept, UNICAMP <tomasz@dcc.unicamp.br>         *)
+.\" (*   Claudio L. Lucchesi - CS Dept, UNICAMP <lucchesi@dcc.unicamp.br>       *)
+.\" (*   Jorge Stolfi        - CS Dept, UNICAMP <stolfi@dcc.unicamp.br>         *)
+.\" (*                                                                          *)
+.\" (* This file can be freely distributed, modified, and used for any          *)
+.\" (*   non-commercial purpose, provided that this copyright and authorship    *)
+.\" (*   notice be included in any copy or derived version of this file.        *)
+.\" (*                                                                          *)
+.\" (* DISCLAIMER: This software is offered ``as is'', without any guarantee    *)
+.\" (*   as to fitness for any particular purpose.  Neither the copyright       *)
+.\" (*   holder nor the authors or their employers can be held responsible for  *)
+.\" (*   any damages that may result from its use.                              *)
+.\" (****************************************************************************)
+.\"
+.\" Last modified on Tue Feb 11 17:43:25 PST 1992 by stolfi
+.nh
+.TH bool 1
+.SH Name
+bool \- union/intersection/difference of two sorted files
+
+.SH Syntax
+.B bool [ -v | --verbose ] [ -s | --signedBytes | -u | -unsignedBytes ] [ 1\-2 | 2\-1 | 1\+2 | 1.2 | 1\#2 ] file1 file2 
+
+.SH Description
+.B bool
+computes a specified Boolean operation (intersection, union, 
+difference, or symmetric difference) of 
+.I file1
+and
+.IR file2 ,
+viewed as sets of lines.  
+.PP
+Either 
+.I file1
+or 
+.I file2
+(but not both) may be "\-", signifying "standard input".
+The result is always written to the standard output.
+.PP
+The Boolean operation is specified by the first argument (after
+the option switches, if any), according to the following code:
+.TP 6
+.B 1\-2
+difference: only the lines of 
+.I file1
+that do not occur in 
+.IR file2 .
+.TP 6
+.B 2\-1
+reverse difference: only the lines of
+.I file2
+that do not occur in 
+.IR file1 .
+.TP 6
+.B 1.2
+intersection: only the lines that occur in both files.
+.TP 6
+.B 1+2
+union: all the lines that occur in
+.I file1
+or 
+.I file2
+or both.
+.TP 6
+.B 1#2
+symmetric difference: only the lines that occur in either
+.I file1
+or 
+.I file2 ,
+but not in both.
+.PP
+The specifications
+.BR 2.1 ,
+.BR 2+1 ,
+and
+.B 2#1
+are equivalent to 
+.BR 1.2 ,
+.BR 1+2 ,
+and
+.BR 1#2 ,
+respectively.
+.PP
+In the input files, every line, including the last one,
+must be terminated by an end-of-line character (\\012).  So, an empty
+(zero length) file is assumed to contain no lines; all other 
+files must end with newline.
+.PP
+The lines in each input file 
+must be sorted in stricly increasing collating order.  
+Bytes are compared as unsigned integers by default---that 
+is, \\200-\\377 follows \\000-\\177---unless the
+.BB -s
+switch is given.
+.PP
+.B bool
+is somewhat similar to
+.BR comm (1).
+However, unlike the latter,
+.B bool
+properly handles characters in the range \\200--\\377,
+lines of arbitrary length, embedded 
+.BR NUL s,
+and complains if the input files are not sorted.
+Moreover, 
+.B bool 
+always writes the output in a single column, with no extraneous
+spaces or 
+.BR TAB s.  
+.SH Options
+.TP 6
+.B \-v
+or 
+.B \--verbose
+Print the input and output line counts to standard error.
+
+.TP 6
+.B \-s
+or
+.B \--signedBytes
+Compares bytes as if they were signed.  With this option, 
+characers in the range \\200--\\377 (which include all the ISO
+accented letters) compare lower than the plain ASCII characters
+\\000--\\177. This option is provided for compatibility with the
+SunOS 4.1 version of 
+.BR sort (1).
+
+.SH Bugs
+Likely.
+
+.SH Challenges for the bored
+Add options for other collating sequences (ASCII, national, ...).
+
+Print more info in final summary 
+.RB ( -v
+option).
+
+.SH Author
+Jorge Stolfi
+
