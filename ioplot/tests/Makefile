@@ -1,4 +1,4 @@
-# Last edited on 2013-10-27 02:33:14 by stolfilocal
+# Last edited on 2023-02-21 10:42:45 by stolfi
 
 PROG := ioplot
 PROGDIR := ..
@@ -12,7 +12,7 @@ check: \
   run-test-2 \
   run-test-3
   
-PSVIEW := gv
+PSVIEW := evince
 PNGVIEW := display
   
 # ====================================================================

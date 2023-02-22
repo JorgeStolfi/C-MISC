@@ -1,5 +1,5 @@
 /* See {init_wf.h}. */
-/* Last edited on 2009-02-10 08:59:48 by stolfi */
+/* Last edited on 2023-02-12 23:52:48 by stolfi */
 
 #include <init_wf.h>
 
@@ -84,7 +84,7 @@ wavefront_t init_wf
 wavefront_t wavefront_from_samples(sref_vec_t *st)
   {
     project_sites(st->ne, st->e);
-    qarc_t a = triangulate(st->ne, st->e);
+    quad_arc_t a = triangulate(st->ne, st->e);
     unproject_sites(st->ne, st->e);
     return (wavefront_t){ a, st->ne, *st };
   }

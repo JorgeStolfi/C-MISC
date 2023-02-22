@@ -4,7 +4,7 @@
 
 #define wikipedia_vorticity_C_COPYRIGHT "Copyright © 2010 by the State University of Campinas (UNICAMP)"
 
-/* Last edited on 2012-09-28 23:08:10 by stolfilocal */
+/* Last edited on 2023-02-20 04:52:18 by stolfi */
 
 #define PROG_HELP \
   PROG_NAME  " \\\n" \
@@ -160,13 +160,13 @@ void output_triangles(FILE *wr, r3_vec_t pts, options_t *o)
         z[i] = o->scale * p->c[2] + o->offset;
       }
     quad_arc_t e = delaunay_build (st, nsites);
-    plot_delaunay_pov(wr, e, nsites, st, z, o->clip_in, o->clip_out, o->clip_int);
+    delaunay_plot_diagram_pov(wr, e, nsites, st, z, o->clip_in, o->clip_out, o->clip_int);
     free(height);
     fflush(wr);
   }
 
 
-void plot_delaunay_POV (quad_arc_t e, delaunay_site_t *st, int nsites, double height[] ,char *filename,double scale,double offset)
+void delaunay_plot_diagram_POV (quad_arc_t e, delaunay_site_t *st, int nsites, double height[] ,char *filename,double scale,double offset)
   { 
       
     /* Create Postscript document or EPS figure stream. */

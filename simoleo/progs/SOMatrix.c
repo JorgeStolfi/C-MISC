@@ -1,5 +1,5 @@
 /* See SOMatrix.h */
-/* Last edited on 2006-02-28 12:06:22 by stolfi */
+/* Last edited on 2023-02-12 07:50:59 by stolfi */
 
 #include <SOMatrix.h>
 
@@ -552,14 +552,14 @@ SOMatrix SOMatrix_Read(FILE *rd)
   { SOMatrix A;
     int nA;
     filefmt_read_header(rd, "SOMatrix", SOMatrix_FileFormat);
-    A.rows = nget_int(rd, "rows"); fget_eol(rd); 
-    A.cols = nget_int(rd, "cols"); fget_eol(rd);
-    nA = nget_int(rd, "elems"); fget_eol(rd);
+    A.rows = nget_int32(rd, "rows"); fget_eol(rd); 
+    A.cols = nget_int32(rd, "cols"); fget_eol(rd);
+    nA = nget_int32(rd, "elems"); fget_eol(rd);
     { MatEntry_vec_t Aents = MatEntry_vec_new(nA);
       int kA;
       for (kA = 0; kA < nA; kA++)
-        { Aents.e[kA].row = fget_int(rd); 
-          Aents.e[kA].col = fget_int(rd); 
+        { Aents.e[kA].row = fget_int32(rd); 
+          Aents.e[kA].col = fget_int32(rd); 
           Aents.e[kA].va = fget_double(rd);
           fget_eol(rd);
         }

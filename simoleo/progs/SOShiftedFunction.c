@@ -1,5 +1,5 @@
 /* See SOShiftedFunction.h */
-/* Last edited on 2005-06-05 21:05:55 by stolfi */
+/* Last edited on 2023-02-12 07:50:55 by stolfi */
 
 #include <SOShiftedFunction.h>
 #include <SOFunction.h>
@@ -150,7 +150,7 @@ SOShiftedFunction *SOShiftedFunction_Read(FILE *rd)
     int i;
     for (i = 0; i < MAX_PDIM; i++) 
       { if (i < f->d->fn.pDim)
-          { int ir = fget_int(rd); 
+          { int ir = fget_int32(rd); 
             affirm(i == ir, "bad seq in file");
             LO(B[i]) = fget_double(rd);
             HI(B[i]) = fget_double(rd);

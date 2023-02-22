@@ -1,32 +1,30 @@
-# Last edited on 2013-10-31 02:32:01 by stolfilocal
+# Last edited on 2023-02-09 08:09:20 by stolfi
 
 PROG := bmix
 PROGDIR := ..
 
 include ${STOLFIHOME}/programs/c/GENERIC-PROGS-TEST.make
 
+IN_FILES := data/afile.txt data/bfile.txt
+KEY_FILE := data/xfile.txt
+OUT_FILES := out/amfile.txt out/bmfile.txt
+OUT2_FILES := out/aufile.txt out/bufile.txt
+
 all: out/amfile.txt out/aufile.txt
 
-out:
-	mkdir -p out
-
 # Mixing two files:
-out/amfile.txt: ${PROGDIR}/${PROG} afile.txt bfile.txt xfile.txt out 
+out/amfile.txt: ${PROGDIR}/${PROG} ${IN_FILES}
 	${PROGDIR}/${PROG} \
             -verbose \
-            afile.txt bfile.txt \
-            xfile.txt \
-            out/amfile.txt out/bmfile.txt
-	ls -l afile.txt bfile.txt xfile.txt out/amfile.txt out/bmfile.txt
+            ${IN_FILES} ${KEY_FILE} ${OUT_FILES}
+	ls -l ${IN_FILES} ${KEY_FILE} ${OUT_FILES}
 	strings out/amfile.txt
 
 # Un-mixing the two files:
-out/aufile.txt: ${PROGDIR}/${PROG} out/amfile.txt out/bmfile.txt xfile.txt out
+out/aufile.txt: ${PROGDIR}/${PROG} ${OUT_FILES} ${KEY_FILE}
 	${PROGDIR}/${PROG} \
             -verbose \
-            out/amfile.txt out/bmfile.txt \
-            xfile.txt \
-            out/aufile.txt out/bufile.txt
-	ls -l out/{a,b}mfile.txt xfile.txt out/{a,b}ufile.txt
-	prdiff afile.txt out/aufile.txt
-	prdiff bfile.txt out/bufile.txt
+            ${OUT_FILES} ${KEY_FILE} ${OUT2_FILES} 
+	ls -l ${OUT_FILES} ${KEY_FILE} ${OUT2_FILES}
+	prdiff data/afile.txt out/aufile.txt
+	prdiff data/bfile.txt out/bufile.txt

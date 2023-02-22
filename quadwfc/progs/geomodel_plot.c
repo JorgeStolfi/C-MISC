@@ -1,5 +1,5 @@
 /* See {geomodel_plot.h}. */
-/* Last edited on 2005-08-26 00:18:36 by stolfi */
+/* Last edited on 2023-02-12 11:45:59 by stolfi */
 
 #include <geomodel_plot.h>
 
@@ -14,7 +14,7 @@
 #include <r4x4.h>
 #include <rmxn.h>
 #include <hr3.h>
-#include <pswr.h>
+#include <epswr.h>
 #include <affirm.h>
 #include <bool.h>
 #include <sign.h>
@@ -27,19 +27,19 @@
 /* INTERNAL PROTOTYPES */
 
 void paint_reflector(
-    PSStream *fps,
+    epswr_figure_t *eps,
     hr3_pmap_t *map,        /* Perspective projection matrix. */
     reflector_t *rf,        /* Reflector to plot. */
     frgb_t *color,          /* Base color of reflector. */
     r3_t *dLight,           /* Direction towards main light source. */
     double shadow           /* Amount of darkening by shadow. */
   );
-  /* Paints the reflector {rfl} to file {fps}. */
+  /* Paints the reflector {rfl} to file {eps}. */
 
 /* IMPLEMENTATIONS */
     
 void plot_geomodel(
-    PSStream *fps,
+    epswr_figure_t *eps,
     hr3_pmap_t *map,         /* Perspective projection matrix. */
     geomodel_t *geo,         /* Mesh to plot. */
     frgb_t *color,           /* Base color of mesh. */
@@ -50,12 +50,12 @@ void plot_geomodel(
     int irf;
     for (irf = 0; irf < geo->nrf; irf++)
       { reflector_t *rf = &(geo->rf[irf]);
-        paint_reflector(fps, map, rf, color, dLight, shadow);
+        paint_reflector(eps, map, rf, color, dLight, shadow);
       }
   }
 
 void paint_reflector(
-    PSStream *fps,
+    epswr_figure_t *eps,
     hr3_pmap_t *map,        /* Perspective projection matrix. */
     reflector_t *rf,        /* Reflector to plot. */
     frgb_t *color,          /* Base color of reflector. */
@@ -67,10 +67,10 @@ void paint_reflector(
     auto void DrawSegment(r3_t *P, r3_t *Q);
     
     void PaintTriangle(r3_t *P, r3_t *Q, r3_t *R)
-      { paint_triangle(fps, P, Q, R, map, color, dLight, shadow); }
+      { paint_triangle(eps, P, Q, R, map, color, dLight, shadow); }
     
     void DrawSegment(r3_t *P, r3_t *Q)
-      { draw_edge(fps, P, Q, map); }
+      { draw_edge(eps, P, Q, map); }
       
     int nx = rf->nv[0];
     

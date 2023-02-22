@@ -1,5 +1,5 @@
 /* Represenatation of the wavefront. */
-/* Last edited on 2013-10-02 03:08:50 by stolfilocal */
+/* Last edited on 2023-02-12 23:52:14 by stolfi */
 
 #ifndef wavefront_H
 #define wavefront_H
@@ -69,15 +69,8 @@ typedef struct face_t
 
 typedef face_t *fref_t;
 
-/* MESH EDGES */
-
-typedef quad_arc_t qarc_t; /* A reference to a directed edge, primal or dual. */
-
-#define qarc_NULL quad_arc_NULL
-
 /* VECTORS OF MESH ELEMENTS */
 
-typedef quad_arc_vec_t qarc_vec_t;
 vec_typedef(sref_vec_t,sref_vec,sref_t);
 vec_typedef(fref_vec_t,fref_vec,fref_t);
   /* An object {v} of type {XXX_vec_t} is a vector of things of type {XXX_t}. The
@@ -99,7 +92,7 @@ vec_typedef(fref_vec_t,fref_vec,fref_t);
 /* WAVEFRONT REPRESENTATION */
 
 typedef struct wavefront_t /* Representation of a wavefront. */
-  { qarc_t a;       /* Some edge reference of the mesh. */
+  { quad_arc_t a;       /* Some edge reference of the mesh. */
     int ns;         /* Number of active samples. */
     sref_vec_t st;  /* Current nodes are {st.e[0..ns-1]}, in arbitrary order. */
   } wavefront_t;
@@ -130,7 +123,7 @@ typedef struct wavefront_t /* Representation of a wavefront. */
 #define SET_LEFT(e,f) quad_set_ddata(quad_rot(e),(void *)(f))
 #define SET_RIGHT(e,f) quad_set_odata(quad_rot(e),(void *)(f))
 
-void create_face_records(qarc_t e);
+void create_face_records(quad_arc_t e);
   /* Creates one {face_t} record for each face of the triangulation
     reachable from {e} (including holes), and sets the {LEFT} fields
     of the appropriate edges. The faces will be numbered consecutively
@@ -139,7 +132,7 @@ void create_face_records(qarc_t e);
 
 /* TRAVERSAL */
 
-qarc_vec_t renumber_edges(qarc_vec_t a);
+quad_arc_vec_t renumber_edges(quad_arc_vec_t a);
   /* Enumerates undirected edges reachable from the arcs {a.e[..]}, and
     stores in their {num} fields consecutive integers.
     Returns an array {res} where {res.e[i]} is one primally reachable
@@ -149,19 +142,19 @@ qarc_vec_t renumber_edges(qarc_vec_t a);
     from {a} by a finite number of {Sym} and {Onext} operations (no {Rot}s
     or {Tor}s).  An edge {e} is /reachable/ iff some of its arcs is reachable. */
 
-qarc_vec_t arcs_from_edges(qarc_vec_t edge);
+quad_arc_vec_t arcs_from_edges(quad_arc_vec_t edge);
   /* Given an array {edge.e[..]} with one arc from each undirected 
     primal edge, returns an array {res} with two symmetric arcs for
     each edge.  The arcs for {edge.e[i]} are {res.e[2*i]} and 
     {res.e[2*i+1]}, in no particular order.  ??? unnecessary? */
 
-qarc_vec_t renumber_vertices(qarc_vec_t arc);
+quad_arc_vec_t renumber_vertices(quad_arc_vec_t arc);
   /* Renumbers all the origin vertices of the arcs in {arc[..]}
     consecutively from 0. Returns a vector of arcs {out} such that
     {quad_org(out[i])} is vertex number {i}, for all vertices, without
     repetitions. */
 
-qarc_vec_t renumber_faces(qarc_vec_t arc);
+quad_arc_vec_t renumber_faces(quad_arc_vec_t arc);
   /* Renumbers all the left faces of the arcs in {arc[..]}
     consecutively from 0. Returns a vector {side} such that
     {LEFT(side[i])} is face number {i}, for all faces, without

@@ -4,7 +4,7 @@
 
 /* Copyright © 2005 by the State University of Campinas (UNICAMP). */
 /* See the copyright, authorship, and warranty notice at end of file. */
-/* Last edited on 2011-12-29 20:32:23 by stolfilocal */
+/* Last edited on 2023-02-12 23:54:48 by stolfi */
 
 #define PROG_HELP \
   "  " PROG_NAME " \\\n" \
@@ -49,7 +49,7 @@
 #include <argparser_geo.h>
 
 #include <frgb.h>
-#include <pswr.h>
+#include <epswr.h>
 #include <affirm.h>
 #include <argparser.h>
 #include <bool.h>
@@ -69,10 +69,10 @@ typedef struct options_t /* Parsed command line options */
   } options_t;
 
 void plot_everything
-  ( PSStream *fps,           /* Poststcript stream, ready to plot. */
+  ( epswr_figure_t *eps,           /* Poststcript stream, ready to plot. */
     mesh_t *tri,             /* mesh_t to draw, or NULL */
     geomodel_t *geo,         /* geophysical model to draw, or NULL */
-    int N,                   /* Mesh subdivision parameter. */
+    int32_t N,                   /* Mesh subdivision parameter. */
     hr3_point_t *obs,        /* Observer's position. */
     hr3_point_t *ctr,        /* Center of interest. */
     double rad,              /* Radius of region of interest. */
@@ -85,12 +85,12 @@ void plot_everything
   );
   /* Plots `everything' about the mesh {tri} and model {geo}. */
 
-void plot_both_sides
-  ( PSStream *fps,           /* Postscript stream. */
-    char *fileTag,           /* Prefix for for page names. */
+void plot_both_sides    
+  ( char *outPrefix,         /* Prefix for for outout file names. */
+    char *fileTag,           /* Tag for for figure. */
     mesh_t *tri,             /* mesh_t to draw, or NULL */
     geomodel_t *geo,         /* geophysical model to draw, or NULL */
-    int N,                   /* Mesh subdivision parameter. */
+    int32_t N,                   /* Mesh subdivision parameter. */
     hr3_point_t *obs,        /* Observer's position */
     hr3_point_t *ctr,        /* Center of interest. */
     double rad,              /* Radius of region of interest. */
@@ -106,7 +106,7 @@ void plot_both_sides
     Each view is produced by {plot_everything} with the given
     parameters.
     
-    If {fps} is an EPS stream, calls {pswr_new_canvas} before each view.
+    If {eps} is an EPS stream, calls {epswr_new_canvas} before each view.
     The {figName} parameter is set to {fileTag} plus {-f} for front,
     or {-v} for back.
     
@@ -119,13 +119,13 @@ void plot_both_sides
     appropriate. However, captions are supressed if
     {pgs->captionLines} is zero. */
 
-options_t *pwfc_parse_options(int argn, char **argc);
+options_t *pwfc_parse_options(int32_t argn, char **argc);
 
 mesh_t *pwfc_read_named_mesh(char *triName);
 
 geomodel_t *pwfc_read_named_geomodel(char *geoName);
 
-int main(int argn, char **argc)
+int32_t main(int32_t argn, char **argc)
   { options_t *o = pwfc_parse_options(argn, argc);
 
     plot_options_t *po = &(o->plt);
@@ -135,13 +135,12 @@ int main(int argn, char **argc)
     geomodel_t *geo = pwfc_read_named_geomodel(o->geoName);
       
     /* Open the figure stream: */
-    PSStream *fps = new_ps_stream
-      (po->eps, o->outName, po->paperSize, FALSE, po->figSize, po->caption.ne);
+    epswr_figure_t *eps = new_figure(o->outName, po->figSize, po->caption.ne + 1);
 
     /* Plot the triangulation: */
-    pswr_new_picture(fps, -1.0,1.0, -1.0,1.0);
+    epswr_set_client_window(eps, -1.0,1.0, -1.0,1.0);
     plot_everything
-      ( fps, tri, geo, 0,
+      ( eps, tri, geo, 0,
         &(po->obs), &(po->ctr), po->radius, &(po->upp),
         &(o->rcolor), &(o->wcolor), &(po->light),
         po->edgeWidth,
@@ -149,11 +148,10 @@ int main(int argn, char **argc)
       );
     
     /* Add caption, if it is the case: */
-    if(! po->eps) { pswr_add_caption(fps, o->outName, 0.0); }
-    int k; 
-    for (k = 0; k < po->caption.ne; k++)
-      { pswr_add_caption(fps, po->caption.e[k], 0.0); }
-    pswr_close_stream(fps);
+    epswr_text(eps, o->outName, FALSE, 0.5, TRUE, FALSE);
+    for (int32_t k = 0; k < po->caption.ne; k++)
+      { epswr_text(eps, po->caption.e[k], FALSE, 0.5, TRUE, FALSE); }
+    epswr_end_figure(eps);
     return 0;
   }
   
@@ -163,7 +161,7 @@ mesh_t *pwfc_read_named_mesh(char *triName)
     fclose(rd);
     return tri;
   }
-    
+
 geomodel_t *pwfc_read_named_geomodel(char *geoName)
   { 
     if (geoName == NULL)
@@ -179,10 +177,10 @@ geomodel_t *pwfc_read_named_geomodel(char *geoName)
   }
     
 void plot_everything
-  ( PSStream *fps,           /* Poststcript stream, ready to plot. */
+  ( epswr_figure_t *eps,           /* Poststcript stream, ready to plot. */
     mesh_t *tri,             /* mesh_t to draw, or NULL */
     geomodel_t *geo,         /* geophysical model to draw, or NULL */
-    int N,                   /* Mesh subdivision parameter. */
+    int32_t N,                   /* Mesh subdivision parameter. */
     hr3_point_t *obs,        /* Observer's position. */
     hr3_point_t *ctr,        /* Observer's position. */
     double rad,              /* Radius of region of interest. */
@@ -196,45 +194,46 @@ void plot_everything
   { hr3_pmap_t map = hr3_pmap_persp(obs, ctr, rad, upp);
 
     mumble("geophysical model...\n");;
-    plot_geomodel(fps, &map, geo, rcolor, dLight, 0.1); 
+    plot_geomodel(eps, &map, geo, rcolor, dLight, 0.1); 
 
     mumble("mesh...\n");;
-    plot_mesh(fps, &map, tri, N, wcolor, dLight, 0.1); 
+    plot_mesh(eps, &map, tri, N, wcolor, dLight, 0.1); 
 
     mumble("Front axes...\n");;
-    pswr_set_pen(fps, 0.0,0.0,0.0, 2.0 * edgeWidth, 0,0);
-    draw_all_axes(fps, &map);
+    epswr_set_pen(eps, 0.0,0.0,0.0, 2.0 * edgeWidth, 0,0);
+    draw_all_axes(eps, &map);
   }
 
 void plot_both_sides
-  ( PSStream *fps,          /* Postscript stream. */
-    char *fileTag,          /* Prefix for for canvas names. */
-    mesh_t *tri,            /* mesh_t to draw, or NULL */
-    geomodel_t *geo,        /* geophysical model to draw, or NULL */
-    int N,                  /* Mesh subdivision parameter. */
+  ( char *outPrefix,        /* Prefix for for output file names. */
+    char *fileTag,          /* Prefix for for figures. */
+    mesh_t *tri,            /* The mesh to draw, or NULL */
+    geomodel_t *geo,        /* Geophysical model to draw, or NULL */
+    int32_t N,                  /* Mesh subdivision parameter. */
     hr3_point_t *obs,       /* Observer's position */
     hr3_point_t *ctr,       /* Observer's position */
     double rad,             /* Radius of region of interest. */
     hr3_point_t *upp,       /* Camera vertical reference */
-    frgb_t *rcolor,          /* Reflector color. */
-    frgb_t *wcolor,          /* Wavefront color. */
+    frgb_t *rcolor,         /* Reflector color. */
+    frgb_t *wcolor,         /* Wavefront color. */
     r3_t *dLight,           /* Direction towards main light source. */
     double edgeWidth,       /* Nominal line width in mm. */
     string_vec_t *caption,  /* Figure caption, or NULL. */
     bool_t verbose          /* TRUE to print messages along the way. */
   )
   { hr3_point_t obsx = (*obs);  /* Observer (to be flipped) */
-    int side, k;
 
-    for (side = +1; side >= -1; side -= 2)
-      { if (fps->eps)
-          { char *figTag = txtcat(fileTag, (side == 1 ? "-f" : "-v"));
-            pswr_new_canvas(fps, figTag);
-            free(figTag);
-          }
-        pswr_new_picture(fps, -1.0,1.0, -1.0,1.0);
+    for (int32_t side = +1; side >= -1; side -= 2)
+      { char *sideTag = (side == 1 ? "f" : "b");
+        char *sideCaption = (side == 1 ? "Front view" : "Back view");
+        char *fname = NULL;
+        asprintf(&fname, "%s-%s-%s.eps", outPrefix, fileTag, sideTag);
+        double figSize = 150.0; /* Plot area width and height (mm). */
+        int32_t nCap = (caption != NULL ? caption->ne : 0) + 1;
+        epswr_figure_t *eps = new_figure(fname, figSize, nCap);
+        epswr_set_client_window(eps, -1.0,1.0, -1.0,1.0);
         plot_everything(
-          fps,
+          eps,
           tri, geo, N,
           &obsx, ctr, rad, upp,
           rcolor, wcolor, dLight, 
@@ -243,20 +242,18 @@ void plot_both_sides
         );
         /* Add caption, etc: */
         if (caption != NULL)
-          { int k; 
-            for (k = 0; k < caption->ne; k++)
-              { pswr_add_caption(fps, caption->e[k], 0.0); }
+          { for (int32_t k = 0; k < caption->ne; k++)
+              { epswr_text(eps, caption->e[k], FALSE, 0.5, TRUE, FALSE); }
           }
-        if (! fps->eps)
-          { pswr_add_caption(fps, (side == 1 ? "Front view" : "Back view"), 0.0); }
+        epswr_text(eps, sideCaption, FALSE, 0.5, TRUE, FALSE);
         /* Reverse position of observer relative to ctr: */
         double obsw = obsx.c.c[0];
-        for (k = 1; k <= 3; k++) 
+        for (int32_t k = 1; k <= 3; k++) 
           { obsx.c.c[k] = 2*obsw*ctr->c.c[k] - obsx.c.c[k]; }
       }
   }
 
-options_t *pwfc_parse_options(int argc, char **argv)
+options_t *pwfc_parse_options(int32_t argc, char **argv)
   {
     argparser_t *pp = argparser_new(stderr, argc, argv);
     argparser_set_help(pp, PROG_NAME " version " PROG_VERS ", usage:\n" PROG_HELP);
@@ -275,21 +272,21 @@ options_t *pwfc_parse_options(int argc, char **argv)
 
     if (argparser_keyword_present(pp, "-rColor"))
       { r3_t color = argparser_get_next_r3(pp, 0.0, 1.0);
-        o->rcolor.c[0] = color.c[0];
-        o->rcolor.c[1] = color.c[1];
-        o->rcolor.c[2] = color.c[2];
+        o->rcolor.c[0] = (float)color.c[0];
+        o->rcolor.c[1] = (float)color.c[1];
+        o->rcolor.c[2] = (float)color.c[2];
       }
     else
-      { o->rcolor = (frgb_t){{1.0, 0.9, 0.8}}; }
+      { o->rcolor = (frgb_t){{1.0f, 0.9f, 0.8f}}; }
 
     if (argparser_keyword_present(pp, "-wColor"))
       { r3_t color = argparser_get_next_r3(pp, 0.0, 1.0);
-        o->wcolor.c[0] = color.c[0];
-        o->wcolor.c[1] = color.c[1];
-        o->wcolor.c[2] = color.c[2];
+        o->wcolor.c[0] = (float)color.c[0];
+        o->wcolor.c[1] = (float)color.c[1];
+        o->wcolor.c[2] = (float)color.c[2];
       }
     else
-      { o->wcolor = (frgb_t){{1.0, 0.9, 0.8}}; }
+      { o->wcolor = (frgb_t){{1.0f, 0.9f, 0.8f}}; }
 
     argparser_get_keyword(pp, "-outName");                               
     o->outName = argparser_get_next(pp);  

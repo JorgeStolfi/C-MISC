@@ -1,5 +1,5 @@
 /* See {mesh.h}. */
-/* Last edited on 2013-10-02 03:15:47 by stolfilocal */
+/* Last edited on 2023-02-13 15:01:23 by stolfi */
 
 #include <mesh.h>
 #include <basic.h>
@@ -15,10 +15,10 @@
 void write_mesh(FILE *wr, mesh_t *tri)
   { 
     auto void write_point(r3_t *p);
-    auto void write_arc(qarc_t a);
-    auto void write_org(qarc_t a);
-    auto void write_left(qarc_t a);
-    auto void write_edge_data(qarc_t e);
+    auto void write_arc(quad_arc_t a);
+    auto void write_org(quad_arc_t a);
+    auto void write_left(quad_arc_t a);
+    auto void write_edge_data(quad_arc_t e);
 
     int NV = tri->out.ne;
     int NE = tri->arc.ne / 2;
@@ -32,16 +32,16 @@ void write_mesh(FILE *wr, mesh_t *tri)
           }
       }
 
-    void write_arc(qarc_t e)
-      { fprintf(wr, "%d:%d", quad_edge(e)->mark, quad_tumble_code(e)); }
+    void write_arc(quad_arc_t e)
+      { quad_write_arc(wr, e, 0); }
 
-    void write_org(qarc_t a)
+    void write_org(quad_arc_t a)
       { fputc('v', wr); fprintf(wr, "%d", quad_org(a)->num); }
 
-    void write_left(qarc_t a)
+    void write_left(quad_arc_t a)
       { fputc('f', wr); fprintf(wr, "%d", LEFT(a)->num); }
 
-    void write_edge_data(qarc_t e)
+    void write_edge_data(quad_arc_t e)
       { write_arc(e); fputc(' ', wr);
         fputc(' ', wr);
 
@@ -66,8 +66,8 @@ void write_mesh(FILE *wr, mesh_t *tri)
 
     fprintf(wr, "vertices:\n");
     for (i = 0; i < NV; i++)
-      { qarc_t a = tri->out.e[i];
-        affirm(a != NULL_REF, "vertex with no arcs");
+      { quad_arc_t a = tri->out.e[i];
+        affirm(a != quad_arc_NULL, "vertex with no arcs");
         segment_t *v = quad_org(a);
         affirm(v->num == i, "inconsistent vertex num");
         fprintf(wr, "%d ", i);
@@ -83,18 +83,18 @@ void write_mesh(FILE *wr, mesh_t *tri)
 
     fprintf(wr, "edges:\n");
     for (i = 0; i < tri->arc.ne; i += 2)
-      { qarc_t a = tri->arc.e[i];
-        affirm(a != NULL_REF, "edge with no arcs");
-        quad_edge_rec *e = quad_edge(a);
-        affirm(e->mark == i/2, "inconsistent edge num");
+      { quad_arc_t a = tri->arc.e[i];
+        affirm(a != quad_arc_NULL, "edge with no arcs");
+        quad_edge_t e = quad_edge(a);
+        affirm(quad_edge_num(e) == i/2, "inconsistent edge num");
         fprintf(wr, "%d ", i/2);
         write_edge_data(a);
       }
 
     fprintf(wr, "faces:\n");
     for (i = 0; i < tri->side.ne; i++)
-      { qarc_t a = tri->side.e[i];
-        affirm(a != NULL_REF, "face with no arcs");
+      { quad_arc_t a = tri->side.e[i];
+        affirm(a != quad_arc_NULL, "face with no arcs");
         face_t *f = LEFT(a);
         affirm(f->num == i, "inconsistent face num");
         fprintf(wr, "%d ", i);
@@ -111,33 +111,33 @@ mesh_t *read_mesh(FILE *rd)
   { 
     mesh_t *tri = (mesh_t*)notnull(malloc(sizeof(mesh_t)), "out of mem");
     filefmt_read_header(rd, "wfmesh", FILE_VERSION);
-    int NV = nget_int(rd, "vertices"); fget_eol(rd);
+    int NV = nget_int32(rd, "vertices"); fget_eol(rd);
     affirm(NV >= 0, "bad NV");
-    int NE = nget_int(rd, "edges"); fget_eol(rd);
+    int NE = nget_int32(rd, "edges"); fget_eol(rd);
     affirm(NE >= 0, "bad NE");
-    int NF = nget_int(rd, "faces"); fget_eol(rd);
+    int NF = nget_int32(rd, "faces"); fget_eol(rd);
     affirm(NF >= 0, "bad NF");
-    tri->out = qarc_vec_new(NV);
-    tri->arc = qarc_vec_new(2*NE);
-    tri->side = qarc_vec_new(NF);
+    tri->out = quad_arc_vec_new(NV);
+    tri->arc = quad_arc_vec_new(2*NE);
+    tri->side = quad_arc_vec_new(NF);
     {
-      auto qarc_t read_arc(void);
+      auto quad_arc_t read_arc(void);
       auto segment_t *read_vertex(void);
       auto face_t *read_face(void);
       auto void read_point(r3_t *c);
      
       sref_vec_t site = sref_vec_new(NV);
-      qarc_vec_t edge = qarc_vec_new(NE);
+      quad_arc_vec_t edge = quad_arc_vec_new(NE);
       fref_vec_t face = fref_vec_new(NF);
      
-      qarc_t read_arc(void)
+      quad_arc_t read_arc(void)
         { int qnum, rnum; 
-          qarc_t a;
+          quad_arc_t a;
           fget_skip_spaces(rd);
-          qnum = fget_int(rd);
+          qnum = fget_int32(rd);
           affirm((qnum >= 0) && (qnum < NE), "bad quad number");
           fget_match(rd, ":");
-          rnum = fget_int(rd);
+          rnum = fget_int32(rd);
           affirm((rnum >= 0) & (rnum <= 3), "inconsistent rot number");
           a = edge.e[qnum];
           while (quad_tumble_code(a) != rnum) { a = quad_rot(a); }
@@ -148,7 +148,7 @@ mesh_t *read_mesh(FILE *rd)
         { int vnum;
           fget_skip_spaces(rd);
           fget_match(rd, "v");
-          vnum = fget_int(rd);
+          vnum = fget_int32(rd);
           affirm((vnum >= 0) && (vnum < NV), "bad vertex number");
           return site.e[vnum];
         }
@@ -157,7 +157,7 @@ mesh_t *read_mesh(FILE *rd)
         { int fnum;
           fget_skip_spaces(rd);
           fget_match(rd, "f");
-          fnum = fget_int(rd);
+          fnum = fget_int32(rd);
           affirm((fnum >= 0) && (fnum < NF), "bad vertex number");
           return face.e[fnum];
         }
@@ -177,7 +177,7 @@ mesh_t *read_mesh(FILE *rd)
           site.e[i] = v; 
         }
       for (i = 0; i < NE; i++)
-        { qarc_t a = quad_make_edge();
+        { quad_arc_t a = quad_make_edge();
           edge.e[i] = a;
         }
       for (i = 0; i < NF; i++)
@@ -189,7 +189,7 @@ mesh_t *read_mesh(FILE *rd)
       fget_match(rd, "vertices:"); fget_eol(rd);
       for (i = 0; i < NV; i++)
         { segment_t *v = site.e[i];
-          int j = fget_int(rd);
+          int j = fget_int32(rd);
           affirm(j == i, "inconsistent vertex number");
           fget_skip_spaces(rd);
           tri->out.e[i] = read_arc();
@@ -207,14 +207,15 @@ mesh_t *read_mesh(FILE *rd)
       /* Read edge pointers: */
       fget_match(rd, "edges:"); fget_eol(rd);
       for (i = 0; i < NE; i++)
-        { qarc_t a = edge.e[i];
-          int j = fget_int(rd);
+        { quad_arc_t a = edge.e[i];
+          int j = fget_int32(rd);
           affirm(j == i, "inconsistent edge number");
-          quad_edge(a)->mark = i;
+          quad_edge_t e = quad_edge(a);
+          quad_set_edge_num(e, i);
           fget_skip_spaces(rd);
-          { qarc_t a = read_arc();
-            qarc_t b = read_arc(); 
-            qarc_t c = read_arc();
+          { quad_arc_t a = read_arc();
+            quad_arc_t b = read_arc(); 
+            quad_arc_t c = read_arc();
             segment_t *o = read_vertex();
             segment_t *d = read_vertex();
             face_t *l = read_face();
@@ -223,10 +224,10 @@ mesh_t *read_mesh(FILE *rd)
             tri->arc.e[2*i+1] = quad_sym(a);
             quad_splice(a, quad_oprev(b));
             if (b != quad_sym(a)){ quad_splice(quad_sym(a), quad_oprev(c)); }
-            quad_odata(a) = o;
-            quad_ddata(a) = d;
-            quad_ldata(a) = l;
-            quad_rdata(a) = r;
+            quad_set_odata(a, (void*)o);
+            quad_set_ddata(a, (void*)d);
+            quad_set_ldata(a, (void*)l);
+            quad_set_rdata(a, (void*)r);
           }
           fget_eol(rd);
         }
@@ -235,7 +236,7 @@ mesh_t *read_mesh(FILE *rd)
       fget_match(rd, "faces:"); fget_eol(rd);
       for (i = 0; i < NF; i++)
         { face_t *f = face.e[i];
-          int j = fget_int(rd);
+          int j = fget_int32(rd);
           affirm(j == i, "inconsistent face number");
           fget_skip_spaces(rd);
           tri->side.e[i] = read_arc();
@@ -249,9 +250,9 @@ mesh_t *read_mesh(FILE *rd)
     return tri;
   }
 
-mesh_t *mesh_from_topology(qarc_t e)
+mesh_t *mesh_from_topology(quad_arc_t e)
   { mesh_t *tri = (mesh_t *)notnull(malloc(sizeof(mesh_t)), "no mem for mesh");
-    qarc_vec_t edge = renumber_edges((qarc_vec_t){1, &e}, 0);
+    quad_arc_vec_t edge = renumber_edges((quad_arc_vec_t){1, &e});
     tri->arc = arcs_from_edges(edge);
     tri->out = renumber_vertices(tri->arc);
     tri->side = renumber_faces(tri->arc);
@@ -272,7 +273,7 @@ void enum_trianglets(mesh_t *tri, int N, double epsilon, triangle_visit_proc_t *
     int k;
     /* Pov each triangle: */
     for (k = 0; k < NT; k++)
-      { qarc_t e = tri->side.e[k];
+      { quad_arc_t e = tri->side.e[k];
         face_t *f = LEFT(e);
         if (! f->omit)
           { r3_t P = quad_dst(quad_onext(e))->curr.pos;

@@ -1,5 +1,5 @@
 /* See SOErrorFunction.h */
-/* Last edited on 2004-08-17 23:29:20 by stolfi */
+/* Last edited on 2023-02-12 07:51:24 by stolfi */
 
 #include <SOErrorFunction.h>
 #include <SOFunction.h>
@@ -166,9 +166,9 @@ SOErrorFunction *SOErrorFunction_Read(FILE *rd, dg_dim_t dDim)
     
     filefmt_read_header(rd, "SOErrorFunction", SOErrorFunction_FileFormat);
     
-    f->d->fn.pDim = nget_int(rd, "domain_dim"); fget_eol(rd);
-    f->d->fn.fDim = nget_int(rd, "range_dim"); fget_eol(rd);
-    bSize = nget_int(rd, "basis_size"); fget_eol(rd);
+    f->d->fn.pDim = nget_int32(rd, "domain_dim"); fget_eol(rd);
+    f->d->fn.fDim = nget_int32(rd, "range_dim"); fget_eol(rd);
+    bSize = nget_int32(rd, "basis_size"); fget_eol(rd);
     
     f->d->testbasFile = nget_string(rd, "testbasis"); fget_eol(rd);
     f->d->appbasFile = nget_string(rd, "appbasis"); fget_eol(rd);

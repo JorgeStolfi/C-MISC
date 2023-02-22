@@ -1,5 +1,5 @@
 /* See SOWaveFunction.h */
-/* Last edited on 2005-06-05 21:05:17 by stolfi */
+/* Last edited on 2023-02-12 07:50:45 by stolfi */
 
 #include <SOWaveFunction.h>
 #include <SOFunction.h>
@@ -166,7 +166,7 @@ SOWaveFunction *SOWaveFunction_Read(FILE *rd, nat_t pDim)
     filefmt_read_header(rd, "SOWaveFunction", SOWaveFunction_FileFormat);
     
     nget_name_eq(rd, "freq"); 
-    for (i = 0; i < pDim; i++) { k[i] = fget_int(rd); }
+    for (i = 0; i < pDim; i++) { k[i] = fget_int32(rd); }
     fget_eol(rd);
 
     f = SOWaveFunction_FromFreq(pDim, k);

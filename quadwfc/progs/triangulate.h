@@ -1,5 +1,5 @@
 /* Delaunay triangulation of points on the plane. */
-/* Last edited on 2005-09-15 18:48:12 by stolfi */
+/* Last edited on 2023-02-12 23:51:25 by stolfi */
 
 #ifndef triangulate_H
 #define triangulate_H
@@ -8,7 +8,7 @@
 #include <quad.h>
 #include <wavefront.h>
 
-qarc_t triangulate(int ns, sref_t st[]);
+quad_arc_t triangulate(int ns, sref_t st[]);
   /* The divide-and-conquer algorithm for computing the Delaunay
     triangulation of a set of sites {st[0..ns-1]} (points of the
     plane). Returns an arc {e} on the triangulation, such that

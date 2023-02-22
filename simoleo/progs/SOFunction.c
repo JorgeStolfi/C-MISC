@@ -1,5 +1,5 @@
 /* See SOFunction.h */
-/* Last edited on 2006-03-19 12:44:50 by stolfi */
+/* Last edited on 2023-02-12 07:51:19 by stolfi */
 
 #include <SOGrid.h>
 #include <SOFunction.h>
@@ -113,9 +113,9 @@ SOFunction *SOFunction_Read(FILE *rd)
 
     t = nget_string(rd, "type"); fget_eol(rd);
     affirm(isprefix(SOFunction_TypeId, t), "incorrect SOFunction type");
-    pDim = nget_int(rd, "domain_dim"); fget_eol(rd);
+    pDim = nget_int32(rd, "domain_dim"); fget_eol(rd);
     affirm((pDim >= 1) && (pDim <= MAX_PDIM), "invalid domain dimension");
-    fDim = nget_int(rd, "range_dim"); fget_eol(rd);
+    fDim = nget_int32(rd, "range_dim"); fget_eol(rd);
     affirm((pDim >= 1) && (pDim <= MAX_FDIM), "invalid range dimension");
     /* Find the concrete subclass and call the corresponding {Read} function: */
     if (isprefix(SOTentFunction_TypeId, t))
@@ -162,12 +162,12 @@ Basis SOFunction_ReadBasis(FILE *rd)
     Basis F;
     int i;
     filefmt_read_header(rd, "SOFunction_Basis", SOFunction_Basis_FileFormat);
-    dim = nget_int(rd, "basis_dim"); fget_eol(rd);
+    dim = nget_int32(rd, "basis_dim"); fget_eol(rd);
     affirm(dim >= 0, "bad dimension");
     F = SOFunctionRef_vec_new(dim);
     fget_skip_formatting_chars(rd);
     for (i = 0; i < dim; i++) 
-      { int ii = nget_int(rd, "elem_index"); 
+      { int ii = nget_int32(rd, "elem_index"); 
         affirm(ii == i, "wrong element index");
         fget_eol(rd);
         F.el[i] = SOFunction_Read(rd); fget_skip_formatting_chars(rd);

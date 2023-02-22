@@ -1,5 +1,5 @@
 /* See {mesh_pov.h} */
-/* Last edited on 2013-10-02 03:14:34 by stolfilocal */
+/* Last edited on 2023-02-12 23:53:11 by stolfi */
 
 #include <basic.h>
 #include <triangulate.h>
@@ -39,7 +39,7 @@ void pov_mesh(FILE *fpov, mesh_t *tri, int N, double radius)
         fprintf(stderr, "drawing %d edges\n", NE);
         int i;
         for (i = 0; i < NE; i ++) 
-          { qarc_t a = tri->arc.e[2*i];
+          { quad_arc_t a = tri->arc.e[2*i];
             r3_t *P = &(ORGP(a));
             r3_t *Q = &(DESTP(a));
             pov_cylinder(fpov, P, Q, radius, "tx_mesh_e");
@@ -52,7 +52,7 @@ void pov_mesh(FILE *fpov, mesh_t *tri, int N, double radius)
         fprintf(stderr, "plotting %d vertices\n", NV);
         int i;
         for (i = 0; i < NV; i ++) 
-          { qarc_t a = tri->out.e[i];
+          { quad_arc_t a = tri->out.e[i];
             r3_t *P = &(ORGP(a));
             pov_sphere(fpov, P, radius, "tx_mesh_v");
           }

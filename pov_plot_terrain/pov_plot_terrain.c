@@ -4,7 +4,7 @@
 
 #define pov_plot_terrain_C_COPYRIGHT "Copyright © 2010 by the State University of Campinas (UNICAMP)"
 
-/* Last edited on 2010-07-02 13:35:09 by stolfi */
+/* Last edited on 2023-02-20 04:53:32 by stolfi */
 
 #define PROG_HELP \
   PROG_NAME  " \\\n" \
@@ -128,7 +128,7 @@ void output_triangles(FILE *wr, r3_vec_t pts, options_t *o)
         z[i] = o->scale * p->c[2] + o->offset;
       }
     quad_arc_t e = delaunay_build (st, nsites);
-    plot_delaunay_pov(wr, e, nsites, st, z, o->clip_in, o->clip_out, o->clip_int);
+    delaunay_plot_diagram_pov(wr, e, nsites, st, z, o->clip_in, o->clip_out, o->clip_int);
     free(height);
     fflush(wr);
   }

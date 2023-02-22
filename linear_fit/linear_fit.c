@@ -4,7 +4,7 @@
 
 #define linear_fit_C_COPYRIGHT \
   "Copyright © 2013 by the State University of Campinas (UNICAMP)"
-/* Last edited on 2023-02-02 13:33:29 by stolfi */
+/* Last edited on 2023-02-12 11:15:50 by stolfi */
     
 #define PROG_HELP \
   "  " PROG_NAME " \\\n" \
@@ -296,36 +296,25 @@ void lif_read_data(FILE *rd, bool_t weighted, int32_t *NZp, char ***IDp, double 
     /* Read the input samples: */
     int32_t NZ = 0; /* Input values are {Z.e[0..NZ-1]}. */
     while (TRUE)
-      { fget_skip_spaces(rd);
-        int32_t c = fgetc(rd);
-        if (c == EOF) 
-          { break; }
-        else if (c == '#')
-          { do { c = fgetc(rd); } while ((c != '\n') && (c != EOF)); 
-            if (c == EOF) { break; }
-            continue;
+      { bool_t ok = fget_test_comment_or_eol(rd, '#');
+        if (ok) { continue; }
+        if (fget_test_eof(rd)) { break; } 
+        string_vec_expand(&ID,NZ);
+        double_vec_expand(&Z,NZ);
+        double_vec_expand(&W,NZ);
+        double_vec_expand(&X,(NZ+1)*NX-1);
+        ID.e[NZ] = fget_string(rd);
+        Z.e[NZ] = fget_double(rd);
+        if (weighted)
+          { W.e[NZ] = fget_double(rd);
+            demand(W.e[NZ] >= 0, "weights must be non-negative");
           }
-        else if (c == '\n')
-          { continue; }
         else
-          { ungetc(c, rd); 
-            string_vec_expand(&ID,NZ);
-            double_vec_expand(&Z,NZ);
-            double_vec_expand(&W,NZ);
-            double_vec_expand(&X,(NZ+1)*NX-1);
-            ID.e[NZ] = fget_string(rd);
-            Z.e[NZ] = fget_double(rd);
-            if (weighted)
-              { W.e[NZ] = fget_double(rd);
-                demand(W.e[NZ] >= 0, "weights must be non-negative");
-              }
-            else
-              { W.e[NZ] = 1.0; }
-            double *Xi = &(X.e[NZ*NX]); /* Row of {X} for this input line. */
-            for (int32_t k = 0; k < NX; k++) { Xi[k] = fget_double(rd); }
-            NZ++;
-            fget_comment_or_eol(rd, '#');
-          }
+          { W.e[NZ] = 1.0; }
+        double *Xi = &(X.e[NZ*NX]); /* Row of {X} for this input line. */
+        for (int32_t k = 0; k < NX; k++) { Xi[k] = fget_double(rd); }
+        NZ++;
+        fget_comment_or_eol(rd, '#');
       }
     string_vec_trim(&ID,NZ);
     double_vec_trim(&Z,NZ);

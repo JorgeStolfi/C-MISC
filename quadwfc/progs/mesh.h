@@ -1,5 +1,5 @@
 /* Triangular meshes. */
-/* Last edited on 2005-09-05 23:20:28 by stolfi */
+/* Last edited on 2023-02-12 23:50:24 by stolfi */
 
 #ifndef mesh_H
 #define mesh_H
@@ -12,12 +12,12 @@
 
 typedef struct mesh_t 
   {
-    qarc_vec_t out;  /* Element {out[i]} is one arc out of site number {i}. */
-    qarc_vec_t arc;  /* Elems {arc[2*i]} and {arc[2*i+1]} are the two arcs of edge {i}. */
-    qarc_vec_t side; /* Element {side[i]} is one arc whose left face is triangle {i}. */
+    quad_arc_vec_t out;  /* Element {out[i]} is one arc out of site number {i}. */
+    quad_arc_vec_t arc;  /* Elems {arc[2*i]} and {arc[2*i+1]} are the two arcs of edge {i}. */
+    quad_arc_vec_t side; /* Element {side[i]} is one arc whose left face is triangle {i}. */
   } mesh_t;
 
-mesh_t *mesh_from_topology(qarc_t e);
+mesh_t *mesh_from_topology(quad_arc_t e);
   /* Enumerates all edges, vertices, and faces of the polyhedron
     hanging from {e}, assigns consecutive numbers to them, then packs
     the tables of those elements into a {mesh_t} record. */

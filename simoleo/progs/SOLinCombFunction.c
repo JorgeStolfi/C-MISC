@@ -1,5 +1,5 @@
 /* See SOLinCombFunction.h */
-/* Last edited on 2004-08-17 23:30:18 by stolfi */
+/* Last edited on 2023-02-12 07:51:06 by stolfi */
 
 #include <SOLinCombFunction.h>
 #include <SOFunction.h>
@@ -150,9 +150,9 @@ SOLinCombFunction *SOLinCombFunction_Read(FILE *rd, dg_dim_t dDim)
     
     filefmt_read_header(rd, "SOLinCombFunction", SOLinCombFunction_FileFormat);
     
-    f->d->fn.pDim = nget_int(rd, "domain_dim"); fget_eol(rd);
-    f->d->fn.fDim = nget_int(rd, "range_dim"); fget_eol(rd);
-    bSize = nget_int(rd, "basis_size"); fget_eol(rd);
+    f->d->fn.pDim = nget_int32(rd, "domain_dim"); fget_eol(rd);
+    f->d->fn.fDim = nget_int32(rd, "range_dim"); fget_eol(rd);
+    bSize = nget_int32(rd, "basis_size"); fget_eol(rd);
     
     f->d->basFile = nget_string(rd, "basis"); fget_eol(rd);
     f->d->bas = SOFunction_ReadBasisCached(f->d->basFile);

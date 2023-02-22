@@ -1,5 +1,5 @@
 /* See {geomodel.h}. */
-/* Last edited on 2008-07-14 22:20:45 by stolfi */
+/* Last edited on 2023-02-12 07:52:09 by stolfi */
 
 #include <basic.h>
 #include <geomodel.h>
@@ -101,12 +101,12 @@ geomodel_t read_geomodel(FILE *rd)
     geomodel_t geo;
     filefmt_read_header(rd, "geomodel", GeoModel_FileFormat);
 
-    int nmd = nget_int(rd, "media"); fget_eol(rd);
+    int nmd = nget_int32(rd, "media"); fget_eol(rd);
     affirm(nmd >= 0, "bad nmd");
     geo.nmd = nmd;
     geo.md = notnull(malloc((nmd)*sizeof(medium_t)), "no mem");
 
-    int nrf = nget_int(rd, "reflectors"); fget_eol(rd);
+    int nrf = nget_int32(rd, "reflectors"); fget_eol(rd);
     affirm(nrf >= 0, "bad nrf");
     geo.nrf = nrf;
     geo.rf = notnull(malloc((nrf+1)*sizeof(reflector_t)), "no mem");
@@ -137,7 +137,7 @@ geomodel_t read_geomodel(FILE *rd)
     medium_t read_medium(int i)
       { 
         medium_t md;
-        md.num = fget_int(rd); 
+        md.num = fget_int32(rd); 
         affirm(md.num == i, "bad medium sequence number");
         fget_skip_spaces(rd); 
         fget_match(rd, ":");
@@ -153,31 +153,31 @@ geomodel_t read_geomodel(FILE *rd)
       { 
         reflector_t rf;
 
-        int num = fget_int(rd); 
+        int num = fget_int32(rd); 
         affirm(num == i, "bad reflector sequence number");
         fget_skip_spaces(rd); 
         fget_match(rd, ":");
         fget_eol(rd);
 
         fget_skip_spaces(rd);
-        int mda = nget_int(rd, "mda");
+        int mda = nget_int32(rd, "mda");
         affirm((mda >= 0) && (mda < nmd), "bad medium number above");
         rf.m_above = &(geo.md[mda]);
 
         fget_skip_spaces(rd);
-        int mdb = nget_int(rd, "mdb");
+        int mdb = nget_int32(rd, "mdb");
         affirm((mdb >= 0) && (mdb < nmd), "bad medium number below");
         rf.m_below = &(geo.md[mdb]);
 
         fget_eol(rd);
 
         fget_skip_spaces(rd);
-        int nx = nget_int(rd, "nx");
+        int nx = nget_int32(rd, "nx");
         affirm(nx >= 0, "bad nx");
         rf.nv[0] = nx;
 
         fget_skip_spaces(rd);
-        int ny = nget_int(rd, "ny");
+        int ny = nget_int32(rd, "ny");
         affirm(ny >= 0, "bad ny");
         rf.nv[1] = ny;
 

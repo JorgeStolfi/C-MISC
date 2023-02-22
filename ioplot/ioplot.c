@@ -1,7 +1,7 @@
 #define PROG_NAME "ioplot"
 #define PROG_DESC "create a sliced-ham in-out plot in Encapsulated Postscript"
 #define PROG_VERS "2013-10-27"
-/* Last edited on 2013-10-27 02:34:25 by stolfilocal */
+/* Last edited on 2023-02-21 10:41:57 by stolfi */
 
 #define PROG_COPYRIGHT "© 2005  State University of Campinas (UNICAMP)"
 
@@ -223,7 +223,7 @@
 #include <values.h>
 #include <math.h>
 
-#include <pswr.h>
+#include <epswr.h>
 #include <bool.h>
 #include <sign.h>
 #include <frgb.h>
@@ -245,8 +245,8 @@ typedef struct options_t
     frgb_t textColor;  /* Color for value and label text. */
     frgb_t fillColor;  /* Color for tree plot interior. */
     frgb_t drawColor;  /* Color for tree plot outline. */
-    int depth_pos;     /* Max plot depth for positive tree; -2 for input depth. */
-    int depth_neg;     /* Max plot depth for negative tree; -2 for input depth. */
+    int32_t depth_pos;     /* Max plot depth for positive tree; -2 for input depth. */
+    int32_t depth_neg;     /* Max plot depth for negative tree; -2 for input depth. */
     bool_t simplify;   /* TRUE deletes internal nodes with only one child. */
     bool_t debug;      /* TRUE prints entries with subtree totals. */
   } options_t;
@@ -287,7 +287,7 @@ typedef struct item_t
 #define MAXDEPTH 255
   /* Maximum allowed depth (absurdly high). */
 
-bool_t read_item(FILE *rd, int *lineP, /*OUT*/ item_t **itP, int *dpnP, sign_t *sideP, bool_t *leafP );
+bool_t read_item(FILE *rd, int32_t *lineP, /*OUT*/ item_t **itP, int32_t *dpnP, sign_t *sideP, bool_t *leafP );
   /* Tries to read an entry from {stdin}, skipping blank and comment
     lines. If it succeeds, stores the address of the entry's record in
     {*itP}, its depth (number of leading '>'s) in {*dpnP}, its sign in
@@ -312,7 +312,7 @@ void free_tree ( item_t *it );
   /* Reclaims all nodes of the tree rooted at {it},
     including the {name} strings. */
 
-item_t *trim_tree ( item_t *it, int dp );
+item_t *trim_tree ( item_t *it, int32_t dp );
   /* Removes all levels of the tree {it} beyond level {dp}.
     In particular, if {dp = 0} leaves only the root node.
     Any internal nodes at level {dp} becomes a leaf. */
@@ -330,7 +330,7 @@ item_t *reverse_siblings( item_t *it );
 /*
   TREE STATISTICS */
 
-void summarize_tree ( item_t *it, int *nvP, int *dpmaxP, double *totP );
+void summarize_tree ( item_t *it, int32_t *nvP, int32_t *dpmaxP, double *totP );
   /* Computes the number of leaves {*nvP}, the maximum leaf depth {*dpmaxP},
     and the sum of all leaf values {*totP}. */
 
@@ -340,33 +340,42 @@ void summarize_tree ( item_t *it, int *nvP, int *dpmaxP, double *totP );
 #define REL_NODE_WD (0.50)
   /* Width of node rectangle relative to level width. */
 
-double pick_scale ( int nv, double tot, double gap, double ysize );
+double pick_scale ( int32_t nv, double tot, double gap, double ysize );
   /* Selects the scale for the vertical axis, given the absolute total
     {tot} and the number of leaf items {nv} on one of the trees.
     Assumes that the figure is {ysize} mm tall (excluding margins) and
     that the slices are spread out {gap} mm apart at their free end. */
 
-void pick_abscissas( options_t *o, int dpos, int dneg, double *xmidP, double *xposP, double *xnegP);
+void pick_abscissas( options_t *o, int32_t dpos, int32_t dneg, double *xmidP, double *xposP, double *xnegP);
   /* Selects the abscissa {*xmidP} for the root end of both plots, and
     the abscissas {*xposP,*xnegP} of the leaf tips for the positive tree
     (on the left side) and negative tree (on the right side). Assumes that
     their depths are {dneg} and {dpos}, respectively. */
 
 
-PSStream *init_plot_file ( FILE *wr, options_t *o );
-  /* Create a Postscript plotting stream.
+epswr_figure_t *init_plot_file
+  ( char *dir, 
+    char *prefix, 
+    char *name, 
+    int32_t seq, 
+    char *suffix, 
+    options_t *o
+  );
+  /* Create an Encapsulated Postscript plotting stream,
+    that writes to a file called "{dir}/{prefix}_{name}_{NNNNN}_{suffix}.eps".
+    Any name that are {NULL} or {-1} are omitted, with the relevant separators.
     The scale {o->scale} must be properly set. */
 
-void fini_plot_file ( PSStream *ps, options_t *o );
+void fini_plot_file ( epswr_figure_t *eps, options_t *o );
   /* Terminates the Postscript stream. */
 
 void plot_slices
-  ( PSStream *ps,  /* Postscript figure stream. */
+  ( epswr_figure_t *eps,  /* Postscript figure stream. */
     options_t *o,  /* Command line options. */
     double xbas,   /* X coordinate of uncut edge of ham. */
     double xtip,   /* X coordinate of cut edge of ham. */
     item_t *it,    /* The root node, or NULL. */
-    int dpmax,     /* Treat any nodes at this depth as leaves. */
+    int32_t dpmax,     /* Treat any nodes at this depth as leaves. */
     sign_t side    /* Side of plot. */
   );
   /* Plots one half of the sliced-ham diagram: {side = +1} means the
@@ -375,14 +384,14 @@ void plot_slices
     at each level is plotted from bottom to top. */
 
 void plot_branch_polygonal
-  ( PSStream *ps,  /* Postscript figure stream. */
+  ( epswr_figure_t *eps,  /* Postscript figure stream. */
     options_t *o,  /* Command line options. */
     double xjoin,  /* X coordinate of joined (parent) side of branch. */
     double xopen,  /* X coordinate of open (child) side of branch. */
     double yjoin,  /* Bottom Y of branch, joined (parent) side. */
     double yopen,  /* Bottom Y of branch, open (child) side. */
     double dy,     /* Y width of branch. */
-    int pass       /* Plotting pass. */
+    int32_t pass       /* Plotting pass. */
   );
   /* Plots the band connecting an internal node to a child node.
     The X range spans from {xjoin} (parent side) to {xopen} (child side).
@@ -391,31 +400,31 @@ void plot_branch_polygonal
     and {[yopen _ yopen+dy]} at the open (child) side. */
 
 void plot_branch_curved
-  ( PSStream *ps,  /* Postscript figure stream. */
+  ( epswr_figure_t *eps,  /* Postscript figure stream. */
     options_t *o,  /* Command line options. */
     double xjoin,  /* X coordinate of joined (parent) side of branch. */
     double xopen,  /* X coordinate of open (child) side of branch. */
     double yjoin,  /* Bottom Y of branch, joined (parent) side. */
     double yopen,  /* Bottom Y of branch, open (child) side. */
     double dy,     /* Y width of branch. */
-    int pass       /* Plotting pass. */
+    int32_t pass       /* Plotting pass. */
   );
   /* Same as plot_band_polygonal, but uses Bézier arcs intead of broken lines. */
 
 /* OTHER PROTOTYPES */
 
-int main ( int argc, char **argv );
+int32_t main ( int32_t argc, char **argv );
 
-options_t *get_options ( int argc, char **argv );
+options_t *get_options ( int32_t argc, char **argv );
 frgb_t parse_frgb ( argparser_t *pp );
-int parse_depth ( argparser_t *pp );
-void data_error ( int line, char *msg );
+int32_t parse_depth ( argparser_t *pp );
+void data_error ( int32_t line, char *msg );
 
 /* IMPLEMENTATIONS */
 
 #define verbose FALSE
 
-int main (int argc, char **argv)
+int32_t main (int32_t argc, char **argv)
   {
     /* Parse command line arguments: */
     options_t *o = get_options(argc, argv);
@@ -440,9 +449,9 @@ int main (int argc, char **argv)
       }
 
     /* Summarize trees: */
-    int dpos, dneg;     /* Maximum depth of any node, or -1 if empty. */
+    int32_t dpos, dneg;     /* Maximum depth of any node, or -1 if empty. */
     double tpos, tneg;  /* Sum of leaf values. */
-    int npos, nneg;     /* Number of leaves in each tree. */
+    int32_t npos, nneg;     /* Number of leaves in each tree. */
     summarize_tree(pos, &npos, &dpos, &tpos);
     summarize_tree(neg, &nneg, &dneg, &tneg);
 
@@ -465,21 +474,21 @@ int main (int argc, char **argv)
     double xmid, xpos, xneg;
     pick_abscissas(o, dpos, dneg, &xmid, &xpos, &xneg);
 
-    PSStream *ps = init_plot_file(stdout, o);
-    plot_slices(ps, o, xmid, xpos, pos, dpos, +1);
-    plot_slices(ps, o, xmid, xneg, neg, dneg, -1);
-    fini_plot_file(ps, o);
+    epswr_figure_t *eps = init_plot_file(NULL, NULL, NULL, -1, NULL, o);
+    plot_slices(eps, o, xmid, xpos, pos, dpos, +1);
+    plot_slices(eps, o, xmid, xneg, neg, dneg, -1);
+    fini_plot_file(eps, o);
     return(0);
   }
 
 void read_data ( FILE *rd, /*OUT*/ item_t **posP, item_t **negP )
   {
     /* Positive and negative stacks: */
-    int pos_dps;
+    int32_t pos_dps;
     item_t *pos_stk[MAXDEPTH+1];
     double pos_tot[MAXDEPTH+1];
 
-    int neg_dps;
+    int32_t neg_dps;
     item_t *neg_stk[MAXDEPTH+1];
     double neg_tot[MAXDEPTH+1];
 
@@ -493,17 +502,17 @@ void read_data ( FILE *rd, /*OUT*/ item_t **posP, item_t **negP )
 
       Ditto for {neg_dps}, {neg_stk}, etc.. */
 
-    int line = 0; /* Current input line number. */
+    int32_t line = 0; /* Current input line number. */
 
-    auto void finish_nephews ( int *dpsP, item_t *stk[], double tot[], int dpn );
+    auto void finish_nephews ( int32_t *dpsP, item_t *stk[], double tot[], int32_t dpn );
 
-    auto void add_item ( int *dpsP, item_t *stk[], double tot[], item_t *it, int dpn, bool_t leaf );
+    auto void add_item ( int32_t *dpsP, item_t *stk[], double tot[], item_t *it, int32_t dpn, bool_t leaf );
       /* Adds to the stack {stk[0..*dps],tot[0..*dps]} an item {it} with depth {dpn},
         which may be leaf or not according to the {leaf} parameter. */
 
-    void finish_nephews ( int *dpsP, item_t *stk[], double tot[], int dpn )
+    void finish_nephews ( int32_t *dpsP, item_t *stk[], double tot[], int32_t dpn )
       {
-        int dps = (*dpsP);
+        int32_t dps = (*dpsP);
 
         /* Close all currently open subtrees deeper than {dpn}: */
         while (dps > dpn)
@@ -511,7 +520,7 @@ void read_data ( FILE *rd, /*OUT*/ item_t **posP, item_t **negP )
             /* Terminates the current sibling list {stk[*dps]}. */
             item_t *its = stk[dps];
             /* Get parent node: */
-            int dpp = dps-1; item_t *itp = stk[dpp];
+            int32_t dpp = dps-1; item_t *itp = stk[dpp];
             if (its == NULL)
               { /* No children, omit parent node: */
                 stk[dpp] = itp->next;
@@ -530,10 +539,10 @@ void read_data ( FILE *rd, /*OUT*/ item_t **posP, item_t **negP )
         (*dpsP) = dps;
       }
 
-    void add_item ( int *dpsP, item_t *stk[], double tot[], item_t *it, int dpn, bool_t leaf )
+    void add_item ( int32_t *dpsP, item_t *stk[], double tot[], item_t *it, int32_t dpn, bool_t leaf )
       {
         assert(dpn >= 0);
-        int dps = (*dpsP);
+        int32_t dps = (*dpsP);
 
         /* Check for proper nesting: */
         if (dpn > dps)
@@ -553,7 +562,7 @@ void read_data ( FILE *rd, /*OUT*/ item_t **posP, item_t **negP )
           }
         else
           { /* Start children list: */
-            int dpc = dps + 1;
+            int32_t dpc = dps + 1;
             assert(dpc <= MAXDEPTH);
             stk[dpc] = NULL; tot[dpc] = 0;
             /* Next item should be of depth {dpc} or less: */
@@ -564,7 +573,7 @@ void read_data ( FILE *rd, /*OUT*/ item_t **posP, item_t **negP )
       }
 
     item_t *it;
-    int dpn;
+    int32_t dpn;
     bool_t leaf;
 
     /* Initialize the stacks to accept the dummy root item: */
@@ -619,12 +628,12 @@ item_t *copy_item ( item_t *it )
     return r;
   }
 
-bool_t read_item(FILE *rd, int *lineP, /*OUT*/ item_t **itP, int *dpnP, sign_t *sideP, bool_t *leafP )
+bool_t read_item(FILE *rd, int32_t *lineP, /*OUT*/ item_t **itP, int32_t *dpnP, sign_t *sideP, bool_t *leafP )
   {
-    int c = getc(rd);
-    int sgn;    /* Sign of entry. */
+    int32_t c = getc(rd);
+    int32_t sgn;    /* Sign of entry. */
     double val; /* Value of entry (including sign): */
-    int dpn;    /* Depth of entry (starting at 1). */
+    int32_t dpn;    /* Depth of entry (starting at 1). */
     while (1)
       {
         /* Check for EOF at beginning-of-line: */
@@ -747,7 +756,7 @@ void free_tree ( item_t *it )
       }
   }
 
-item_t *trim_tree ( item_t *it, int dp )
+item_t *trim_tree ( item_t *it, int32_t dp )
   {
     if (it == NULL)
       { return NULL; }
@@ -783,17 +792,17 @@ item_t *simplify_tree ( item_t *it )
       }
   }
 
-void summarize_tree ( item_t *it, int *nvP, int *dpmaxP, double *totP )
+void summarize_tree ( item_t *it, int32_t *nvP, int32_t *dpmaxP, double *totP )
   {
-    int nv = 0;
-    int dpmax = -1;
+    int32_t nv = 0;
+    int32_t dpmax = -1;
     double tot = 0.0;
 
-    auto void do_sum ( item_t *t, int dp );
+    auto void do_sum ( item_t *t, int32_t dp );
     /* Summarize the subtree rooted at {t}. If not NULL,
        its items are assumed to be at level {dp}. */
 
-    void do_sum( item_t *t, int dp )
+    void do_sum( item_t *t, int32_t dp )
       { while (t != NULL)
           { if (t->sub == NULL)
               { /* Leaf: */
@@ -818,14 +827,13 @@ void summarize_tree ( item_t *it, int *nvP, int *dpmaxP, double *totP )
 void print_tree ( FILE *wr, char *fmt, item_t *it )
   {
 
-    auto void do_print ( item_t *t, int dp );
+    auto void do_print ( item_t *t, int32_t dp );
     /* Print the subtree rooted at {t}. If not NULL,
        its items are assumed to be at level {dp}. */
 
-    void do_print( item_t *t, int dp )
+    void do_print( item_t *t, int32_t dp )
       { while (t != NULL)
-          { int k;
-            for (k = 0; k < dp; k++) { fprintf(wr, "> "); }
+          { for (int32_t k = 0; k < dp; k++) { fprintf(wr, "> "); }
             if (t->sub == NULL)
               { fprintf(wr, fmt, t->val); 
                 fprintf(wr, " %s\n", t->name);
@@ -843,7 +851,7 @@ void print_tree ( FILE *wr, char *fmt, item_t *it )
     do_print(it, 0);
   }
 
-double pick_scale ( int nv, double tot, double gap, double ysize )
+double pick_scale ( int32_t nv, double tot, double gap, double ysize )
   {
     /* Compute vertical extent of figure, minus all gaps: */
     double yfree = ysize - nv*gap;
@@ -852,7 +860,7 @@ double pick_scale ( int nv, double tot, double gap, double ysize )
     return scale;
   }
 
-void pick_abscissas( options_t *o, int dpos, int dneg, double *xmidP, double *xposP, double *xnegP)
+void pick_abscissas( options_t *o, int32_t dpos, int32_t dneg, double *xmidP, double *xposP, double *xnegP)
   {
 
     /* Center the plot within the figure: */
@@ -886,31 +894,41 @@ item_t *reverse_siblings(item_t *it)
     return r;
   }
 
-PSStream *init_plot_file(FILE *wr, options_t *o)
-  {
-    double mm = 72.0/25.4; /* One mm in pt. */
-    double mrg = 4.0;  /* Default {pswr} margin width (pt). */
+epswr_figure_t *init_plot_file
+  ( char *dir, 
+    char *prefix, 
+    char *name, 
+    int32_t seq, 
+    char *suffix, 
+    options_t *o
+  )
+  { double mm = 72.0/25.4; /* One mm in pt. */
+    double mrg = 4.0;  /* Default {epswr} margin width (pt). */
     double xtot = o->figSizeX*mm + 2.0*mrg;  /* Total figure width (pt). */
     double ytot = o->figSizeY*mm + 2.0*mrg;  /* Total figure height (pt). */
-    PSStream *ps = pswr_new_stream("fig", wr, TRUE, "doc", NULL, FALSE, xtot, ytot);
-    pswr_new_picture(ps, 0, o->figSizeX, 0, o->figSizeY);
-    pswr_set_label_font(ps, o->fontName, o->fontSize);
-    return ps;
+    bool_t eps_verbose = FALSE;
+    epswr_figure_t *eps = epswr_new_named_figure
+      ( dir, prefix, name, seq, suffix, 
+        xtot, ytot, mrg, mrg, mrg, mrg, eps_verbose
+      );
+    epswr_set_client_window(eps, 0, o->figSizeX, 0, o->figSizeY);
+    epswr_set_label_font(eps, o->fontName, o->fontSize);
+    return eps;
   }
 
 void plot_slices
-  ( PSStream *ps,  /* Postscript figure stream. */
+  ( epswr_figure_t *eps,  /* Postscript figure stream. */
     options_t *o,  /* Command line options. */
     double xbas,   /* X coordinate of uncut edge of ham. */
     double xtip,   /* X coordinate of cut edge of ham. */
     item_t *it,    /* The root node, or NULL. */
-    int dpmax,     /* Treat any nodes at this depth as leaves. */
+    int32_t dpmax,     /* Treat any nodes at this depth as leaves. */
     sign_t side    /* Side of plot. */
   )
   {
     /* Is there anything to plot? */
     if ((it == NULL) || (dpmax < 0)) { return; }
-
+    
     /* Compute width {levelwd} of each level, and {nodewd} of each node: */
     double levelwd = fabs(xtip - xbas)/(dpmax + REL_NODE_WD);
     double nodewd = REL_NODE_WD * levelwd;
@@ -919,17 +937,15 @@ void plot_slices
     double xlab = xtip - side*o->labelGap; /* Edge of label. */
 
     /* Pass 0 = paint interior, Pass 1 = draw outline, Pass 2 = write labels: */
-    int pass;
-    for (pass = 0; pass <= 2; pass++)
+    for (int32_t pass = 0; pass <= 2; pass++)
       {
-
-        auto double do_plot ( item_t *itr, int dp, double ybas );
+        auto double do_plot ( item_t *itr, int32_t dp, double ybas );
           /* Plots the tree rooted at {itr}, assumed to be non-NULL and
             of depth {dp}. The bottom of the root and of the first leaf
             will be at ordinate {ybas}. Returns the top ordinate of the
             last leaf. */
 
-        double do_plot ( item_t *itr, int dp, double ybot )
+        double do_plot ( item_t *itr, int32_t dp, double ybot )
           {
             assert(itr != NULL);
             assert(itr->val > 0);
@@ -943,14 +959,14 @@ void plot_slices
             /* Set corner Ys of slice: */
             if (pass == 0)
               { /* Fill slice: */
-                pswr_rectangle(ps, xini, xfin, ybot, ytop, TRUE, FALSE);
+                epswr_rectangle(eps, xini, xfin, ybot, ytop, TRUE, FALSE);
               }
             else if (pass == 1)
               { /* Draw outline of slice: */
-                pswr_segment(ps, xini, ybot, xfin, ybot);
-                if (is_leaf || o->showNodes) { pswr_segment(ps, xfin, ybot, xfin, ytop); }
-                if (o->showNodes && (dp > 0)) { pswr_segment(ps, xini, ybot, xini, ytop); }
-                pswr_segment(ps, xfin, ytop, xini, ytop);
+                epswr_segment(eps, xini, ybot, xfin, ybot);
+                if (is_leaf || o->showNodes) { epswr_segment(eps, xfin, ybot, xfin, ytop); }
+                if (o->showNodes && (dp > 0)) { epswr_segment(eps, xini, ybot, xini, ytop); }
+                epswr_segment(eps, xfin, ytop, xini, ytop);
               }
             else if (pass == 2)
               { /* Do nothing */ }
@@ -965,7 +981,7 @@ void plot_slices
                 else if (pass == 2)
                   { /* Write label and dot: */
                     double ylab = (ybot + ytop)/2;
-                    pswr_dot(ps, xfin, ylab, 0.3, TRUE, FALSE);
+                    epswr_dot(eps, xfin, ylab, 0.3, TRUE, FALSE);
                     double xalign = (side > 0 ? 1.0 : 0.0);
                     if ((o->fmt != NULL) && (strlen(o->fmt) > 0))
                       { char *tval = NULL;
@@ -975,11 +991,11 @@ void plot_slices
                           { asprintf(&text, "%s %s", itr->name, tval); }
                         else
                           { asprintf(&text, "%s %s", tval, itr->name); }
-                        pswr_label(ps, text, xlab, ylab, 0.0, xalign, 0.5);
+                        epswr_label(eps, text, text, xlab, ylab, 0.0, TRUE, xalign, 0.5, TRUE, FALSE);
                         free(tval); free(text);
                       }
                     else
-                      { pswr_label(ps, itr->name, xlab, ylab, 0.0, xalign, 0.5); }
+                      { epswr_label(eps, itr->name, itr->name, xlab, ylab, 0.0, TRUE, xalign, 0.5, TRUE,FALSE); }
                   }
                 return ytop + o->leafGap;
               }
@@ -997,7 +1013,7 @@ void plot_slices
                   {
                     double dy = itp->val/o->scale; /* Thickness of current slice. */
 
-                    plot_branch_curved(ps, o, xjoin, xopen, yjoin, yopen, dy, pass);
+                    plot_branch_curved(eps, o, xjoin, xopen, yjoin, yopen, dy, pass);
 
                     /* Plot child and its subtree, get bottom Y of next slice at open end: */
                     yopen = do_plot(itp, dp+1, yopen);
@@ -1016,18 +1032,18 @@ void plot_slices
         if (pass == 0)
           { float *c = o->fillColor.c;
             if (isnan(c[0]) || (c[0] == INF)) { /* Skip pass: */ continue; }
-            pswr_set_fill_color(ps, c[0], c[1], c[2]);
+            epswr_set_fill_color(eps, c[0], c[1], c[2]);
           }
         else if (pass == 1)
           { float *c = o->drawColor.c;
             if (isnan(c[0]) || (c[0] == INF)) { /* Skip pass: */ continue; }
-            pswr_set_pen(ps, c[0], c[1], c[2], 0.2, 0.0, 0.0);
+            epswr_set_pen(eps, c[0], c[1], c[2], 0.2, 0.0, 0.0);
           }
         else if (pass == 2)
           { float *c = o->textColor.c;
             if (isnan(c[0]) || (c[0] == INF)) { /* Skip pass: */ continue; }
-            pswr_set_pen(ps, c[0], c[1], c[2], 0.2, 0.0, 0.0);
-            pswr_set_fill_color(ps, c[0], c[1], c[2]);
+            epswr_set_pen(eps, c[0], c[1], c[2], 0.2, 0.0, 0.0);
+            epswr_set_fill_color(eps, c[0], c[1], c[2]);
           }
 
         /* Plot whole diagram: */
@@ -1037,14 +1053,14 @@ void plot_slices
   }
 
 void plot_branch_polygonal
-  ( PSStream *ps,  /* Postscript figure stream. */
+  ( epswr_figure_t *eps,  /* Postscript figure stream. */
     options_t *o,  /* Command line options. */
     double xjoin,  /* X coordinate of joined (parent) side of branch. */
     double xopen,  /* X coordinate of open (child) side of branch. */
     double yjoin,  /* Bottom Y of branch, joined (parent) side. */
     double yopen,  /* Bottom Y of branch, open (child) side. */
     double dy,     /* Y width of branch. */
-    int pass       /* Plotting pass. */
+    int32_t pass       /* Plotting pass. */
   )
   {
     double x[4], y[4]; /* Corners of connecting parallelogram. */
@@ -1057,26 +1073,26 @@ void plot_branch_polygonal
 
     if (pass == 0)
       { /* Fill slice: */
-        pswr_polygon(ps, TRUE, x, y, 4, TRUE, FALSE, FALSE);
+        epswr_polygon(eps, TRUE, x, y, 4, TRUE, FALSE, FALSE);
       }
     else  if (pass == 1)
       { /* Draw outline of slice: */
-        pswr_segment(ps, x[0], y[0], x[1], y[1]);
-        pswr_segment(ps, x[2], y[2], x[3], y[3]);
+        epswr_segment(eps, x[0], y[0], x[1], y[1]);
+        epswr_segment(eps, x[2], y[2], x[3], y[3]);
       }
     else if (pass == 2)
       { /* Do nothing: */ }
   }
 
 void plot_branch_curved
-  ( PSStream *ps,  /* Postscript figure stream. */
+  ( epswr_figure_t *eps,  /* Postscript figure stream. */
     options_t *o,  /* Command line options. */
     double xjoin,  /* X coordinate of joined (parent) side of branch. */
     double xopen,  /* X coordinate of open (child) side of branch. */
     double yjoin,  /* Bottom Y of branch, joined (parent) side. */
     double yopen,  /* Bottom Y of branch, open (child) side. */
     double dy,     /* Y width of branch. */
-    int pass       /* Plotting pass. */
+    int32_t pass       /* Plotting pass. */
   )
   {
     double x[8], y[8]; /* Bézier control points of lower and upper curves. */
@@ -1088,32 +1104,31 @@ void plot_branch_curved
     x[7] = xjoin; y[7] = yjoin+dy;
 
     /* Compute intermediate control points so that branch is horiz at corners: */
-    int i;
-    for (i = 0; i < 8; i += 4)
+    for (int32_t i = 0; i < 8; i += 4)
       { x[i+1] = (2*x[i] + x[i+3])/3; y[i+1] = y[i];
         x[i+2] = (x[i] + 2*x[i+3])/3; y[i+2] = y[i+3];
       }
 
     if (pass == 0)
       { /* Fill slice: */
-        pswr_bezier_polygon(ps, TRUE, x, y, 2, TRUE, FALSE, FALSE);
+        epswr_bezier_polygon(eps, TRUE, x, y, 2, TRUE, FALSE, FALSE);
       }
     else  if (pass == 1)
       { /* Draw outline of slice: */
-        pswr_curve(ps, x[0], y[0], x[1], y[1], x[2], y[2], x[3], y[3]);
-        pswr_curve(ps, x[4], y[4], x[5], y[5], x[6], y[6], x[7], y[7]);
+        epswr_curve(eps, x[0], y[0], x[1], y[1], x[2], y[2], x[3], y[3]);
+        epswr_curve(eps, x[4], y[4], x[5], y[5], x[6], y[6], x[7], y[7]);
       }
     else if (pass == 2)
       { /* Do nothing: */ }
   }
 
 
-void fini_plot_file(PSStream *ps, options_t *o)
+void fini_plot_file(epswr_figure_t *eps, options_t *o)
   {
-    pswr_close_stream(ps);
+    epswr_end_figure(eps);
   }
 
-options_t *get_options(int argc, char **argv)
+options_t *get_options(int32_t argc, char **argv)
   {
     options_t *o = notnull(malloc(sizeof(options_t)), "no mem");
 
@@ -1198,19 +1213,18 @@ options_t *get_options(int argc, char **argv)
     return o;
   }
 
-int parse_depth(argparser_t *pp)
+int32_t parse_depth(argparser_t *pp)
   {
     if (argparser_keyword_present_next(pp, "all"))
       { return MAXDEPTH; }
     else
-      { return (int)argparser_get_next_int(pp, -1, MAXDEPTH); }
+      { return (int32_t)argparser_get_next_int(pp, -1, MAXDEPTH); }
   }
 
 frgb_t parse_frgb ( argparser_t *pp )
   { frgb_t color;
-    int i;
     bool_t invisible = FALSE;
-    for (i = 0; i < 3; i++)
+    for (int32_t i = 0; i < 3; i++)
       { color.c[i] = (float)argparser_get_next_double(pp, -1.0, +1.0);
         if (color.c[i] < 0.0) { invisible = TRUE; }
       }
@@ -1220,7 +1234,7 @@ frgb_t parse_frgb ( argparser_t *pp )
       { return color; }
   }
 
-void data_error(int line, char *msg)
+void data_error(int32_t line, char *msg)
   {
     fprintf(stderr, "%s:%d: **%s\n", "-", line, msg);
     exit(1);

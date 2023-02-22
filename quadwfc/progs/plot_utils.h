@@ -1,5 +1,5 @@
 /* Basic plotting operations. */
-/* Last edited on 2005-08-26 00:15:23 by stolfi */
+/* Last edited on 2023-02-12 11:44:28 by stolfi */
 
 #ifndef plot_utils_H
 #define plot_utils_H
@@ -8,7 +8,7 @@
 
 #include <bool.h>
 #include <sign.h>
-#include <pswr.h>
+#include <epswr.h>
 #include <frgb.h>
 #include <r3.h>
 #include <r4.h>
@@ -27,36 +27,19 @@
 #define Invisible ((frgb_t){{-1,-1,-1}})
 /* Use this color to omit the faces. */
 
-PSStream *new_ps_stream
-  ( bool_t eps,
-    char *name,
-    char *paperSize,
-    bool_t landscape,
-    double figSize,
-    int nCap
-  );
-  /* Creates a new Postscript stream as specified by the given
-    options: either a standalone document, called "{name}.ps", or a
-    bunch of EPS files, called "{name}-{NNNNNN}.eps".
-    The {figSize} is in millimeters. */
+epswr_figure_t *new_figure(char *name, double figSize, int32_t nCap);
+  /* Creates a new object that writes to the 
+    Encapsulatd Postscript file "{name}.eps", with space for {nCap}
+    caption lines at the bottom.  The {figSize} is in millimeters. */
 
-double default_fig_size
-  ( bool_t eps, 
-    char *paperSize, 
-    int nRows, 
-    int nCols,
-    int captionLines
-  );
+double default_fig_size(int nRows, int nCols, int captionLines);
   /* A convenient default figure size (in mm) for the given output options.
-    If {eps = FALSE}, chooses the size so as to fit the given number of rows
-    and columns in the page, with 1 inch margins.  If {eps = TRUE}, ignores
-    the {paperSize} and returns 150.0 mm divided by the *minimum* of 
-    {nCols,nRows}. */
+    Returns 150.0 mm divided by the *minimum* of {nCols,nRows}. */
     
 /* MESH PLOTTING */
 
 void paint_triangle
-  ( PSStream *fps,
+  ( epswr_figure_t *eps,
     r3_t *P, 
     r3_t *Q, 
     r3_t *R,
@@ -69,7 +52,7 @@ void paint_triangle
     coordinates of the original (unprojected) corner points. */
 
 void draw_edge
-  ( PSStream *fps,
+  ( epswr_figure_t *eps,
     r3_t *P, 
     r3_t *Q, 
     hr3_pmap_t *map          /* Perspective projection matrix. */
@@ -78,7 +61,7 @@ void draw_edge
     the original (unprojected) endpoints. */
 
 void draw_vertex
-  ( PSStream *fps,
+  ( epswr_figure_t *eps,
     r3_t *P, 
     hr3_pmap_t *map          /* Perspective projection matrix. */
   );
@@ -88,7 +71,7 @@ void draw_vertex
 /* UTILITIES */
 
 void draw_axis
-  ( PSStream *fps, 
+  ( epswr_figure_t *eps, 
     hr3_pmap_t *map, 
     r3_t *dir,
     double length
@@ -96,7 +79,7 @@ void draw_axis
   /* Draws an arrow from the origin, with the specified length
     and direction. */
     
-void draw_all_axes(PSStream *fps, hr3_pmap_t *map);
+void draw_all_axes(epswr_figure_t *eps, hr3_pmap_t *map);
   /* Draws the three Cartesian coordinate axes X, Y, Z. */
 
 /* FINDING PERSPECTIVE PROJECTION */
@@ -119,8 +102,6 @@ hr3_point_t default_zenith(void);
 
 typedef struct plot_options_t
   { /* General plotting options: */
-    bool_t eps;           /* TRUE to generate ".eps" instead of ".ps". */
-    char *paperSize;      /* Document paper size (when {eps == FALSE}). */
     double figSize;       /* Figure size in mm. */
     double meshSize;      /* Plotting resolution in mm. */
     string_vec_t caption; /* Figure caption. */
@@ -137,7 +118,6 @@ typedef struct plot_options_t
   } plot_options_t;  
 
 #define PLOT_PARAMS_HELP \
-  "  [ -eps | -ps ] [ -paperSize STRING ] \\\n" \
   "  [ -caption TEXT ]... \\\n" \
   "  [ -obs OW OX OY OZ ] \\\n" \
   "  [ -ctr CW CX CY CZ ] \\\n" \

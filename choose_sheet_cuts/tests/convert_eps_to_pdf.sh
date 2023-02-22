@@ -1,5 +1,5 @@
 #! /bin/bash -f
-# Last edited on 2020-11-06 22:31:57 by jstolfi
+# Last edited on 2023-02-12 10:05:16 by stolfi
 
 eps_files=( "$@" )
 pdf_files=()
@@ -8,7 +8,8 @@ for efile in ${eps_files[@]} ; do
   pfile="${efile%.*}.pdf"
   echo "converting ${efile} to ${pfile}" 1>&2
   echo "quit" \
-    | gs -sOutputFile=${pfile} -sDEVICE=pdfwrite -g6253x4576 -r72 -sPAPERSIZE=a4 -dEPSFitPage ${efile}
+    | gs -sOutputFile="-" -sDEVICE=pdfwrite -g6253x4576 -r72 -sPAPERSIZE=a4 -dEPSFitPage ${efile} \
+    > ${pfile} 
   pdf_files+=( ${pfile} )
 done 
 for ff in ${pdf_files[@]} ; do 

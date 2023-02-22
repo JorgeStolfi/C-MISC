@@ -4,7 +4,7 @@
 
 /* Copyright © 2005 by the State University of Campinas (UNICAMP). */
 /* See the copyright, authorship, and warranty notice at end of file. */
-/* Last edited on 2006-04-15 13:19:53 by stolfi */
+/* Last edited on 2023-02-12 11:19:43 by stolfi */
 
 #define PROG_HELP \
   "  " PROG_NAME " \\\n" \
@@ -42,18 +42,18 @@
 
 typedef struct options_t 
   { char *outName;      /* Prefix for file names. */
-    int maxIter;        /* Number of iterations to run. */
+    int32_t maxIter;        /* Number of iterations to run. */
     double timeStep;    /* Time step in seconds. */
     double edgeLength;  /* Ideal edge length. */
     char *signature;    /* Signature of rays to be followed. */
   } options_t;
   
-options_t *get_options(int argc, char **argv);
-double parse_double(int *argn, int argc, char **argv, double lo, double hi);
-void arg_error(char *msg, int argn, char *arg);
+options_t *get_options(int32_t argc, char **argv);
+double parse_double(int32_t *argn, int32_t argc, char **argv, double lo, double hi);
+void arg_error(char *msg, int32_t argn, char *arg);
 geomodel_t make_geomodel(void);
 
-int main (int argc, char **argv)
+int32_t main (int32_t argc, char **argv)
 {
   /* Parse command line arguments: */
   options_t *o = get_options(argc, argv);
@@ -65,20 +65,19 @@ int main (int argc, char **argv)
   /* Build initial wavefront: */
   r3_t orig = (r3_t){{ 5000, 5000, 4000 }};
   double rad = 4.0*o->edgeLength; /* Radius of initial wavefront. */
-  int imd = 0; /* Initial layer index. */
+  int32_t imd = 0; /* Initial layer index. */
   char *sgn = o->signature;
   wavefront_t wf = init_wf(&orig, rad, geo.md[0].v_P, o->edgeLength, imd, sgn);
   // wavefront_t wf = init_wf(&orig, 2500, geo.md[0].v_P, 100);
   
-  int i;
   output_wave(&wf, o->outName, -1);
-  for (i = 1; i <= o->maxIter; i++)
+  for (int32_t i = 1; i <= o->maxIter; i++)
     {
       wave_prop(&wf,o->timeStep, &(geo), o->edgeLength);
       plot_wave(&wf, o->outName, i);
       if ((i < 5) || (i % 5 == 0)) { output_wave(&wf, o->outName, i); }
     }
-  output_wave(&wf, o->outName, INT_MAX);
+  output_wave(&wf, o->outName, INT32_MAX);
     
   return 0;
 }
@@ -87,7 +86,7 @@ geomodel_t make_geomodel(void)
   {
     geomodel_t geo;
     
-    int nrf = 1; /* Number of reflectors */
+    int32_t nrf = 1; /* Number of reflectors */
     
     double xinf = 0, xsup = 10000;
     double yinf = 0, ysup = 10000;
@@ -120,7 +119,7 @@ geomodel_t make_geomodel(void)
     return geo;
   }
 
-options_t *get_options(int argc, char **argv)
+options_t *get_options(int32_t argc, char **argv)
   {
     argparser_t *pp = argparser_new(stderr, argc, argv);
     argparser_set_help(pp, PROG_NAME " version " PROG_VERS ", usage:\n" PROG_HELP);
@@ -133,7 +132,7 @@ options_t *get_options(int argc, char **argv)
     o->outName = argparser_get_next(pp);  
 
     argparser_get_keyword(pp, "-maxIter");                           
-    o->maxIter = argparser_get_next_int(pp, 1, 100000);  
+    o->maxIter = (int32_t)argparser_get_next_int(pp, 1, 100000);  
 
     argparser_get_keyword(pp, "-timeStep");                           
     o->timeStep = argparser_get_next_double(pp, 1.0e-10, 1.0e10);  

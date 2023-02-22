@@ -1,5 +1,5 @@
 /* See SOTentFunction.h */
-/* Last edited on 2004-06-20 10:34:56 by stolfi */
+/* Last edited on 2023-02-12 07:50:50 by stolfi */
 
 #include <SOTentFunction.h>
 #include <SOFunction.h>
@@ -138,8 +138,8 @@ SOTentFunction *SOTentFunction_Read(FILE *rd, dg_dim_t dDim)
     f->d->fn.pDim = dDim;
     f->d->fn.fDim = 1;
   
-    f->d->index = nget_int(rd, "index"); fget_eol(rd);
-    f->d->rank = nget_int(rd, "rank"); fget_eol(rd);
+    f->d->index = nget_int32(rd, "index"); fget_eol(rd);
+    f->d->rank = nget_int32(rd, "rank"); fget_eol(rd);
 
     filefmt_read_footer(rd, "SOTentFunction");
     return f;

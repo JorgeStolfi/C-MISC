@@ -1,5 +1,5 @@
 /* Plotting a mesh of triangles. */
-/* Last edited on 2005-08-26 00:09:23 by stolfi */
+/* Last edited on 2023-02-12 11:45:00 by stolfi */
 
 #ifndef mesh_plot_H
 #define mesh_plot_H
@@ -11,7 +11,7 @@
 
 #include <bool.h>
 #include <sign.h>
-#include <pswr.h>
+#include <epswr.h>
 #include <frgb.h>
 #include <r3.h>
 #include <r4.h>
@@ -20,8 +20,8 @@
 #include <argparser.h>
 
 void plot_mesh(
-    PSStream *fps,
-    hr3_pmap_t *map,        /* Perspective projection matrix. */
+    epswr_figure_t *eps,
+    hr3_pmap_t *map,         /* Perspective projection matrix. */
     mesh_t *tri,             /* Mesh to plot. */
     int N,                   /* Mesh subdivision parameter. */
     frgb_t *color,           /* Base color of mesh. */

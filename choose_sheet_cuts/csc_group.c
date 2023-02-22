@@ -1,5 +1,5 @@
 
-/* Last edited on 2020-01-01 09:26:23 by jstolfi */
+/* Last edited on 2023-02-12 10:00:59 by stolfi */
 
 #define _GNU_SOURCE
 #include <stdio.h>
@@ -145,38 +145,26 @@ void csc_group_read_one_item(FILE *rd, int32_t *cmdP, char **tagP)
     (*tagP) = NULL; /* "No plate". */
     while (TRUE)
       { /* Read another line, which may be a comment: */
-      fget_skip_formatting_chars(rd);
-      int32_t ch = fgetc(rd);
-      if (debug) 
-        { fprintf(stderr, "csc_read_item: ch = %d", ch);
-          if (ch >= ' ') { fprintf(stderr, " = '%c'", ch); }
-          fputc('\n', stderr);
-        }
-      if (ch == EOF)
-        { /* No more input, return: */
-          (*cmdP) = EOF;
-          return;
-        }
-      else if (ch == '#')
-        { /* Ignore rest of line and try again: */
-          fget_skip_to_eol(rd); 
-        }
-      else if ((ch == '[') || (ch == ']') || (ch =='@'))
-        { /* Command code, return it: */
-          (*cmdP) = ch;
-          return;
-        }
-      else
-        { /* Must be a plate tag: */
-          ungetc(ch, rd);
-          char *tag = fget_string(rd);
-          assert(tag != NULL);
-          if (debug) { fprintf(stderr, "  tag = %s", tag); }
-          /* Return the plate just read: */
-          (*tagP) = tag;
-          return;
-        }
-    }
+        bool_t ok = fget_test_comment_or_eol(rd, '#');
+        if (ok) { continue; }
+        if (fget_test_eof(rd)) { (*cmdP) = EOF; return; }
+        char ch = fget_char(rd);
+        if ((ch == '[') || (ch == ']') || (ch =='@'))
+          { /* Command code, return it: */
+            (*cmdP) = ch;
+            return;
+          }
+        else
+          { /* Must be a plate tag: */
+            ungetc(ch, rd);
+            char *tag = fget_string(rd);
+            assert(tag != NULL);
+            if (debug) { fprintf(stderr, "  tag = %s", tag); }
+            /* Return the plate just read: */
+            (*tagP) = tag;
+            return;
+          }
+      }
   }
 
 sheet_cut_node_t *csc_group_nodes

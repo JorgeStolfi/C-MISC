@@ -1,4 +1,4 @@
-/* Last edited on 2013-10-31 02:17:14 by stolfilocal */
+/* Last edited on 2023-02-09 07:56:40 by stolfi */
 
 #define PROG_NAME "bxor"
 #define PROG_DESC "Reads two files, outputs their bitwise XOR."
@@ -21,9 +21,10 @@
   "  Reads two files, {FILE_A} and {FILE_B}, and writes" \
   " to the standard output their bitwise XOR (exclusive OR).\n" \
   "\n" \
-  "  If {FILE_B} is longer than {FILE_A}, the excess bytes" \
+  "  Even though bit XOR is a commutative operation, the order of the" \
+  " two files is important. If {FILE_B} is longer than {FILE_A}, the excess bytes" \
   " in {FILE_B} are ignored.  Conversely, if {FILE_A} is" \
-  " longer than {FILE_B}, fails with an error message and" \
+  " longer than {FILE_B}, the program fails with an error message and" \
   " a non-zero exit code.\n" \
   "\n" \
   "  Either file name may be \"-\" to mean 'read from standard input'.\n" \

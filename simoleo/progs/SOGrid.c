@@ -1,5 +1,5 @@
 /* See SOGrid.h */
-/* Last edited on 2005-06-05 20:58:45 by stolfi */
+/* Last edited on 2023-02-12 07:51:13 by stolfi */
 
 #include <SOGrid.h>
 
@@ -68,7 +68,7 @@ SOGrid_Tree *SOGrid_Tree_read(FILE *rd)
   { int dim;
     SOGrid_Tree *tree;
     filefmt_read_header(rd, "SOGrid_Tree", SOGrid_Tree_FileFormat);
-    dim = nget_int(rd, "dim"); fget_eol(rd);
+    dim = nget_int32(rd, "dim"); fget_eol(rd);
     affirm(dim >= 0, "bad dimension");
     tree = SOGrid_Tree_new(dim);
     fget_skip_formatting_chars(rd);
@@ -80,27 +80,27 @@ SOGrid_Tree *SOGrid_Tree_read(FILE *rd)
   
 dg_tree_node_t *SOGrid_subtree_read(FILE *rd, dg_tree_node_t *p, dg_cell_index_t k)
   { int c = fget_char(rd);
-  if (c == '*')
-    { return NULL; }
-  else if (c == '(')
-    { dg_tree_node_t *this = dg_tree_node_new(p, k);
-      // Read low subtree:
-      LOCH(*this) = SOGrid_subtree_read(rd, this, 2*k);
-      // Check for comma:
-      fget_skip_formatting_chars(rd);
-      c = fget_char(rd);
-      affirm(c == ',', "comma expected");
-      fget_skip_formatting_chars(rd);
-      // Read high subtree:
-      HICH(*this) = SOGrid_subtree_read(rd, this, 2*k + 1);
-      // Check for close parenthesis:
-      fget_skip_formatting_chars(rd);
-      c = fget_char(rd);
-      affirm(c == ')', " expected ')'");
-      return this;
-    }
-  else
-    { affirm(FALSE, "expected '*' or '('");
-      return NULL;
-    }
+    if (c == '*')
+      { return NULL; }
+    else if (c == '(')
+      { dg_tree_node_t *this = dg_tree_node_new(p, k);
+        // Read low subtree:
+        LOCH(*this) = SOGrid_subtree_read(rd, this, 2*k);
+        // Check for comma:
+        fget_skip_formatting_chars(rd);
+        c = fget_char(rd);
+        affirm(c == ',', "comma expected");
+        fget_skip_formatting_chars(rd);
+        // Read high subtree:
+        HICH(*this) = SOGrid_subtree_read(rd, this, 2*k + 1);
+        // Check for close parenthesis:
+        fget_skip_formatting_chars(rd);
+        c = fget_char(rd);
+        affirm(c == ')', " expected ')'");
+        return this;
+      }
+    else
+      { affirm(FALSE, "expected '*' or '('");
+        return NULL;
+      }
   }

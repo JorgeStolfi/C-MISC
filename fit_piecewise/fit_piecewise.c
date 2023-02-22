@@ -4,7 +4,7 @@
 
 #define fit_piecewise_C_COPYRIGHT \
   "Copyright © 2013 by the State University of Campinas (UNICAMP)"
-/* Last edited on 2015-10-18 02:56:10 by stolfilocal */
+/* Last edited on 2023-02-12 10:08:35 by stolfi */
     
 /* !!! Provide optional format strings for {X}, {W}, {Z}. !!! */
 /* !!! Use {(X[i]-XC)/XR} instead of just {(X[i]-XC)/XR} as the poly argument. !!! */
@@ -372,8 +372,6 @@ void fpc_make_predictions
     is the number of data points spanned by that last segment, instead of 
     {min(gMax,m-2)} as in the other segments. */
 
-
-
 void fpc_eval_function_original(int NP, double X[], double B[], fpc_segment_t *A[], int NS, int r[], double Y[]);
   /* For each {i} in {0..NP-1}, computes the value {Y[i] = F(X[i])} of the fitted function described 
     by {B[0..NP],A[0..NA-1],NS,r[0..NS]}.
@@ -508,35 +506,24 @@ void fpc_read_data(FILE *rd, bool_t weighted, int *NPp, int **IDp, double **Xp, 
     /* Read the input samples: */
     int NP = 0; /* Input values are {Z.e[0..NP-1]}. */
     while (TRUE)
-      { fget_skip_spaces(rd);
-        int c = fgetc(rd);
-        if (c == EOF) 
-          { break; }
-        else if (c == '#')
-          { do { c = fgetc(rd); } while ((c != '\n') && (c != EOF)); 
-            if (c == EOF) { break; }
-            continue;
+      { bool_t ok = fget_test_comment_or_eol(rd, '#');
+        if (ok) { continue; }
+        if (fget_test_eof(rd)) { break; }
+        int_vec_expand(&ID,NP);
+        double_vec_expand(&X,NP);
+        double_vec_expand(&Z,NP);
+        double_vec_expand(&W,NP);
+        ID.e[NP] = fget_int32(rd);
+        X.e[NP] = fget_double(rd);
+        Z.e[NP] = fget_double(rd);
+        if (weighted)
+          { W.e[NP] = fget_double(rd);
+            demand(W.e[NP] >= 0, "weights must be non-negative");
           }
-        else if (c == '\n')
-          { continue; }
         else
-          { ungetc(c, rd); 
-            int_vec_expand(&ID,NP);
-            double_vec_expand(&X,NP);
-            double_vec_expand(&Z,NP);
-            double_vec_expand(&W,NP);
-            ID.e[NP] = fget_int32(rd);
-            X.e[NP] = fget_double(rd);
-            Z.e[NP] = fget_double(rd);
-            if (weighted)
-              { W.e[NP] = fget_double(rd);
-                demand(W.e[NP] >= 0, "weights must be non-negative");
-              }
-            else
-              { W.e[NP] = 1.0; }
-            NP++;
-            fget_comment_or_eol(rd, '#');
-          }
+          { W.e[NP] = 1.0; }
+        NP++;
+        fget_comment_or_eol(rd, '#');
       }
     int_vec_trim(&ID,NP);
     double_vec_trim(&X,NP);

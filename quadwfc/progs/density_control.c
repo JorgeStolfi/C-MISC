@@ -1,5 +1,5 @@
 /* See {density_control.h}. */
-/* Last edited on 2013-10-02 03:16:10 by stolfilocal */
+/* Last edited on 2023-02-12 23:52:33 by stolfi */
 
 #include <density_control.h>
 
@@ -62,7 +62,7 @@ segment_t *interpolate_segments
     reason, the procedure returns {NULL}. Otherwise, the segment {p}
     may have a live {prev} but dead {curr}. */
   
-void split_quadrilateral(qarc_t a);
+void split_quadrilateral(quad_arc_t a);
   /* Assumes that the face {f = LEFT(a)} is a regular (non-hole) face
     that has become a quadrilateral as a consequence of edge
     splitting. Inserts a new diagonal edge {d} between {p = quad_dst(a)}
@@ -81,12 +81,12 @@ void density_control
     contract_short_edges(wf, tol);
   }
   
-void split_quadrilateral(qarc_t a)
+void split_quadrilateral(quad_arc_t a)
   {
     
-    qarc_t b = quad_lnext(a);
-    qarc_t c = quad_lnext(b);
-    qarc_t d = quad_lnext(c);
+    quad_arc_t b = quad_lnext(a);
+    quad_arc_t c = quad_lnext(b);
+    quad_arc_t d = quad_lnext(c);
     
     /* Make sure that the left face is now a quadrilateral: */
     assert(quad_lnext(d) == a);
@@ -104,7 +104,7 @@ void split_quadrilateral(qarc_t a)
     segment_t *q = quad_org(d);
     
     /* Create the new diagonal edge: */
-    qarc_t ediag = quad_make_edge();
+    quad_arc_t ediag = quad_make_edge();
     
     /* Attach it to {p}: */
     SET_quad_org(ediag, p); quad_splice(ediag, b);
@@ -131,8 +131,8 @@ void break_long_edges
   )
   {
     /* Queue of edges to check: */
-    qarc_vec_t root = (qarc_vec_t){1, &(wf->a)};
-    qarc_vec_t Q = renumber_edges(root);
+    quad_arc_vec_t root = (quad_arc_vec_t){1, &(wf->a)};
+    quad_arc_vec_t Q = renumber_edges(root);
     int nQ = Q.ne; /* Number of edges in queue. */
     int nC = 0; /* Number of edges already checked. */
     
@@ -140,7 +140,7 @@ void break_long_edges
       { /* Here, the checked edges are {Q[0..nC-1]}, 
           the unchecked ones are {Q[nC..nQ-1]}. */
         /* Get next unchecked edge: */
-        qarc_t e = Q.e[nC];
+        quad_arc_t e = Q.e[nC];
         /* Get endpoints and edge length: */
         segment_t *u = quad_org(e);
         segment_t *v = quad_dst(e);
@@ -178,15 +178,15 @@ void break_long_edges
                 face_t *fr = RIGHT(e);
 
                 /* Get key edges in the star of {e}: */
-                qarc_t a = quad_oprev(e);
-                qarc_t b = quad_lnext(a);
-                qarc_t c = quad_lnext(e);
-                qarc_t d = quad_lnext(c);
+                quad_arc_t a = quad_oprev(e);
+                quad_arc_t b = quad_lnext(a);
+                quad_arc_t c = quad_lnext(e);
+                quad_arc_t d = quad_lnext(c);
                 /* Disconnect {e} at the destination end: */
                 quad_splice(quad_sym(e), c);
                 SET_quad_dst(e, p);
                 /* Create the new edge and attach it to {p,v}: */
-                qarc_t newe = quad_make_edge(); 
+                quad_arc_t newe = quad_make_edge(); 
                 /* Attach it to {p}: */
                 SET_quad_org(newe, p); quad_splice(newe, quad_sym(e));
                 /* Attach it to {v}: */
