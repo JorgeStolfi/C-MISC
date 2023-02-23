@@ -1,7 +1,7 @@
 #ifndef irt_info_H
 #define irt_info_H
 
-/* Last edited on 2008-01-19 19:27:35 by stolfi */
+/* Last edited on 2023-02-22 11:48:18 by stolfi */
 /* Documentation of the Interval Ray Tracer. */
 
 #define PROG_HELP \
@@ -16,7 +16,8 @@
   "  " PROG_HELP "\n" \
   "\n" \
   "DESCRIPTION\n" \
-  "  ???.\n" \
+  "  Produces an image of a 3D scene by tay-tracing based on\n" \
+  " Interval Arithmetic (IA) or Affine Arithmetic (AA).\n" \
   "\n" \
   "OUTPUT FILES\n" \
   "  ???.\n" \

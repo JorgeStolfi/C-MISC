@@ -1,6 +1,8 @@
 /* See {irt_shade.h}. */
-/* Last edited on 2009-01-06 05:56:30 by stolfi */
+/* Last edited on 2023-02-22 19:54:18 by stolfi */
 
+#define _GNU_SOURCE
+#include <stdint.h>
 #include <stdio.h>
 #include <math.h>
 
@@ -10,7 +12,7 @@
 #include <bool.h>
 #include <affirm.h>
 #include <frgb.h>
-#include <pswr.h>
+#include <epswr.h>
 #include <frgb_ops.h>
 
 #include <irt_inter.h>
@@ -19,18 +21,19 @@
 
 /*** INTERNAL PROTOTYPES ***/
 
-bool_t color_is_almost_black(frgb_t *r, double eps);
-  /* TRUE iff all components of {*r} are less than {eps}. */
+bool_t color_is_almost_black(frgb_t *r, double tol);
+  /* TRUE iff all components of {*r} are less than {tol}. */
 
 frgb_t irt_compute_hit_color 
   ( scene_t *sc,
     r3_t *dir, 
     hr3_point_t *npt, 
     hr3_point_t *fpt, 
-    int slo, int shi,
-    int max_bounces,
+    int32_t slo, int32_t shi,
+    int32_t max_bounces,
+    arith_t arith,
     bool_t print_ray,
-    PSStream *ps
+    epswr_figure_t *epsf
   );
   /* Computes the apparent color of a point on the surface of the scene,
     when seen from very close, looking in the direction {dir}.
@@ -45,8 +48,9 @@ frgb_t irt_compute_scene_transparency
     hr3_point_t *org,
     hr3_point_t *dst,
     double dist,
-    int print_ray,
-    PSStream *ps
+    arith_t arith,
+    int32_t print_ray,
+    epswr_figure_t *epsf
   );
   /* Computes the straight-line transparency between the two points {org}
     and {dst} on the scene.  
@@ -59,7 +63,7 @@ frgb_t irt_compute_scene_transparency
     have about the same magnitude. 
     
     Setting {print_ray} generates a debugging printout of the ray. If
-    {ps} is not NULL, writes to it a plot of the function along the
+    {epsf} is not NULL, writes to it a plot of the function along the
     ray. */
   
 void irt_compute_hit_endpoints
@@ -89,9 +93,10 @@ frgb_t irt_compute_scene_color
   ( scene_t *sc,
     hr3_point_t *eye, 
     r3_t *dir,
-    int max_bounces,
+    int32_t max_bounces,
+    arith_t arith,
     bool_t print_ray,
-    PSStream *ps
+    epswr_figure_t *epsf
   )
   {
     hr3_point_t inf;  /* Ray's endpoint (at infinity) */
@@ -100,24 +105,24 @@ frgb_t irt_compute_scene_color
     hr3_point_t fpt;  /* "Mean" hit point */
     
     Interval hit;    /* Parameter interval containing hit point */
-    int slo, shi;    /* Sign of function before and after {hit} (see zerofind.h) */
+    int32_t slo, shi;    /* Sign of function before and after {hit} (see zerofind.h) */
     frgb_t color;
     
     inf = hr3_point_at_infinity(dir);
 
-    if (ps != NULL)
+    if (epsf != NULL)
       { /* Print a graph of the fucntion with equal-interval enclosures: */
-        irt_debug_ray_graphically(ps, &(sc->shape), sc->arithmetic, eye, &inf);
+        irt_debug_ray_graphically(epsf, &(sc->shape), arith, eye, &inf);
       }
 
     /* Trace the ray: */
     if (print_ray) { fprintf(stderr, "=== begin irt_compute_scene_color ===\n"); }
-    if (ps != NULL) { pswr_new_picture(ps, Zero, One, Zero, One); }
+    if (epsf != NULL) { epswr_set_client_window(epsf, Zero, One, Zero, One); }
     irt_compute_intersection 
-      ( &(sc->shape), sc->arithmetic, eye, &inf, 
-        &hit, &slo, &shi, print_ray, ps
+      ( &(sc->shape), arith, eye, &inf, 
+        &hit, &slo, &shi, print_ray, epsf
       );
-    if (ps != NULL) { pswr_frame(ps); }
+    if (epsf != NULL) { epswr_frame(epsf); }
     
     if (hit.lo <= hit.hi)  /* ray intersected object */
       { irt_compute_hit_endpoints (eye, &inf, &hit, &npt, &fpt);
@@ -134,7 +139,7 @@ frgb_t irt_compute_scene_color
                 fatalerror("aborted");
               }
           }
-        color = irt_compute_hit_color (sc, dir, &npt, &fpt, slo, shi, max_bounces, print_ray, ps);
+        color = irt_compute_hit_color (sc, dir, &npt, &fpt, slo, shi, max_bounces, arith, print_ray, epsf);
       }
     else
       { color = sc->looks.background_color; }
@@ -151,10 +156,11 @@ frgb_t irt_compute_hit_color
     r3_t *dir, 
     hr3_point_t *npt, 
     hr3_point_t *fpt, 
-    int slo, int shi,
-    int max_bounces,
+    int32_t slo, int32_t shi,
+    int32_t max_bounces,
+    arith_t arith,
     bool_t print_ray,
-    PSStream *ps
+    epswr_figure_t *epsf
   )
   { hr3_point_t mpt;  /* "Mean" (nominal) hit point */
     
@@ -174,11 +180,11 @@ frgb_t irt_compute_hit_color
     frgb_t shiny_light; /* Shiny-scatter component of light */
     frgb_t mirrr_light; /* Mirror component of light */
     
-    int lnum;
+    int32_t lnum;
 
     irt_compute_mean_hit_point(npt, fpt, &mpt);
     
-    irt_compute_surface_normal(&(sc->shape), sc->arithmetic, &mpt, &nrm);
+    irt_compute_surface_normal(&(sc->shape), arith, &mpt, &nrm);
     cos_dir_nrm = r3_dot(dir, &nrm);
         
     /* Perturb the "near" hit point along normal, towards the observer's side: */
@@ -247,7 +253,7 @@ frgb_t irt_compute_hit_color
             hr3_L_inf_normalize_point(&lfp);
             
             /* Attenuate light's color by shadow and inverse-square factors: */
-            shadow_factor = irt_compute_scene_transparency (sc, &nfp, &lfp, ldist, print_ray, ps);
+            shadow_factor = irt_compute_scene_transparency (sc, &nfp, &lfp, ldist, arith, print_ray, epsf);
 	    incident_light = frgb_mul(&(lt->color), &shadow_factor);
             inv_sq_factor = 2.0/((ldist*ldist)/(rdist*rdist) + 1.0);
             incident_light = frgb_scale(inv_sq_factor, &incident_light);
@@ -295,7 +301,7 @@ frgb_t irt_compute_hit_color
 
     /* Mirror-like reflection */
     if ((sc->looks.has_mirror) && (max_bounces > 0))
-      { mirrr_light = irt_compute_scene_color(sc, &npp, &rfl, max_bounces - 1, print_ray, ps);
+      { mirrr_light = irt_compute_scene_color(sc, &npp, &rfl, max_bounces - 1, arith, print_ray, epsf);
         if (print_ray) { frgb_print(stderr, "mirror light = ", &mirrr_light, 3, "%7.5f", "\n"); }
         frgb_t mirrr_color = mirrr_light; /* frgb_mul(&mirrr_light, &(sc->looks.mirrr_color)); */
         if (print_ray) { frgb_print(stderr, "mirror color = ", &mirrr_color, 3, "%7.5f", "\n"); }
@@ -315,20 +321,21 @@ frgb_t irt_compute_scene_transparency
     hr3_point_t *org,
     hr3_point_t *dst,
     double dist,
-    int print_ray,
-    PSStream *ps
+    arith_t arith,
+    int32_t print_ray,
+    epswr_figure_t *epsf
   )
   { frgb_t color;
     Interval hit;
-    int slo, shi;
+    int32_t slo, shi;
     
     if (print_ray) { fprintf(stderr, "=== begin irt_compute_scene_transparency ===\n"); }
-    if (ps != NULL) { pswr_new_picture(ps, Zero, One, Zero, One); }
+    if (epsf != NULL) { epswr_set_client_window(epsf, Zero, One, Zero, One); }
     irt_compute_intersection
-      ( &(sc->shape), sc->arithmetic, org, dst, 
-        &hit, &slo, &shi, print_ray, ps 
+      ( &(sc->shape), arith, org, dst, 
+        &hit, &slo, &shi, print_ray, epsf 
       );
-    if (ps != NULL) { pswr_frame(ps); }
+    if (epsf != NULL) { epswr_frame(epsf); }
 
     if ((hit.lo > hit.hi) || (hit.lo >= 1.0))
       { color = frgb_White; }
@@ -364,6 +371,6 @@ void irt_compute_mean_hit_point
     hr3_L_inf_normalize_point(mpt);
   }
 
-bool_t color_is_almost_black(frgb_t *r, double eps)
-  { return((r->c[0] < eps) && (r->c[1] < eps) && (r->c[2] < eps)); }
+bool_t color_is_almost_black(frgb_t *r, double tol)
+  { return((r->c[0] < tol) && (r->c[1] < tol) && (r->c[2] < tol)); }
 

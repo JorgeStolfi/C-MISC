@@ -1,7 +1,12 @@
-/* Last edited on 2012-12-08 23:37:17 by stolfilocal */
+/* Last edited on 2023-02-22 12:24:41 by stolfi */
 /* See {irt_evray.h}. */
 
-#include <irt_evray.h>
+#define _GNU_SOURCE
+#include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include <assert.h>
 
 #include <zf.h>
 #include <r3.h>
@@ -16,15 +21,12 @@
 #include <iaeval.h>
 #include <aaeval.h>
 #include <flteval.h>
-#include <pswr.h>
+#include <epswr.h>
 #include <affirm.h>
 #include <jsstring.h>
 /* #include <jsfile.h> */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <assert.h>
+#include <irt_evray.h>
 
 /*** PROTOTYPES FOR INTERNAL PROCEDURES ***/
 
@@ -43,7 +45,7 @@ void irt_check_seg_eval_aa
 
 /*** IMPLEMENTATIONS ***/
 
-int irt_num_evals = 0;
+int32_t irt_num_evals = 0;
 
 Float irt_eval_f_on_point
   ( pcode_proc_t *proc,   /* The function's pseudo-code */
@@ -55,12 +57,12 @@ Float irt_eval_f_on_point
   )
   { 
     double tt = (double) t;
-    int i;
+    int32_t i;
 
     ROUND_NEAR;
 
     hr3_point_t p = hr3_point_mix(1.0 - tt, org, tt, dst);
-    for (i=0; i<4; i++) regs[i] = p.c.c[i];
+    for (i=0; i<4; i++) regs[i] = (Float)p.c.c[i];
     flt_eval(regs, stack, proc->code);
     return(stack[0]);
   }
@@ -136,26 +138,26 @@ void irt_seg_eval_ia
     hr3_point_t *org,     /* Start of ray */
     hr3_point_t *dst,     /* End of ray */
     Interval *tv,         /* Parameter interval (in [0__1]) */
-    int print_ray,        /* Debugging flag */
+    int32_t print_ray,        /* Debugging flag */
     ia_butfly_t *ip,      /* Out: bounding butterfly for function along segment */
     Interval *yr          /* Out: computed range of function along segment */
   )
-  { int i;
+  { int32_t i;
     double a, b;
     for (i=0; i<4; i++)
       { a = org->c.c[i];
         b = dst->c.c[i];
         if (a < b)
           { ROUND_DOWN;
-            regs[i].lo = a + tv->lo * (b - a);
+            regs[i].lo = (Float)(a + tv->lo * (b - a));
             ROUND_UP;
-            regs[i].hi = a + tv->hi * (b - a);
+            regs[i].hi = (Float)(a + tv->hi * (b - a));
           }
         else
           { ROUND_DOWN;
-            regs[i].lo = b + (1.0 - tv->hi) * (a - b);
+            regs[i].lo = (Float)(b + (1.0 - tv->hi) * (a - b));
             ROUND_UP;
-            regs[i].hi = b + (1.0 - tv->lo) * (a - b);
+            regs[i].hi = (Float)(b + (1.0 - tv->lo) * (a - b));
           }
       }
     ia_eval (regs, stack, proc->code);
@@ -168,14 +170,14 @@ void irt_seg_eval_ia_diff
   ( pcode_proc_t *proc,   /* The function's pseudo-code */
     IntervalDiff *regs,   /* Evaluation registers */
     IntervalDiff *stack,  /* Evaluation stack */
-    hr3_point_t *org,      /* Start of ray */
-    hr3_point_t *dst,      /* End of ray */
+    hr3_point_t *org,     /* Start of ray */
+    hr3_point_t *dst,     /* End of ray */
     Interval *tv,         /* Parameter interval (in [0__1]) */
-    int print_ray,        /* Debugging flag */
+    int32_t print_ray,    /* Debugging flag */
     ia_butfly_t *ip,      /* Out: bounding butterfly for function along segment */
     Interval *yr          /* Out: computed range of function along segment */
   )
-  { int i;
+  { int32_t i;
     double a, b;
     /*   Note: the derivatives are relative to a new paramater {u}, which ranges from
       0 to 1 as {t} ranges from {tv->lo} to {tv->hi}. */
@@ -184,20 +186,20 @@ void irt_seg_eval_ia_diff
         b = dst->c.c[i];
         if (a < b)
           { ROUND_DOWN;
-            regs[i].f.lo = a + tv->lo * (b - a);
+            regs[i].f.lo = (Float)(a + tv->lo * (b - a));
             ROUND_UP;
-            regs[i].f.hi = a + tv->hi * (b - a);
+            regs[i].f.hi = (Float)(a + tv->hi * (b - a));
           }
         else
           { ROUND_DOWN;
-            regs[i].f.lo = b + (1.0 - tv->hi) * (a - b);
+            regs[i].f.lo = (Float)(b + (1.0 - tv->hi) * (a - b));
             ROUND_UP;
-            regs[i].f.hi = b + (1.0 - tv->lo) * (a - b);
+            regs[i].f.hi = (Float)(b + (1.0 - tv->lo) * (a - b));
           }
         ROUND_DOWN;
-        regs[i].df.lo = (tv->hi - tv->lo)*(b - a);
+        regs[i].df.lo = (Float)((tv->hi - tv->lo)*(b - a));
         ROUND_UP;
-        regs[i].df.hi = (tv->hi - tv->lo)*(b - a);
+        regs[i].df.hi = (Float)((tv->hi - tv->lo)*(b - a));
       }
     /* !!! Must make sure that the derivative is undef if {sh} is not differentiable !!! */
     ia_eval_diff (regs, stack, proc->code);
@@ -212,10 +214,10 @@ void irt_seg_eval_aa
   ( pcode_proc_t *proc,   /* The function's pseudo-code */
     AAP *regs,            /* Evaluation registers */
     AAP *stack,           /* Evaluation stack */
-    hr3_point_t *org,      /* Start of ray */
-    hr3_point_t *dst,      /* End of ray */
+    hr3_point_t *org,     /* Start of ray */
+    hr3_point_t *dst,     /* End of ray */
     Interval *tv,         /* Parameter interval (in [0__1]) */
-    int print_ray,        /* Debugging flag */
+    int32_t print_ray,    /* Debugging flag */
     ia_butfly_t *ip,      /* Out: bounding butterfly for function along segment */
     Interval *yr          /* Out: computed range of function along segment */
   )
@@ -223,7 +225,7 @@ void irt_seg_eval_aa
     AAP aat = aa_from_interval (*tv);
     AAP aar = aa_affine (aat, -1.0, 1.0, 1.0, 0.0); /* r = 1-t */
     AAP aaf;
-    int i;
+    int32_t i;
 
     if (print_ray)
       { fprintf(stderr, "      aat = "); aa_print(stderr, aat);
@@ -233,7 +235,7 @@ void irt_seg_eval_aa
       }
 
     for (i=0; i<4; i++)
-      { regs[i] = aa_affine_2 (aar, org->c.c[i], aat, dst->c.c[i], 1.0, 0.0, 0.0);
+      { regs[i] = aa_affine_2 (aar, (Float)(org->c.c[i]), aat, (Float)(dst->c.c[i]), 1.0, 0.0, 0.0);
         if (print_ray)
           { fprintf(stderr, "      regs[%d] = ", i); aa_print(stderr, regs[i]);
             fprintf(stderr, "\n");
@@ -277,7 +279,7 @@ void irt_check_seg_eval_aa
 
     MemP frame = aa_top();
     AATerm eps[1];
-    int i, j;
+    int32_t i, j;
 
     affirm((aat->nterms == 1), "irt_check_seg_eval_aa: bad aat");
     eps[0].id = ((AATermP)(aat + 1))->id;
@@ -285,10 +287,10 @@ void irt_check_seg_eval_aa
     fprintf(stderr, "\n");
     for (j=-NCHECK; j<=NCHECK; j++)
       { /* The following comments assume that {t(e)} is the exact value of {t}
-          corresponding to {eps_k = e}, where {eps_k} is the (unique)
+          corresponding to {epsf_k = e}, where {epsf_k} is the (unique)
           noise var that appears in {aat}. */
 
-        /* Pick a sample value {e} in {[-1_+1]} for {eps_k}: */
+        /* Pick a sample value {e} in {[-1_+1]} for {epsf_k}: */
         ROUND_NEAR; 
         Float e = ((Float) j)/((Float) NCHECK);
         
@@ -304,14 +306,14 @@ void irt_check_seg_eval_aa
         
         /* Compute the range {f_cmp}for {f(t(e))} as {f(aa_fix_eps(aat, e))}: */ 
         for (i=0; i<4; i++)
-          { regs[i] = aa_affine_2(sa, org->c.c[i], ta, dst->c.c[i], 1.0, 0.0, 0.0); }
+          { regs[i] = aa_affine_2(sa, (Float)(org->c.c[i]), ta, (Float)(dst->c.c[i]), 1.0, 0.0, 0.0); }
         aa_eval (regs, stack, proc->code);
         Interval f_cmp = aa_range(stack[0]);
         
         /* Compute the range for {f(t(e))} obtained by slicing {ip} at {t(e)}: */
         Interval tev = aa_range(ta); /* A Small interval containing {t(e)}. */
         Interval f_trp = (Interval){ +1, -1 }; /* Enclosing interval for {f(t(e))}. */  
-        int j;
+        int32_t j;
         for (j = 0; j < 2; j++)
           { /* Get the trapezoid {j} from the butterfly, clipped to domain {tev}: */
             ia_trapez_t tpj = ia_trapez_clip(&tev, &(ip->tp[j]));
@@ -360,7 +362,7 @@ void irt_seg_eval_mix
     hr3_point_t *org,      /* Start of ray */
     hr3_point_t *dst,      /* End of ray */
     Interval *tv,         /* Parameter interval (in [0__1]) */
-    int print_ray,        /* Debugging flag */
+    int32_t print_ray,        /* Debugging flag */
     ia_butfly_t *ip,      /* Out: bounding butterfly for function along segment */
     Interval *yr          /* Out: computed range of function along segment */
   )
@@ -382,13 +384,13 @@ void irt_compute_surface_normal
     hr3_point_t *hit,     /* The hit point. */
     r3_t *nrm            /* Out: The normal vector at {hit}. */
   )
-  { int i;
+  { int32_t i;
     FloatDiff4 *regs  = sh->nrm_regs;
     FloatDiff4 *stack = sh->nrm_stack;
 
     for (i=0; i<4; i++)
       { FloatDiff4 *ri = &(regs[i]);
-        ri->f = hit->c.c[i];
+        ri->f = (Float)(hit->c.c[i]);
         ri->df[0] = 0.0;
         ri->df[1] = 0.0;
         ri->df[2] = 0.0;
@@ -407,7 +409,7 @@ void irt_compute_surface_normal
   }
 
 void irt_debug_ray_graphically
-  ( PSStream *ps,
+  ( epswr_figure_t *epsf,
     shape_t *sh,         /* The shape function */
     arith_t arith,       /* Type of arithmetic to use */
     hr3_point_t *org,     /* Ray's origin */
@@ -434,8 +436,8 @@ void irt_debug_ray_graphically
   
     /* Widen the y plotting range a bit: */
     { Float r = Half * fd.hi - Half * fd.lo;
-      fd.lo -= 0.05 * r;
-      fd.hi += 0.05 * r;
+      fd.lo -= 0.0625f * r;
+      fd.hi += 0.0625f * r;
     }
     if ((fd.lo <= MinusInfinity) || (fd.hi >= PlusInfinity))
       { fprintf(stderr, "irt_debug_ray_graphically: y range is infinite, aborted");
@@ -443,26 +445,25 @@ void irt_debug_ray_graphically
       }
 
     /* Start a new plot: */
-    pswr_new_picture(ps, Zero, One, Zero, One);
-    pswr_set_grid(ps, NUMINTS, 1);
+    epswr_set_client_window(epsf, Zero, One, Zero, One);
 
     /* Now plot the butterfiles: */
-    irt_plot_butterflies_along_segment(ps, NUMINTS, td, fd, tv, fvp);
+    irt_plot_butterflies_along_segment(epsf, NUMINTS, td, fd, tv, fvp);
 
     /* Draw the axes: */
     if ((td.lo < Zero) && (td.hi > Zero))
-      { pswr_coord_line(ps, HOR, (Zero - td.lo)/(td.hi - td.lo)); }
+      { epswr_coord_line(epsf, epswr_axis_HOR, (Zero - td.lo)/(td.hi - td.lo)); }
     if ((fd.lo < Zero) && (fd.hi > Zero))
-      { pswr_coord_line(ps, VER, (Zero - fd.lo)/(fd.hi - fd.lo)); }
+      { epswr_coord_line(epsf, epswr_axis_VER, (Zero - fd.lo)/(fd.hi - fd.lo)); }
 
     /* Now draw the function: */
     irt_plot_f_along_segment
-      ( ps, sh, arith, org, dst,
+      ( epsf, sh, arith, org, dst,
         NUMSTEPS, td, fd
       );
 
     /* Draw the frame: */
-    pswr_frame(ps);
+    epswr_frame(epsf);
 
     #undef NUMSTEPS
     #undef NUMINTS
@@ -474,7 +475,7 @@ void irt_eval_shape_on_equal_segments
     arith_t arith,       /* Type of arithmetic to use */
     hr3_point_t *org,    /* Ray origin */
     hr3_point_t *dst,    /* Ray destination */
-    int nints,           /* Number of intervals to compute */
+    int32_t nints,           /* Number of intervals to compute */
     Interval td,         /* Overall range of paramter (always [0_1] for now), */
     Interval *fd,        /* (Out) Overall range of function over {td} */
     Interval tv[],       /* (Out) Parameter intervals */
@@ -482,7 +483,7 @@ void irt_eval_shape_on_equal_segments
     bool_t print         /* TRUE prints the trapezoids. */
   )
   {
-    int i;
+    int32_t i;
     Interval yr;
 
     *fd = (Interval){Zero, Zero};
@@ -508,7 +509,7 @@ void irt_eval_shape_on_equal_segments
           );
           
         if (print)
-          { int j;
+          { int32_t j;
             fprintf(stderr, "  t[%02d]    = ", i);
             ia_print(stderr, tv[i]), 
             fprintf(stderr, "\n");
@@ -521,7 +522,7 @@ void irt_eval_shape_on_equal_segments
           }
 
         /* Update the y range: */
-        int j;
+        int32_t j;
         for (j = 0; j < 2; j++)
           { if (! ia_is_full(&(fvp[i].tp[j].yxlo))) *fd = ia_join(*fd, fvp[i].tp[j].yxlo);
             if (! ia_is_full(&(fvp[i].tp[j].yxhi))) *fd = ia_join(*fd, fvp[i].tp[j].yxhi);
@@ -532,8 +533,8 @@ void irt_eval_shape_on_equal_segments
   }
 
 void irt_plot_butterflies_along_segment
-  ( PSStream *ps,
-    int nints,           /* Number of intervals to plot */
+  ( epswr_figure_t *epsf,
+    int32_t nints,           /* Number of intervals to plot */
     Interval td,         /* Overall range of parameter */
     Interval fd,         /* Overall range of function over {td} */
     Interval tv[],       /* Parameter intervals (sub-intervals of {td}) */
@@ -542,9 +543,9 @@ void irt_plot_butterflies_along_segment
   {
     double xp[4], yp[4];
     double gray = 0.75;
-    int i;
+    int32_t i;
 
-    pswr_comment(ps, "begin plot of butterflies");
+    epswr_comment(epsf, "begin plot of butterflies");
 
     for (i=0; i<nints; i++)
       {
@@ -553,7 +554,7 @@ void irt_plot_butterflies_along_segment
         assert(tvi.lo == fvpi.tp[0].x.lo);
         assert(tvi.hi == fvpi.tp[1].x.hi);
        
-        int j;
+        int32_t j;
         for (j = 0; j < 2; j++)
           { ia_trapez_t tpj = fvpi.tp[j]; 
 
@@ -580,33 +581,33 @@ void irt_plot_butterflies_along_segment
             xp[3] = sx*(tpj.x.lo - td.lo);
             yp[3] = sy*(tpj.yxlo.hi - fd.lo);
 
-            pswr_set_fill_color(ps,  gray,gray,gray);
-            pswr_polygon(ps, TRUE, xp, yp, 4, TRUE, TRUE, FALSE);
+            epswr_set_fill_color(epsf,  gray,gray,gray);
+            epswr_polygon(epsf, TRUE, xp, yp, 4, TRUE, TRUE, FALSE);
           }
       }
 
-    pswr_comment(ps, "end plot of butterflies");
+    epswr_comment(epsf, "end plot of butterflies");
   }
 
 void irt_plot_f_along_segment
-  ( PSStream *ps,
+  ( epswr_figure_t *epsf,
     shape_t *sh,         /* The shape function */
     arith_t arith,       /* Type of arithmetic to use */
     hr3_point_t *org,     /* Ray origin */
     hr3_point_t *dst,     /* Ray destination */
-    int nsteps,          /* Number of intervals to plot */
+    int32_t nsteps,          /* Number of intervals to plot */
     Interval td,         /* Overall range of parameter */
     Interval fd          /* Overall range of function over {td} */
   )
   {
     Float t0, f0, t1, f1;
     double x0, y0, x1, y1;
-    int i;
+    int32_t i;
 
     ROUND_NEAR;
-    pswr_comment(ps, "begin plot of actual graph");
+    epswr_comment(epsf, "begin plot of actual graph");
 
-    pswr_set_pen(ps, 0.00, 0.30, 0.00, 0.0,0.0,0.0);
+    epswr_set_pen(epsf, 0.00, 0.30, 0.00, 0.0,0.0,0.0);
 
     t1 = td.lo;
     f1 = irt_eval_f_on_point(&(sh->proc), sh->flt_regs, sh->flt_stack, org, dst, t1);
@@ -616,20 +617,20 @@ void irt_plot_f_along_segment
         t0 = t1;
         f0 = f1;
 
-        t1 = td.lo + ((td.hi - td.lo)*(i+1))/((Float) nsteps);
+        t1 = (Float)(td.lo + ((td.hi - td.lo)*((double)(i+1)))/((double)nsteps));
         f1 = irt_eval_f_on_point(&(sh->proc), sh->flt_regs, sh->flt_stack, org, dst, t1);
 
-        if ( ((abs(f1) < Infinity) && (abs(f0) < Infinity))
+        if ( ((fabs(f1) < Infinity) && (fabs(f0) < Infinity))
           && ((f0 <= fd.hi) || (f1 <= fd.hi))
           && ((f0 >= fd.lo) || (f1 >= fd.lo))
           )
           { x0 = (t0 - td.lo)/(td.hi - td.lo); y0 = (f0 - fd.lo)/(fd.hi - fd.lo);
             x1 = (t1 - td.lo)/(td.hi - td.lo); y1 = (f1 - fd.lo)/(fd.hi - fd.lo);
-            pswr_segment(ps, x0, y0, x1, y1);
+            epswr_segment(epsf, x0, y0, x1, y1);
           }
 
       }
 
-    pswr_comment(ps, "end plot of actual graph");
+    epswr_comment(epsf, "end plot of actual graph");
   }
 

@@ -1,4 +1,4 @@
-# Last edited on 2022-10-23 17:50:22 by stolfi
+# Last edited on 2023-02-22 20:46:41 by stolfi
 
 PROG := irt_main
 PROGDIR := ..
@@ -28,11 +28,23 @@ NONTESTS := \
   
 include ${STOLFIHOME}/programs/c/GENERIC-PROGS-TEST.make
 
+.PHONY:: \
+  run-all clean-all \
+  run-shape clean-shape \
+  run-arith clean-arith \
+
 SHOWPPM := display
   
-all: ${PROGDIR}/${PROG}
+all: clean-all run-all
+
+clean-all:
 	for t in ${TESTS}; do \
-          ${MAKE} TESTARGS=$$t single ; \
+          ${MAKE} TESTARGS=$$t clean-shape ; \
+        done
+
+run-all: ${PROGDIR}/${PROG}
+	for t in ${TESTS}; do \
+          ${MAKE} TESTARGS=$$t run-shape ; \
         done
 
 ######################################################################
@@ -44,41 +56,69 @@ ifneq "/${TESTARGS}" "/TESTARGS.IS.UNDEFINED"
 ARGS := ${subst /, ,${TESTARGS}}
 TNAME   := ${word 1,${ARGS}}
 IMGSIZE := ${word 2,${ARGS}}
-ARITHS  := ${word 3,${ARGS}}
+ARITHS  := ${subst :, ,${word 3,${ARGS}}}
 
 SUBDIR := ${TNAME}
 
 EXPR_FILE := ${SUBDIR}/${TNAME}.expr
 PCODE_FILE := ${SUBDIR}/${TNAME}.pcode
+PARMS_FILE := ${SUBDIR}/${TNAME}.parms
 
-single: ${PCODE_FILE}
-	for m in ${subst :, ,${ARITHS}} ; do \
-          ${MAKE} TESTARGS=${TESTARGS} ARITH=$$m single-arith ; \
+clean-shape:
+	for m in ${ARITHS} ; do \
+          ${MAKE} TESTARGS=${TESTARGS} ARITH=$$m clean-arith ; \
         done
 
-# ${PCODE_FILE}: ${EXPR_FILE} ${EXCOMPILER}
-# 	${EXCOMPILER} < ${EXPR_FILE} > ${PCODE_FILE}
+run-shape:
+	for m in ${ARITHS} ; do \
+          ${MAKE} TESTARGS=${TESTARGS} ARITH=$$m run-arith ; \
+        done
+
+OUT_DIR := ${SUBDIR}/out
+
+${OUT_DIR}:
+	mkdir -pv ${OUT_DIR}
+
+EXCOMPILER := ${STOLFIHOME}/bin/expr_to_pcode.sh
+
+${PCODE_FILE}: ${EXPR_FILE} ${EXCOMPILER} Makefile
+	${EXCOMPILER} < ${EXPR_FILE} > ${PCODE_FILE}
 
 ######################################################################
 # Recursive make - caller must define ${ARITH}
 
-ARITH := ARITH.IS.UNDEFINED
-ifneq "/${ARITH}" "/ARITH.IS.UNDEFINED"
+ifneq "/${ARITH}" "/"
 
 DATE := ${shell date '+%Y-%m-%d-%H%M%S'}
 
 RUN :=  ${TNAME}-${IMGSIZE}-${ARITH}
 
-PARMFILE := ${SUBDIR}/${RUN}.parms
-PPMFILE := ${SUBDIR}/out/${RUN}.ppm
-EVPGMFILE := ${SUBDIR}/out/${RUN}-evals.pgm
-LOGFILE := ${SUBDIR}/out/${RUN}-${DATE}.log
+OUT_PREFIX := ${OUT_DIR}/${RUN}
 
-single-arith: ${PPMFILE}
+PPMFILE := ${OUT_PREFIX}.ppm
+EVPGMFILE := ${OUT_PREFIX}-evals.pgm
+LOGFILE := ${OUT_PREFIX}-${DATE}.log
+
+PRINT_RAY := -1 -1
+PLOT_RAY := -1 -1
+
+clean-arith: 
+	rm -f ${OUT_DIR}/*.{pgm,ppm,log,eps}
+
+run-arith: ${PPMFILE}
 	@echo '= = = did ${PPMFILE} = = = = = = = = = = = = = = = = = = = = ='
 
-${PPMFILE}: ${PCODE_FILE} ${PARMFILE} ${PROGDIR}/${PROG}
-	${PROGDIR}/${PROG} ${SUBDIR} ${RUN} 2>&1 | tee ${LOGFILE}
+${PPMFILE}: ${PCODE_FILE} ${PARMS_FILE} ${PROGDIR}/${PROG} ${OUT_DIR} Makefile
+	${PROGDIR}/${PROG} \
+            -imageSize ${IMGSIZE} ${IMGSIZE} \
+            -pcodeFile ${PCODE_FILE} \
+            -arith ${ARITH} \
+            -parmsFile ${PARMS_FILE} \
+            -printRay ${PRINT_RAY} \
+            -plotRay ${PLOT_RAY} \
+            -outPrefix ${OUT_PREFIX} \
+          2>&1 \
+          | tee ${LOGFILE}
 	display ${PPMFILE} ${EVPGMFILE}
 
 endif

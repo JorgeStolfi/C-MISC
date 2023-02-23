@@ -1,0 +1,14 @@
+matte_color      0.20 0.70 0.10
+background_color 0.00 0.20 0.50
+observer 70.0 30.0  15.0
+focus     0.0  0.0   0.0 
+up        0.0  0.0   1.0
+light_source
+  position   200 -20 100
+  color      0.8 0.9 0.9
+end_light
+light_source
+  position   200  100   50
+  color      0.7  0.5  0.5
+end_light
+

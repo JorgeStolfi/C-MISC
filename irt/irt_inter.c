@@ -1,11 +1,13 @@
-/* Last edited on 2012-12-08 23:37:21 by stolfilocal */
+/* Last edited on 2023-02-22 15:11:45 by stolfi */
 
+#define _GNU_SOURCE
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 
 #include <zf.h>
-#include <pswr.h>
+#include <epswr.h>
 #include <frgb.h>
 #include <affirm.h>
 /* #include <aa_trapez.h> */
@@ -27,13 +29,13 @@
 
 /*** PROTOTYPES FOR INTERNAL PROCEDURES ***/
 
-void irt_plot_interval(PSStream *ps, Interval *td, Interval *fd, Interval xv, Interval yv, zf_kind_t tv);
-  /* Plots the rectangle {xv × yv} to {ps}, assuming that the overall plot area is 
+void irt_plot_interval(epswr_figure_t *epsf, Interval *td, Interval *fd, Interval xv, Interval yv, zf_kind_t tv);
+  /* Plots the rectangle {xv × yv} to {epsf}, assuming that the overall plot area is 
      {td × fd}. The color is chosen according to the classification {tv}. */
 
 /*** IMPLEMENTATIONS ***/
 
-int irt_num_rays = 0;
+int32_t irt_num_rays = 0;
 
 void irt_compute_intersection
   ( shape_t *sh,         /* The object's shape */
@@ -41,15 +43,15 @@ void irt_compute_intersection
     hr3_point_t *org,
     hr3_point_t *dst,
     Interval *hit,
-    int *slo, int *shi,
+    int32_t *slo, int32_t *shi,
     bool_t print_ray,
-    PSStream *ps
+    epswr_figure_t *epsf
   )
   {
     #define EPSILON 0.0
     #define DELTA 1.0e-6
 
-    Interval unit_int = (Interval){Zero, One};
+    Interval unit_int32_t = (Interval){Zero, One};
     zf_kind_t tn; /* Type of next interval after root */
 
     if (print_ray)
@@ -90,7 +92,7 @@ void irt_compute_intersection
     tn = zf_enum_zeros(
       eval_shape,
       process_interval,
-      unit_int,
+      unit_int32_t,
       EPSILON,
       DELTA
     );
@@ -126,18 +128,18 @@ void irt_compute_intersection
     /* Internal functions: */
     
     bool_t process_interval(Interval *xv, Interval *yv, zf_kind_t tv)
-      { if (ps != NULL) 
-          { /* Plot the interval on {ps} */
+      { if (epsf != NULL) 
+          { /* Plot the interval on {epsf} */
             if (fd.lo > fd.hi)
               { /* Hack: set the function plot range {fd} from the first interval. */
                 Float ff = FMAX(FABS(yv->lo), FABS(yv->hi));
-                fd = (Interval){ -1.5*ff, +1.5*ff }; 
+                fd = (Interval){ -1.5f * ff, +1.5f * ff }; 
               }
-            irt_plot_interval(ps, &td, &fd, *xv, *yv, tv);
+            irt_plot_interval(epsf, &td, &fd, *xv, *yv, tv);
           }
         affirm(hit->lo > hit->hi, "irt_process_interval: zf_enum_zeros didn't stop!");
         /* Set {sv} to +1 if interval is positive, -1 if negative, 0 if root-like: */
-        int sv;
+        int32_t sv;
         switch (tv)
           { case zf_kind_positive: sv = +1; break;
             case zf_kind_negative: sv = -1; break;
@@ -169,7 +171,7 @@ void irt_compute_intersection
       }
   }
 
-void irt_plot_interval(PSStream *ps, Interval *td, Interval *fd, Interval xv, Interval yv, zf_kind_t tv)
+void irt_plot_interval(epswr_figure_t *epsf, Interval *td, Interval *fd, Interval xv, Interval yv, zf_kind_t tv)
   {
     double xp[4], yp[4];
 
@@ -195,16 +197,16 @@ void irt_plot_interval(PSStream *ps, Interval *td, Interval *fd, Interval xv, In
     /* Choose the color based on the interval's classification {tv}:  */
     frgb_t color;
     if (tv == zf_kind_positive)
-      { color = (frgb_t){{ 1.00, 0.40, 0.20 }}; }
+      { color = (frgb_t){{ 1.000f, 0.400f, 0.200f }}; }
     else if (tv == zf_kind_negative)
-      { color = (frgb_t){{ 0.20, 0.60, 1.00 }}; }
+      { color = (frgb_t){{ 0.200f, 0.600f, 1.000f }}; }
     else if (tv == zf_kind_undefined)
-      { color = (frgb_t){{ 0.40, 0.40, 0.40 }}; }
+      { color = (frgb_t){{ 0.400f, 0.400f, 0.400f }}; }
     else if (tv == zf_kind_mixed)
-      { color = (frgb_t){{ 0.50, 0.80, 0.10 }}; }
+      { color = (frgb_t){{ 0.500f, 0.800f, 0.100f }}; }
     else
-      { color = (frgb_t){{ 1.00, 0.00, 0.20 }}; }
+      { color = (frgb_t){{ 1.000f, 0.000f, 0.200f }}; }
 
-    pswr_set_fill_color(ps,  color.c[0], color.c[1], color.c[2]);
-    pswr_polygon(ps, TRUE, xp, yp, 4, TRUE, TRUE, FALSE);
+    epswr_set_fill_color(epsf,  color.c[0], color.c[1], color.c[2]);
+    epswr_polygon(epsf, TRUE, xp, yp, 4, TRUE, TRUE, FALSE);
   }

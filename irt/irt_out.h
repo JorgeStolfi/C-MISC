@@ -1,11 +1,14 @@
 #ifndef irt_out_H
 #define irt_out_H
 
-/* Last edited on 2017-02-26 02:50:21 by stolfilocal */
+/* Last edited on 2023-02-22 20:07:25 by stolfi */
 /* Image output facilities for the Interval Ray Tracer. */
 
-#include <frgb.h>
+#define _GNU_SOURCE
+#include <stdint.h>
 #include <stdio.h>
+
+#include <frgb.h>
 
 #define irt_GAMMA 2.4
 
@@ -23,19 +26,19 @@
   {frgb_t} values in the {[0_1]} scale. They are gamma-corrected when
   written, with exponent {irt_GAMMA}. */
 
-FILE *irt_open_color_image_file(char *dir_name, char *scene_name, char *tag, int width, int height);
-void irt_write_color_image_row(FILE *image_file, int irow, int width, frgb_t rgb[]);
+FILE *irt_open_color_image_file(char *outPrefix, char *tag, int32_t width, int32_t height);
+void irt_write_color_image_row(FILE *image_file, int32_t irow, int32_t width, frgb_t rgb[]);
 void irt_close_color_image_file(FILE *image_file);
 
 /* COUNT IMAGES
   
   Count image files are in the "plain" PGM format with {maxval =
-  65535}. The pixels are internally represented as {int} counts.
+  65535}. The pixels are internally represented as {int32_t} counts.
   The counts are clipped to the range {0..65535} and are written
   out without any rescaling or gamma correction. */
 
-FILE *irt_open_count_image_file(char *dir_name, char *scene_name, char *tag, int width, int height);
-void irt_write_count_image_row(FILE *image_file, int irow, int width, int count[]);
+FILE *irt_open_count_image_file(char *outPrefix, char *tag, int32_t width, int32_t height);
+void irt_write_count_image_row(FILE *image_file, int32_t irow, int32_t width, int32_t count[]);
 void irt_close_count_image_file(FILE *image_file);
 
 #endif

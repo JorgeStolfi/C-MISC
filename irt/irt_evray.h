@@ -1,8 +1,11 @@
 #ifndef irt_evray_H
 #define irt_evray_H
 
-/* Last edited on 2008-01-20 15:06:13 by stolfi */
+/* Last edited on 2023-02-22 20:31:05 by stolfi */
 /* Tools for evaluating a scene along a ray using IA, AA, etc. */
+
+#define _GNU_SOURCE
+#include <stdint.h>
 
 #include <hr3.h>
 #include <r3.h>
@@ -14,7 +17,7 @@
 #include <iaeval.h>
 #include <flteval.h>
 
-extern int irt_num_evals;  /* Total calls to the shape function  */
+extern int32_t irt_num_evals;  /* Total calls to the shape function  */
 
 typedef enum 
   { arith_ia = 0,       /* Standard interval arithmentic (IA) */
@@ -24,8 +27,7 @@ typedef enum
   } arith_t;
   
 typedef struct shape_t  /* Description of the scene's geometry: */
-  { char *proc_name;           /* Name of function that defines the scene's shape */
-    pcode_proc_t proc;         /* The pseudo-code for the characteristic function */
+  { pcode_proc_t proc;         /* The pseudo-code for the characteristic function */
 
     /* Register and stack arrays for evaluating {proc}: */
     Interval *ia_regs, *ia_stack;      /* For interval arithmetic */
@@ -75,7 +77,7 @@ void irt_seg_eval_ia
     hr3_point_t *org,     /* Start of ray */
     hr3_point_t *dst,     /* End of ray */
     Interval *tv,         /* Parameter interval (in [0__1]) */
-    int print_ray,        /* Debugging flag */
+    int32_t print_ray,        /* Debugging flag */
     ia_butfly_t *ip,      /* Out: bounding butterfly for function along segment */
     Interval *yr          /* Out: computed range of function along segment */
   );
@@ -87,7 +89,7 @@ void irt_seg_eval_ia_diff
     hr3_point_t *org,     /* Start of ray */
     hr3_point_t *dst,     /* End of ray */
     Interval *tv,         /* Parameter interval (in [0__1]) */
-    int print_ray,        /* Debugging flag */
+    int32_t print_ray,        /* Debugging flag */
     ia_butfly_t *ip,      /* Out: bounding butterfly for function along segment */
     Interval *yr          /* Out: computed range of function along segment */
   );
@@ -99,7 +101,7 @@ void irt_seg_eval_aa
     hr3_point_t *org,     /* Start of ray */
     hr3_point_t *dst,     /* End of ray */
     Interval *tv,         /* Parameter interval (in [0__1]) */
-    int print_ray,        /* Debugging flag */
+    int32_t print_ray,        /* Debugging flag */
     ia_butfly_t *ip,      /* Out: bounding butterfly for function along segment */
     Interval *yr          /* Out: computed range of function along segment */
   );
@@ -113,7 +115,7 @@ void irt_seg_eval_mix
     hr3_point_t *org,     /* Start of ray */
     hr3_point_t *dst,     /* End of ray */
     Interval *tv,         /* Parameter interval (in [0__1]) */
-    int print_ray,        /* Debugging flag */
+    int32_t print_ray,        /* Debugging flag */
     ia_butfly_t *ip,      /* Out: bounding butterfly for function along segment */
     Interval *yr          /* Out: computed range of function along segment */
   );
@@ -123,7 +125,7 @@ void irt_eval_shape_on_equal_segments
     arith_t arith,       /* Type of arithmetic to use */
     hr3_point_t *org,    /* Ray origin */
     hr3_point_t *dst,    /* Ray destination */
-    int nints,           /* Number of intervals to compute */
+    int32_t nints,           /* Number of intervals to compute */
     Interval td,         /* Overall range of paramter (always [0_1] for now), */
     Interval *fd,        /* (Out) Overall range of function over {td} */
     Interval tv[],       /* (Out) Parameter intervals */
@@ -150,8 +152,8 @@ void irt_compute_surface_normal
 /* PLOTTING */
 
 void irt_plot_butterflies_along_segment
-  ( PSStream *ps,
-    int nints,           /* Number of intervals to plot */
+  ( epswr_figure_t *epsf,
+    int32_t nints,           /* Number of intervals to plot */
     Interval td,         /* Overall range of parameter */
     Interval fd,         /* Overall range of function over {td} */
     Interval tv[],       /* Parameter intervals (sub-intervals of {td}) */
@@ -159,15 +161,15 @@ void irt_plot_butterflies_along_segment
   );
   /* Plots a list of butterflies (such as those computed by
     {irt_eval_shape_on_equal_segments}) to the Postscript stream
-    {ps}. */
+    {epsf}. */
 
 void irt_plot_f_along_segment
-  ( PSStream *ps,
+  ( epswr_figure_t *epsf,
     shape_t *sh,         /* The shape function */
     arith_t arith,       /* Type of arithmetic to use */
     hr3_point_t *org,    /* Ray origin */
     hr3_point_t *dst,    /* Ray destination */
-    int nsteps,          /* Number of intervals to plot */
+    int32_t nsteps,          /* Number of intervals to plot */
     Interval td,         /* Overall range of parameter */
     Interval fd          /* Overall range of function over {td} */
   );
@@ -175,13 +177,13 @@ void irt_plot_f_along_segment
     with ordinary floating-point on {nsteps} points. */
 
 void irt_debug_ray_graphically
-  ( PSStream *ps,
+  ( epswr_figure_t *epsf,
     shape_t *sh,         /* The shape function */
     arith_t arith,       /* Type of arithmetic to use */
     hr3_point_t *org,    /* Ray's origin */                                  
     hr3_point_t *dst     /* Ray's destination */                             
   );
-  /* Appends to {ps} a Postscript plot of the function's value along the ray
+  /* Appends to {epsf} a Postscript plot of the function's value along the ray
     from {org} to {dst}. */
 
 

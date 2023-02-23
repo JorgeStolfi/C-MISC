@@ -1,21 +1,24 @@
 #ifndef irt_inter_H
 #define irt_inter_H
 
-/* Last edited on 2008-01-20 11:38:42 by stolfi */
+/* Last edited on 2023-02-22 12:17:12 by stolfi */
 /* Tools for ray-scene intersection using IA, AA, etc.. */
+
+#define _GNU_SOURCE
+#include <stdint.h>
 
 #include <hr3.h>
 #include <r3.h>
 #include <ia.h>
 #include <aa.h>
 #include <pcode.h>
-#include <pswr.h>
+#include <epswr.h>
 #include <iaeval.h>
 #include <flteval.h>
 
 #include <irt_evray.h>
 
-extern int irt_num_rays;   /* Total calls to {irt_compute_intersection} */
+extern int32_t irt_num_rays;   /* Total calls to {irt_compute_intersection} */
 
 void irt_compute_intersection
   ( shape_t *sh,         /* The object's shape */
@@ -23,9 +26,9 @@ void irt_compute_intersection
     hr3_point_t *org,    /* Ray's origin */
     hr3_point_t *dst,    /* Ray's destination */
     Interval *hit,       /* (Out) Parameter interval of surface hit */
-    int *slo, int *shi,  /* (Out) Function's signs before and after hit */
+    int32_t *slo, int32_t *shi,  /* (Out) Function's signs before and after hit */
     bool_t print_ray,    /* TRUE to print diagnostics. */
-    PSStream *ps         /* Postscript stream for debugging plot, or NULL. */
+    epswr_figure_t *epsf         /* Postscript stream for debugging plot, or NULL. */
   ); 
   /* Computes the first proper intersection {hit} of the given
     shape, which will be evaluated with {arith}.
@@ -54,7 +57,7 @@ void irt_compute_intersection
     the routine will probably take forever and/or die before returning...)
     
     If {print_ray} is TRUE, generates some diagnostic
-    printout for this ray. If {ps} is not NULL, writes
+    printout for this ray. If {epsf} is not NULL, writes
     to it a plot of the function along the ray.  */
 
 #endif
