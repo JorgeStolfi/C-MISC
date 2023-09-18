@@ -3,7 +3,7 @@
 #define PROG_VERS "2023-02-21"
 
 #define PROG_COPYRIGHT "Copyright © 2023 Universidade Estadual de Campinas (UNICAMP)"
-/* Last edited on 2023-02-21 14:22:13 by stolfi */
+/* Last edited on 2023-02-25 16:16:07 by stolfi */
 
 #define PROG_HELP \
   "  PROG_NAME \\\n" \
@@ -59,6 +59,7 @@
 
 #include <epswr.h>
 #include <argparser.h>
+#include <rn.h>
 
 #include <stmap.h>
 
@@ -279,11 +280,11 @@ options_t *parse_options(int32_t argc, char **argv)
     
     o->nCircle = 0; /* No Euclidean circles */
     o->ctrCircle = (Point *)malloc(pltmap_MAXMARKS * sizeof(Point));
-    o->rCircle = (double *)malloc(pltmap_MAXMARKS * sizeof(double));
+    o->rCircle = rn_alloc(pltmap_MAXMARKS);
     
     o->nBall = 0;   /* No street-cost balls. */
     o->ctrBall = (Point *)malloc(pltmap_MAXMARKS * sizeof(Point));
-    o->rBall = (double *)malloc(pltmap_MAXMARKS * sizeof(double));
+    o->rBall = rn_alloc(pltmap_MAXMARKS);
 
     /* Initialize argument parser: */
     argparser_t *pp = argparser_new(stderr, argc, argv);

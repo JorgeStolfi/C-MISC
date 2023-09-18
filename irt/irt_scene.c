@@ -1,5 +1,5 @@
 /* See {irt_scene.h}. */
-/* Last edited on 2023-02-22 20:44:15 by stolfi */
+/* Last edited on 2023-03-18 11:34:12 by stolfi */
 
 #define _GNU_SOURCE
 #include <stdlib.h>
@@ -74,7 +74,7 @@ frgb_t irt_read_rgb (void);
   /* 
     Parses three real numbers (intensities, usually in [0__1]). */
   
-int32_t irt_read_int32_t(void);
+int32_t irt_read_int(void);
   /* Parses an integer */
 
 double irt_read_number(void);
@@ -161,7 +161,7 @@ void irt_read_parm_file(char *parmsFile, scene_t *sc)
         else if (strcmp(t, "shiny_spread") == 0)
           { sc->looks.shiny_spread = irt_read_number(); }
         else if (strcmp(t, "max_bounces") == 0)
-          { sc->looks.max_bounces = irt_read_int32_t(); }
+          { sc->looks.max_bounces = irt_read_int(); }
         else if (strcmp(t, "background_color") == 0)
           { sc->looks.background_color = irt_read_rgb(); }
         else if (strcmp(t, "observer") == 0)
@@ -331,7 +331,7 @@ r3_t irt_read_vector(void)
     return(v);
   }
   
-int32_t irt_read_int32_t(void)
+int32_t irt_read_int(void)
   { return(irt_atoi(strtok(NULL," "))); }
   
 double irt_read_number(void)

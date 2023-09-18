@@ -1,9 +1,9 @@
-# Last edited on 2023-02-02 12:19:32 by stolfi
+# Last edited on 2023-04-26 22:05:58 by stolfi
 # Z = affine function X[0] + 1
 # X[0] = sample index from 0.
 # HAS weight (all 1).
 # NO unit term 
 # ONLY TWO DATA POINTS.
 
-1  1   1  0
-2  2   1  1
+1  1   1  5
+2  2   1  6

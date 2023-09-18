@@ -1,4 +1,4 @@
-/* Last edited on 2023-02-22 15:11:45 by stolfi */
+/* Last edited on 2023-03-18 11:35:04 by stolfi */
 
 #define _GNU_SOURCE
 #include <stdint.h>
@@ -51,7 +51,7 @@ void irt_compute_intersection
     #define EPSILON 0.0
     #define DELTA 1.0e-6
 
-    Interval unit_int32_t = (Interval){Zero, One};
+    Interval unit = (Interval){Zero, One};
     zf_kind_t tn; /* Type of next interval after root */
 
     if (print_ray)
@@ -92,7 +92,7 @@ void irt_compute_intersection
     tn = zf_enum_zeros(
       eval_shape,
       process_interval,
-      unit_int32_t,
+      unit,
       EPSILON,
       DELTA
     );

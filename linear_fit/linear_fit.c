@@ -4,7 +4,7 @@
 
 #define linear_fit_C_COPYRIGHT \
   "Copyright © 2013 by the State University of Campinas (UNICAMP)"
-/* Last edited on 2023-02-12 11:15:50 by stolfi */
+/* Last edited on 2023-09-17 20:27:28 by stolfi */
     
 #define PROG_HELP \
   "  " PROG_NAME " \\\n" \
@@ -66,7 +66,7 @@
   " weight must be sufficiently varied, otherwise the minimum is not unique and" \
   " the coefficients found may be meaningless.\n" \
   "\n" \
-  "  Optionally (see the \"-unutTerm\" argument below), the program will fit an affine function, that is, a linear" \
+  "  Optionally (see the \"-unitTerm\" argument below), the program will fit an affine function, that is, a linear" \
   " function of the {X[i]} plus a constant term {C[NX]}:\n" \
   "\n" \
   "     {Y[i] = C[0]*X[0] + C[1]*X[1] + ... + C[NX-1]*X[NX-1]  +  C[NX]}\n" \
@@ -188,44 +188,54 @@ void lif_read_data(FILE *rd, bool_t weighted, int32_t *NZp, char ***IDp, double 
     If {weighted} is true, each weight {W[i]} is read from the input line, just after 
     the target value {Z[i]}.  If {weighted} is false, {W[i]} is set to 1 for all {i}.  */
    
-void lif_accum_system(double Zi, double Wi, int32_t NX, double Xi[], double *A, double *B);
-  /* Updates the least squares system {*A,*B} with one more observation,
-    consisting of the given value {Zi = Z[i]} with weight {Wi = W[i]} and the corresponding
-    values {Xi[0..NX-1]} of the independent variables. The matrix {A}
-    must have {NX} rows and columns, and the vector {B} must have {NX}
-    elements. */
- 
 void lif_build_model
   ( int32_t NZ, 
     double Z[], 
     double W[], 
     int32_t NX, 
-    double X[], 
-    bool_t unitTerm, 
-    int32_t NC, 
+    double X[],
+    bool_t unitTerm,
+    int32_t NC,
     double C[], 
     bool_t verbose
   );
-  /* Takes a list {Z[0..NZ-1]} of data samples with weights {W[0..NZ-1]}, and a linearized {NZ} by
-    {NX} array {X[0..NZ*NX-1]} of the corresponding values of the
-    independent variables. Builds a linear model that gives an
-    approximation {Y[i]} to each {Z[i]} by a combination of the
-    independent variables {X[i,0..NX-1]}.
+  /* Takes a list {Z[0..NZ-1]} of data samples with weights
+    {W[0..NZ-1]}, and a linearized {NZ} by {NX} array {X[0..NZ*NX-1]} of
+    the corresponding values of the independent variables. Builds a
+    linear model that gives an approximation {Y[i]} to each {Z[i]} by a
+    linear combination of the independent variables {X[i,0..NX-1]}.
     
     The model is defined by a column vector {C[0..NC-1]} of {NC}
-    coefficients that are determined by the procedure. 
+    coefficients that are determined by the procedure.
     
-    If {unitTerm} is false, {NC} should be {NX}, and the model is {Y =
-    X*C} where {Y[0..NZ-1]} is the vector of predicted values.
+    If {unitTerm} is false, {NC} must be {NX}, and the model is simply {Y = X*C}.
     
-    If {unitTerm} is true, {NC} must be {NX+1}, and the model is {Y =
-    X*C[0..NX-1] + C[NX]}. */
- 
+    If {unitTerm} is true, assumes an implicit independent variable {X[0..NZ-1][NX]}
+    for every sample, with value 1.  In that case {NC} must be {NX+1},
+    and the model is {Y = X*C[0..NX-1] + C[NX]}.  */
+
+void lif_accum_system
+  ( double Zi, 
+    double Wi, 
+    int32_t NX, 
+    double Xi[], 
+    bool_t unitTerm, 
+    int32_t NC, 
+    double *A, 
+    double *B
+  );
+  /* Updates the least squares system {*A,*B} with one more observation,
+    consisting of the given value {Zi = Z[i]} with weight {Wi = W[i]} and the corresponding
+    values {Xi[0..NX-1]} of the independent variables. 
+    
+    The matrix {A} must have {NC} rows and columns, and the vector {B} must have {NC}
+    elements. */
+
 void lif_apply_model(int32_t NZ, int32_t NX, double X[], bool_t unitTerm, int32_t NC, double C[], double Y[]);
   /* Takes a series {Z[0..NZ-1]} of data samples, and the coefficients
     {C[0..NC-1]} of a linear predictor. Computes the approximation values
-    {Y[0..NZ-1]}. See {lif_build_model} for the meaning of {NC,C,Y}. */
-  
+    {Y[0..NZ-1]} as described under {lif_build_model}. */
+
 void lif_residual_stats(int32_t NZ, double Z[], double W[], double Y[], double *avgP, double *devP);
   /* Computes the mean {*avgP} and deviation {*devP} of the residual {Z[i]-Y[i]}.
     weighted by {W[i]}.  No correction is made for the number of fitted parameters. */
@@ -257,9 +267,9 @@ int32_t main (int32_t argc, char **argv)
     lif_read_data(stdin, o->weighted, &NZ, &ID, &Z, &W, NX, &X);
     if (verbose) { fprintf(stderr, "read %d data samples {Z[i],X[i,j]}\n", NZ); }
 
-    /* Build the model: */
+    /* Build the model for {NX} variables, set only C[0..NX-1]}: */
     int32_t NC = NX + (unitTerm ? 1 : 0);
-    double C[NX]; /* Fitted model coefficients. */
+    double C[NC]; /* Fitted model coefficients, possibly plus one for unit term. */
     lif_build_model(NZ, Z, W, NX, X, unitTerm, NC, C, verbose);
 
     /* Apply the model: */
@@ -267,7 +277,7 @@ int32_t main (int32_t argc, char **argv)
     double *Y = notnull(malloc(NZ*sizeof(double)), "no mem");
     lif_apply_model(NZ, NX, X, unitTerm, NC, C, Y);
     
-    /* Apply the model: */
+    /* Compute residual stats: */
     if (verbose) { fprintf(stderr, "computing residual stats\n"); }
     double avg, dev; /* Statistics of residual. */
     lif_residual_stats(NZ, Z, W, Y, &avg, &dev);
@@ -327,82 +337,55 @@ void lif_read_data(FILE *rd, bool_t weighted, int32_t *NZp, char ***IDp, double 
     (*Wp) = W.e;
     (*Xp) = X.e;
    }
-  
+
 void lif_build_model
   ( int32_t NZ, 
     double Z[], 
     double W[], 
     int32_t NX, 
-    double X[], 
-    bool_t unitTerm, 
-    int32_t NC, 
+    double X[],
+    bool_t unitTerm,
+    int32_t NC,
     double C[], 
     bool_t verbose
   )
   {
-    double Xave[NX];     /* If {unitTerm}, average value of each {X[i]}. */
-    double Zave = NAN;   /* If {unitTerm}, average value of {Z}. */
-    if (unitTerm)
-      { demand(NC == NX + 1, "{NC} should be {NX+1}");
-        if (verbose) { fprintf(stderr, "removing variable averages...\n"); }
-        /* Compute the weighted sums of {X[k],Z} in {Xave[k],Zave}: */
-        for (int32_t k = 0; k < NX; k++) { Xave[k] = 0; }
-        Zave = 0;
-        double sumW = 0;
-        for (int32_t i = 0; i < NZ; i++)
-          { double Wi = W[i];
-            demand(Wi >= 0, "invalid weight {W[i]}");
-            double *Xi = &(X[i*NX]); 
-            for (int32_t k = 0; k < NX; k++) 
-              { Xave[k] += Wi*Xi[k]; }
-            Zave += Wi*Z[i];
-            sumW += Wi;
-          }
-        /* Convert weighted sums to weighted averages: */
-        if (sumW > 0)
-          { for (int32_t k = 0; k < NX; k++) { Xave[k] /= sumW; }
-            Zave /= sumW;
-          }
-        /* Subtract averages from all variables: */
-        for (int32_t i = 0; i < NZ; i++)
-          { double *Xi = &(X[i*NX]); 
-            for (int32_t k = 0; k < NX; k++) { Xi[k] -= Xave[k]; }
-            Z[i] -= Zave;
-          }
-      }
-    else
-      { demand(NC == NX, "{NC} should be {NX}"); }
-
     /* Build the least squares system: */
     if (verbose) { fprintf(stderr, "building linear system matrices...\n"); }
-    double *A = rmxn_alloc(NX, NX);
-    double B[NX];
-    rn_zero(NX, B);
-    rmxn_zero(NX, NX, A);
+    assert(NC == NX + (unitTerm? 1 : 0));
+    double *A = rmxn_alloc(NC, NC);
+    double B[NC];
+    rn_zero(NC, B);
+    rmxn_zero(NC, NC, A);
     
     /* Accumulate the matrix and vector of the least squares system: */
     for (int32_t i = 0; i < NZ; i++)
       { double *Xi = &(X[i*NX]); 
-        lif_accum_system(Z[i], W[i], NX, Xi, A, B);
+        lif_accum_system(Z[i], W[i], NX, Xi, unitTerm, NC, A, B);
       }
-    if (verbose) { rmxn_gen_print2(stderr, NX,  NX, A,  1, B,  "%+18.9f", "  ","\n  ","\n", "[ "," "," ]", "  "); }
+    if (verbose) { rmxn_gen_print2(stderr, NC,  NC, A,  1, B,  "%+18.9f", "  ","\n  ","\n", "[ "," "," ]", "  "); }
     
     if (verbose) { fprintf(stderr, "solving system...\n"); }
     double tiny = 1.0e-8;
-    int32_t rank = gsel_solve(NX, NX, A, 1, B, C, tiny);
-    if (rank < NX) { fprintf(stderr, "!! warning: system rank = %d\n", rank); }
-    if (verbose) { rmxn_gen_print(stderr, NX, 1, C, "%+18.9f", "  ","\n  ","\n", "[ "," "," ]"); }
-    
-    if (unitTerm)
-      { if (verbose) { fprintf(stderr, "adding variable averages to indep term...\n"); }
-        double Cunit = Zave;
-        for (int32_t k = 0; k < NX; k++) { Cunit -= C[k]*Xave[k]; }
-        C[NC-1] = Cunit;
-      }
+    int32_t rank = gsel_solve(NC, NC, A, 1, B, C, tiny);
+    if (rank < NC) { fprintf(stderr, "!! warning: system rank = %d\n", rank); }
+    if (verbose) { rmxn_gen_print(stderr, NC, 1, C, "%+18.9f", "  ","\n  ","\n", "[ "," "," ]"); }
     
     free(A);
   }
-  
+    
+void lif_accum_system(double Zi, double Wi, int32_t NX, double Xi[], bool_t unitTerm, int32_t NC, double *A, double *B)
+  { 
+    for (int32_t k = 0; k < NC; k++)
+      { double Xik = (k == NX ? 1 : Xi[k]);
+        B[k] += Wi*Zi*Xik;
+        for (int32_t j = 0; j < NC; j++)
+          { double Xij = (j == NX ? 1 : Xi[j]);
+            A[k*NC + j] += Wi*Xik*Xij;
+          }
+      }
+  }
+
 void lif_apply_model(int32_t NZ, int32_t NX, double X[], bool_t unitTerm, int32_t NC, double C[], double Y[])
   { 
     assert(NC == NX + (unitTerm ? 1 : 0));
@@ -417,10 +400,10 @@ void lif_apply_model(int32_t NZ, int32_t NX, double X[], bool_t unitTerm, int32_
 
 void lif_residual_stats(int32_t NZ, double Z[], double W[], double Y[], double *avgP, double *devP)
   {
-    double sumWD = 0;
+    double sumWE = 0;
     double sumW = 0;
-    for (int32_t i = 0; i < NZ; i++) { sumWD += W[i]*(Z[i] - Y[i]); sumW += W[i]; }
-    double avg = sumWD/sumW;
+    for (int32_t i = 0; i < NZ; i++) { sumWE += W[i]*(Z[i] - Y[i]); sumW += W[i]; }
+    double avg = sumWE/sumW;
     demand(sumW > 0, "total weight is zero");
     double sumWD2 = 0;
     for (int32_t i = 0; i < NZ; i++) { double Di = (Z[i] - Y[i]) - avg;  sumWD2 += W[i]*Di*Di; }
@@ -433,7 +416,7 @@ void lif_write_model(char *fname, int32_t NX, char *tName[], bool_t unitTerm, in
   {
     assert(NC == NX + (unitTerm ? 1 : 0));
     FILE *wr = open_write(fname, TRUE);
-    fprintf(wr, "%d\n", NX);
+    fprintf(wr, "%d\n", NC);
     for (int32_t k = 0; k < NX; k++) 
       { fprintf(wr, "%3d %+24.16e", k, C[k]); 
         if (tName != NULL)
@@ -479,14 +462,6 @@ void lif_print_model(FILE *wr, int32_t NX, char *tName[], bool_t unitTerm, int32
       }
     fprintf(wr, "  %+14.9f         # avg residual\n", avg);
     fprintf(wr, "  %+14.9f * RND() # dev residual\n", dev);
-  }
-    
-void lif_accum_system(double Zi, double Wi, int32_t NX, double Xi[], double *A, double *B)
-  { 
-    for (int32_t k = 0; k < NX; k++)
-      { B[k] += Wi*Zi*Xi[k];
-        for (int32_t j = 0; j < NX; j++) { A[k*NX + j] += Wi*Xi[k]*Xi[j]; }
-      }
   }
   
 void lif_write_data(FILE *wr, int32_t NZ, char *ID[], double Z[], double Y[], char *fmt)

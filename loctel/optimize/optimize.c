@@ -1,5 +1,5 @@
 /* Find optimum placement of public telephones in a street map. */
-/* Last edited on 2023-02-22 09:28:48 by stolfi */
+/* Last edited on 2023-03-18 11:33:43 by stolfi */
 
 #include <stmap.h>
 #include <stimage.h>
@@ -39,7 +39,7 @@ int32_t main(int32_t argc, char **argv);
 Options *parse_options(int32_t argc, char **argv);
 void get_next_arg_string(char **varp, int32_t *argnp, int32_t argc, char **argv, char *usage);
 void get_next_arg_double(double *varp, int32_t *argnp, int32_t argc, char **argv, char *usage);
-void get_next_arg_int32_t(int32_t *varp, int32_t *argnp, int32_t argc, char **argv, char *usage);
+void get_next_arg_int(int32_t *varp, int32_t *argnp, int32_t argc, char **argv, char *usage);
 void arg_error(char *msg, char *arg, char *pname, char *usage);
 Map *read_map(char *mapName);
 double_vec_t read_vertex_data(char *demName);
@@ -536,7 +536,7 @@ double_vec_t read_vertex_data(char *demName)
   
 #define GET_NEXT_STRING(Var) get_next_arg_string(&(Var), &argn, argc, argv, usage)
 #define GET_NEXT_DOUBLE(Var) get_next_arg_double(&(Var), &argn, argc, argv, usage)
-#define GET_NEXT_INT32_T(Var) get_next_arg_int32_t(&(Var), &argn, argc, argv, usage)
+#define GET_NEXT_INT32_T(Var) get_next_arg_int(&(Var), &argn, argc, argv, usage)
   
 Options *parse_options(int32_t argc, char **argv)
    /*
@@ -652,7 +652,7 @@ void get_next_arg_double(double *varp, int32_t *argnp, int32_t argc, char **argv
     (*argnp) = argn+1;
   }
 
-void get_next_arg_int32_t(int32_t *varp, int32_t *argnp, int32_t argc, char **argv, char *usage)
+void get_next_arg_int(int32_t *varp, int32_t *argnp, int32_t argc, char **argv, char *usage)
    /*
      Stores the next command line argument (as an int32_t) into "*varp" */
   {

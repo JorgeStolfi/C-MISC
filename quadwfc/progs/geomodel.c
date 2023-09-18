@@ -1,5 +1,5 @@
 /* See {geomodel.h}. */
-/* Last edited on 2023-02-12 07:52:09 by stolfi */
+/* Last edited on 2023-02-25 16:02:22 by stolfi */
 
 #include <basic.h>
 #include <geomodel.h>
@@ -9,6 +9,7 @@
 #include <filefmt.h>
 #include <fget.h>
 #include <nget.h>
+#include <rmxn.h>
 
 #define GeoModel_FileFormat "2005-07-09"
 
@@ -258,7 +259,7 @@ reflector_t make_sinusoidal_reflector
     rf.nv[0] = nx;  
     rf.nv[1] = ny;
     double zctr = (zinf + zsup)/2, zamp = (zsup - zinf)/2;
-    double *z = (double *)notnull(malloc(nx*ny*sizeof(double)), "no mem");
+    double *z = rmxn_alloc(nx,ny);
     int ix, iy;
     for (ix = 0; ix < nx; ix++)
       for (iy = 0; iy < ny; iy++)
