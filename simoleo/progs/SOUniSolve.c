@@ -1,5 +1,5 @@
 /* SOUniSolve -- Solves the screened Poisson equation by uniscale iteration. */
-/* Last edited on 2006-03-19 12:46:26 by stolfi */
+/* Last edited on 2023-10-15 03:38:36 by stolfi */
 
 /*
   This program solves a differential equation on the root cell
@@ -163,7 +163,7 @@ int main(int argn, char **argc)
 
     SOApprox_GuessSol(a); 
     while (TRUE)
-      { char *uName = txtcat(o.outName, txtcat("-", fmtint(iter, 4)));
+      { char *uName = txtcat3(o.outName, "-", fmt_int(iter, 4));
 
         g = SOApprox_BuildFunction(bas, a, uName, basName, sol);
 
@@ -218,7 +218,7 @@ SOFunction *GetTrueSolution(char *solName, dg_dim_t pDim, dg_dim_t fDim)
 char *SolutionName(char *outName, int iter)
   {
     if ((iter > 0) && (iter < INT_MAX))
-      { return txtcat(outName, txtcat("-", fmtint(iter,4))); }
+      { return txtcat3(outName, "-", fmt_int(iter,4)); }
     else
       { return outName; }
   }

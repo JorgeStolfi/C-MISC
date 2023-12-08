@@ -1,5 +1,5 @@
 /* See {delaunay_plot.h}. */
-/* Last edited on 2009-01-06 04:22:27 by stolfi */
+/* Last edited on 2023-10-01 19:38:28 by stolfi */
 
 #define _GNU_SOURCE
 #include <stdio.h>
@@ -156,7 +156,7 @@ delaunay_site_t far_left(delaunay_site_t *ap, delaunay_site_t *bp)
   
 PSStream *open_ps_stream(double r, char *prefix, bool_t eps)
   { 
-    double mm = (72.0/25.4); /* One mm in pt. */
+    double mm = epswr_pt_per_mm; /* One mm in pt. */
     double xfigsz = 150.00*mm; /* Figure X size excluding margin (pt). */
     double yfigsz = 150.00*mm; /* Figure Y size excluding margin (pt). */
     double fmrg = 3.0; /* Figure margin width (pt). */

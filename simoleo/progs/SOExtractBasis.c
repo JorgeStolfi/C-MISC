@@ -1,5 +1,5 @@
 /* SOExtractBasis -- Extracts elements from a basis */
-/* Last edited on 2007-01-04 00:21:58 by stolfi */
+/* Last edited on 2023-10-15 03:38:48 by stolfi */
 
 #include <SOParams.h>
 #include <SOFunction.h> 
@@ -67,7 +67,7 @@ int main(int argn, char **argc)
     if (o.writeElems)
       { for (k = 0; k < G.ne; k++)
           { if (G.e[k] != NULL)
-              { char *elName = txtcat(o.outName, txtcat("-e", fmtint(k, 4)));
+              { char *elName = txtcat3(o.outName, "-e", fmt_int(k, 4));
                 WriteFunction(G.e[k], elName);
               }
           }

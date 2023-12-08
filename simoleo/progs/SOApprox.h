@@ -1,5 +1,5 @@
 /* SOApprox.h -- tools for function approximation. */
-/* Last edited on 2007-01-04 00:21:13 by stolfi */
+/* Last edited on 2023-10-15 03:23:49 by stolfi */
 
 #ifndef SOApprox_H
 #define SOApprox_H
@@ -22,7 +22,7 @@
 /* READING THINGS FROM FILES */
 
 /* The procedures in this section read some object from the file
-  {fileName}. The file name must include the extension; see {addext}
+  {fileName}. The file name must include the extension; see {add_ext}
   in {js.h}.
   
   If {fileName == "-"}, these procedures will read from {stdin}. They

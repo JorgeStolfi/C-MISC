@@ -1,5 +1,5 @@
 /* See {plot_utils.h} */
-/* Last edited on 2023-02-13 15:09:26 by stolfi */
+/* Last edited on 2023-10-01 19:38:13 by stolfi */
 
 #include <basic.h>
 #include <plot_utils.h>
@@ -47,10 +47,9 @@ epswr_figure_t *new_figure(char *name, double figSize, int32_t nCap)
   { /* Add caption only if there is a user caption. */
     /* Select a good figure size: */
     double fontSize = 14.0; /* Nominal font height (pt). */
-    double pt_per_mm = 72.0/25.4;
     double mrg = 5.0;                   /* Total margin (pt). */
     /* Dimensions minus margin and captions: */ 
-    double hvSize = figSize*pt_per_mm;
+    double hvSize = figSize*epswr_pt_per_mm;
     /* Space for captions at bottom: */
     double capSize = nCap*fontSize; 
     double botMrg = (nCap == 0 ? mrg : mrg + capSize + mrg);

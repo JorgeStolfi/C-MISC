@@ -4,7 +4,7 @@
 
 #define ct_C_COPYRIGHT \
   "Copyright © 2023 by the State University of Campinas (UNICAMP)"
-/* Last edited on 2023-09-18 00:37:30 by stolfi */
+/* Last edited on 2023-10-15 03:39:21 by stolfi */
 
 #define PROG_HELP \
   "  " PROG_NAME " \\\n" \
@@ -289,7 +289,7 @@ void ct_parse_seq_arg(argparser_t *pp, char *name, double *val_P, bool_t require
     char *rest = NULL;
     double val = strtod(arg, &rest);
     if ((*rest) != 0)
-      { argparser_error(pp, txtcat3("invalid value \"", arg, txtcat("\" for ", name))); }
+      { argparser_error(pp, txtcat4("invalid value \"", arg, "\" for ", name)); }
     if (! isfinite(val))
       { argparser_error(pp, txtcat3("value of ", name, " must be finite")); }
     (*val_P) = val;
@@ -307,7 +307,7 @@ void ct_parse_int_arg(argparser_t *pp, char *name, int32_t *val_P, int32_t max)
     char *rest = NULL;
     int64_t val = strtol(arg, &rest, 10);
     if ((*rest) != 0)
-      { argparser_error(pp, txtcat3("invalid value \"", arg, txtcat("\" for ", name))); }
+      { argparser_error(pp, txtcat4("invalid value \"", arg, "\" for ", name)); }
     if (val < 0)
       { argparser_error(pp, txtcat3("value of ", name, " cannot be negative")); }
     if (val > max)

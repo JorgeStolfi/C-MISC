@@ -5,7 +5,7 @@
 #define PROG_C_COPYRIGHT \
   "Copyright © 1992 by the State University of Campinas (UNICAMP)"
 
-/* Last edited on 2023-02-08 21:37:28 by stolfi */ 
+/* Last edited on 2023-10-15 00:55:15 by stolfi */ 
 
 #define PROG_HELP \
   "  " PROG_NAME " \\\n" \
@@ -50,7 +50,7 @@
   " In the input files, every line, including the last one," \
   " must be terminated by an end-of-line character (octal \\012, hex 0x0a).  An empty" \
   " (zero length) file is assumed to contain no lines; all other" \
-  " files must end with newline.\n" \
+  " files must end with end-of-line.\n" \
   "\n" \
   " The lines in each input file" \
   " must be sorted in strictly increasing collating order. See the" \

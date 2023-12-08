@@ -1,5 +1,5 @@
 /* SOPlotFunction - Plots an arbitrary function from R^2 to R. */
-/* Last edited on 2004-06-20 10:09:46 by stolfi */
+/* Last edited on 2023-10-15 03:23:10 by stolfi */
 
 /*
   This program plots an arbitrary function from R^2 to R,
@@ -43,8 +43,8 @@ SOGrid_Tree *ReadTree(char *treeName);
 int main(int argn, char **argc)
   { 
     Options *o = GetOptions(argn, argc);
-    SOFunction *f = SOApprox_ReadFunction(addext(o->funcName, ".fun")); 
-    SOGrid_Tree *tree = SOApprox_ReadTree(addext(o->treeName, ".tree"));
+    SOFunction *f = SOApprox_ReadFunction(add_ext(o->funcName, ".fun")); 
+    SOGrid_Tree *tree = SOApprox_ReadTree(add_ext(o->treeName, ".tree"));
 
     double fMin = INFTY, fMax = -INFTY;
 

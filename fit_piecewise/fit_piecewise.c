@@ -4,7 +4,7 @@
 
 #define fit_piecewise_C_COPYRIGHT \
   "Copyright © 2013 by the State University of Campinas (UNICAMP)"
-/* Last edited on 2023-02-12 10:08:35 by stolfi */
+/* Last edited on 2023-10-14 21:08:51 by stolfi */
     
 /* !!! Provide optional format strings for {X}, {W}, {Z}. !!! */
 /* !!! Use {(X[i]-XC)/XR} instead of just {(X[i]-XC)/XR} as the poly argument. !!! */
@@ -506,7 +506,7 @@ void fpc_read_data(FILE *rd, bool_t weighted, int *NPp, int **IDp, double **Xp, 
     /* Read the input samples: */
     int NP = 0; /* Input values are {Z.e[0..NP-1]}. */
     while (TRUE)
-      { bool_t ok = fget_test_comment_or_eol(rd, '#');
+      { bool_t ok = fget_test_comment_or_eol(rd, '#', NULL);
         if (ok) { continue; }
         if (fget_test_eof(rd)) { break; }
         int_vec_expand(&ID,NP);
@@ -523,7 +523,7 @@ void fpc_read_data(FILE *rd, bool_t weighted, int *NPp, int **IDp, double **Xp, 
         else
           { W.e[NP] = 1.0; }
         NP++;
-        fget_comment_or_eol(rd, '#');
+        fget_comment_or_eol(rd, '#', NULL);
       }
     int_vec_trim(&ID,NP);
     double_vec_trim(&X,NP);

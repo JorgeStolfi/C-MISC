@@ -1,7 +1,7 @@
 #define PROG_NAME "ioplot"
 #define PROG_DESC "create a sliced-ham in-out plot in Encapsulated Postscript"
 #define PROG_VERS "2013-10-27"
-/* Last edited on 2023-02-21 10:41:57 by stolfi */
+/* Last edited on 2023-10-01 19:39:45 by stolfi */
 
 #define PROG_COPYRIGHT "© 2005  State University of Campinas (UNICAMP)"
 
@@ -902,7 +902,7 @@ epswr_figure_t *init_plot_file
     char *suffix, 
     options_t *o
   )
-  { double mm = 72.0/25.4; /* One mm in pt. */
+  { double mm = epswr_pt_per_mm; /* One mm in pt. */
     double mrg = 4.0;  /* Default {epswr} margin width (pt). */
     double xtot = o->figSizeX*mm + 2.0*mrg;  /* Total figure width (pt). */
     double ytot = o->figSizeY*mm + 2.0*mrg;  /* Total figure height (pt). */

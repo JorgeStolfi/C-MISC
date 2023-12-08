@@ -1,5 +1,5 @@
 /* See {mesh.h}. */
-/* Last edited on 2023-02-13 15:01:23 by stolfi */
+/* Last edited on 2023-10-05 20:54:59 by stolfi */
 
 #include <mesh.h>
 #include <basic.h>
@@ -86,7 +86,7 @@ void write_mesh(FILE *wr, mesh_t *tri)
       { quad_arc_t a = tri->arc.e[i];
         affirm(a != quad_arc_NULL, "edge with no arcs");
         quad_edge_t e = quad_edge(a);
-        affirm(quad_edge_num(e) == i/2, "inconsistent edge num");
+        affirm(quad_edge_id(e) == i/2, "inconsistent edge num");
         fprintf(wr, "%d ", i/2);
         write_edge_data(a);
       }
@@ -211,7 +211,7 @@ mesh_t *read_mesh(FILE *rd)
           int j = fget_int32(rd);
           affirm(j == i, "inconsistent edge number");
           quad_edge_t e = quad_edge(a);
-          quad_set_edge_num(e, i);
+          quad_set_edge_id(e, i);
           fget_skip_spaces(rd);
           { quad_arc_t a = read_arc();
             quad_arc_t b = read_arc(); 

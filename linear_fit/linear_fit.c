@@ -4,7 +4,7 @@
 
 #define linear_fit_C_COPYRIGHT \
   "Copyright © 2013 by the State University of Campinas (UNICAMP)"
-/* Last edited on 2023-09-17 20:27:28 by stolfi */
+/* Last edited on 2023-10-14 21:08:35 by stolfi */
     
 #define PROG_HELP \
   "  " PROG_NAME " \\\n" \
@@ -306,7 +306,7 @@ void lif_read_data(FILE *rd, bool_t weighted, int32_t *NZp, char ***IDp, double 
     /* Read the input samples: */
     int32_t NZ = 0; /* Input values are {Z.e[0..NZ-1]}. */
     while (TRUE)
-      { bool_t ok = fget_test_comment_or_eol(rd, '#');
+      { bool_t ok = fget_test_comment_or_eol(rd, '#', NULL);
         if (ok) { continue; }
         if (fget_test_eof(rd)) { break; } 
         string_vec_expand(&ID,NZ);
@@ -324,7 +324,7 @@ void lif_read_data(FILE *rd, bool_t weighted, int32_t *NZp, char ***IDp, double 
         double *Xi = &(X.e[NZ*NX]); /* Row of {X} for this input line. */
         for (int32_t k = 0; k < NX; k++) { Xi[k] = fget_double(rd); }
         NZ++;
-        fget_comment_or_eol(rd, '#');
+        fget_comment_or_eol(rd, '#', NULL);
       }
     string_vec_trim(&ID,NZ);
     double_vec_trim(&Z,NZ);

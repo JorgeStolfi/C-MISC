@@ -1,5 +1,5 @@
 /* See {choose_sheet_cuts.h}. */
-/* Last edited on 2020-10-27 15:32:18 by jstolfi */
+/* Last edited on 2023-10-14 21:09:03 by stolfi */
 
 #define PROG_NAME "choose_sheet_cuts"
 #define PROG_DESC "fits rectangular plates on rectangular sheets and draws them"
@@ -285,7 +285,7 @@ sheet_cut_node_t* csc_read_plate(FILE *rd)
         if (debug) { fprintf(stderr, "  dx = %.1f dy = %.1f thk = %.1f\n", size.c[0], size.c[1], thk); }
         sheet_cut_node_t *pc = sheet_cut_new_plate(mat, thk, size, tag);
         /* Check rest of line: */
-        fget_comment_or_eol(rd, '#');
+        fget_comment_or_eol(rd, '#', NULL);
         return pc;
       }
   }

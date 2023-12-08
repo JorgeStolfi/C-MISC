@@ -1,5 +1,5 @@
 /* See {wavefront.h}. */
-/* Last edited on 2023-02-12 23:53:42 by stolfi */
+/* Last edited on 2023-10-05 20:54:50 by stolfi */
 
 #include <basic.h>
 #include <wavefront.h>
@@ -20,7 +20,7 @@ quad_arc_vec_t renumber_edges(quad_arc_vec_t a)
   {
     quad_arc_vec_t o = quad_arc_vec_new(a.ne);
     
-    quad_edge_num_t nE = quad_renumber_edges(&a, &o);
+    quad_edge_id_t nE = quad_renumber_edges(&a, &o);
     assert(nE == o.ne);
     
     return o;

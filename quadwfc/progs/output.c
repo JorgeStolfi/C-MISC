@@ -1,5 +1,5 @@
 /* See {output.h}. */
-/* Last edited on 2009-02-10 10:05:06 by stolfi */
+/* Last edited on 2023-10-15 03:26:11 by stolfi */
 
 #define _GNU_SOURCE
 #include <stdio.h>
@@ -70,7 +70,7 @@ char *iteration_tag(int iter)
       { return txtcat("fin",""); }
     else 
       { affirm(iter > 0, "bad iteration number"); 
-        return fmtint(iter,6);
+        return fmt_int(iter,6);
       }
   }
 

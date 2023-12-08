@@ -1,5 +1,5 @@
 /* See {tmaze.h} */
-/* Last edited on 2023-02-04 06:51:40 by stolfi */
+/* Last edited on 2023-10-01 19:37:31 by stolfi */
 
 #define _GNU_SOURCE
 #include <stdio.h>
@@ -250,7 +250,7 @@ void tmaze_plot_maze
     /* Assemble the directory and name into the figure name and prefix: */
     
     /* Create the EPS stream {eps}: */
-    double mm = (72.0/25.4);  /* One millimeter in Postscript points. */
+    double mm = epswr_pt_per_mm;  /* One millimeter in Postscript points. */
     double hsize = tsize * mm * M->nx; /* H size of plotting area (pt). */
     double vsize = tsize * mm * M->ny; /* V size of plotting area (pt). */
     double mrg = margin*mm; /* Margin around the plotting area (pt) */
@@ -355,7 +355,7 @@ void tmaze_plot_pattern
   )
   {
     /* Create the EPS stream {eps}: */
-    double mm = (72.0/25.4);  /* One millimeter in Postscript points. */
+    double mm = epswr_pt_per_mm;  /* One millimeter in Postscript points. */
     double hsize = tsize * mm * M->nx; /* H size of plotting area (pt). */
     double vsize = tsize * mm * M->ny; /* V size of plotting area (pt). */
     double mrg = margin*mm; /* Margin around the plotting area (pt) */
