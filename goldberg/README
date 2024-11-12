@@ -1,0 +1,36 @@
+To compile the C and C++ code (both the implementations of
+the algorithms and the generators):
+
+1) edit the file make.config in this directory -- change BASE to point
+to this directory and change CC and CXX to your C and C++ compiler
+respectively
+
+2) from this directory type 
+	make install
+
+The binaries will then all be found in the bin subdirectory.  
+The implementations all expect to receive input from standard input
+and write output to standard output.  There are scripts in the
+scripts directory which run the implementations on the generators
+provided in this distribution.
+
+The file make.config is included by all makefiles in this distribution, 
+it is used to set optimization flags and other options which are common to
+multiple applications.  
+
+To compile the unibm and unimf generators you will require a modula-3
+compiler.  Change directory to Generators/unibm/src (or Generators/unimf/src)
+and type m3build.
+
+ BipMatch/	Contains source code for bipartite matching implementations
+ Generators/	Contains source code for generators
+ Makefile	Recursively calls makefiles in each subdirectory
+ README		
+ UnitFlow/	Contains source code for unit capacity flow implementations
+ bin/		make install creates binaries in this directory
+ common/	contains common code used in several implementations
+ include/	contains common header used in push-relabel implementations
+ make.config	included in all makefiles in this distribution
+ results/	scripts put output in this directory by default
+ scripts/	contains scripts to perform automated runs
+

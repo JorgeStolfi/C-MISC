@@ -1,0 +1,5 @@
+s/EvalTimeBasis/SPTimeBasisG1C0_BasisEval/g
+s/TimeBasisCoeffs/SPTimeBasisG1C0_BasisCoeffs/g
+s/EvalTimeGauge/SPTimeBasisG1C0_GaugeEval/g
+s/TimeGaugeCoeffs/SPTimeBasisG1C0_GaugeCoeffs/g
+s/TimeBasisProduct/SPTimeBasisG1C0_BasisGaugeDot/g

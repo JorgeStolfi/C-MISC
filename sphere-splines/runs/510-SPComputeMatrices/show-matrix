@@ -1,0 +1,25 @@
+#! /bin/csh -f
+# Shows the shape of a sparse matrix (".mat" file)
+
+set usage = "$0 MATNAME"
+set example = "$0 sp/pw/icosa/raw/nh-d4c0/b-ev"
+
+if ($#argv != 1) then
+  echo "wrong num of arguments"
+  echo "usage = ${usage}";
+  echo "example = ${example}"; 
+  exit 1
+endif
+
+set matname = "$1"; shift;
+
+set image = "${matname}.pgm"
+set display = "display"
+
+cat ${matname}.mat \
+  | ./matrix-to-pgm \
+  | pnmdepth 255 \
+  | pnmnorm -wv 255 -bpercent 0.1 \
+  > ${image}
+${display} ${image}
+# /bin/rm ${image}

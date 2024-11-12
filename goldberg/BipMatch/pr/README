@@ -1,0 +1,13 @@
+This directory contains a C++ implementation of the 
+push relabel algorithm specialized for the bipartite
+mathcing problem.  Include files containing the data
+structures used are all found in the include directory.
+
+ Makefile	
+ bim.cc		Code for bipartite matching
+ bim.h		Header for bipartite matching
+ bim_parser.h	Specialized inline functions used by the generic
+		parser (parser is located in common directory)
+ bim_run.cc	Code that sets up the run by calling the parser
+		and produces output at the end
+

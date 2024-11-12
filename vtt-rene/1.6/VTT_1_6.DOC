@@ -1,0 +1,388 @@
+Voynich Transcription Tool
+
+Version 1.6 of 1997/09/30
+
+R.Zandbergen
+1997/09/30
+
+
+1. Introduction
+
+The Voynich Transcription Tool (vtt) may be used to modify Voynich
+Manuscript transcription files in various ways. Its two main purposes
+are:
+- Selecting a portion of the text (e.g. all language A text
+  or all herbal folios)
+- Turning the selected formatted text into 'raw data' for further
+  processing by analysis tools.
+It is invoked by the command 'vtt' followed by various arguments.
+Arguments starting with a plus or minus sign are treated as
+options. Other arguments are treated as file names.
+
+It reads a transcription file (or other text file) from standard
+input or a user-named file, writes the output (processed) file to
+standard output (or again a user-named file) and it will write
+some information to standard error output.
+
+For example, the command:
+
+  vtt trans.eva trans.out
+
+will read file trans.eva, write it out to trans.out without
+modification, and it will display the following messages:
+
+  Voynich Transcription Tool
+
+  Ascii output format
+  Leave high ascii as is
+  Keep all comments
+  Keep foliation
+  Keep ligature brackets
+  Use comma for uncertain spaces
+  Use dot for normal spaces
+  Keep white space
+  Keep % and ! interlinear placeholders
+  Keep alternate readings notation
+  Keep words containing *
+  Keep paragraph end sign
+  Keep plant gap sign
+  Maintain line wrapping
+  Ignore transcriber ID
+
+  Page selection options (exclude overrules include):
+  - Include all.
+
+  Input file: trans.eva
+  Output file: trans.out
+
+  Starting...
+
+     8518 lines read in
+        0 lines de-selected
+        0 hash comment lines suppressed
+        0 empty lines suppresed
+     8518 lines written to output
+
+possibly with some warnings or error messages about the input
+file between the 'Starting' and 'nnnn lines read in' output.
+Operating system-dependent features of the input and output
+are discussed at the end of this document.
+
+2. Options
+
+Two types of options are available: those to decide whether to
+include or exclude pages, and those to process the selected (i.e.
+included) pages. Pages that are not selected are not written to
+the output. In order to select all pages, just omit any page
+selection options.
+
+All options should be placed on the command line. There can be 
+as many options in each command as you like, and they can be
+of any combination of selection and processing options. They are
+all of the format:
+- a plus or a minus sign, followed by
+- one alphabetical character (upper case for page selection or
+  lower case for processing options), followed by
+- one alphanumerical character
+The plus sign is only used for the page selection options.
+
+There can be at most two file names on the command line.
+The first such name will be used as the input file (instead
+of using standard input), and the second one as the output file
+(instead of using standard output).
+
+Each argument should be separated from the others by at least one
+space. They can be in any order, but it must be realised they
+are interpreted from left to right. Thus, contradicting options are
+allowed; the rightmost one will take precedence. Side effects of
+some options (-o1, -s2, -h3, all -x...) may thus be overruled.
+
+2.1 Page selection options
+
+Page selection options all work according to the same principle.
+They are based on the assumption that certain dedicated comments
+are available in the transcription file, on the first line for
+each of the pages. These comments set a one-character variable
+to a one-character value. For example the following line in a
+transcription file:
+
+<f12r>   { $A=1  $B=b   $C=C }
+
+sets variable A to 1, variable B to b and variable C to C, for 
+folio 12 recto. All variable definitions set for a previous page
+are reset at the start of a new page. Variable names must be upper
+case characters, but their values can also be lower case or 
+numerical. The variable @ ('at') is also defined, and it has a
+special meaning, which is described later.
+
+The command line options to select/de-select certain pages are:
+
++A1   meaning: include page if it has variable A set to value 1
+-B2   meaning: exclude page if it has variable B set to value 2
+
+The following variables are defined in the EVMT framework (with an
+indication of their possible values):
+
+Var     Meaning and values
+---     ------------------      
+ H      Currier's hand. Values 1, 2, 3, 4, 5, X, Y.
+ I      Illustration type. Values: 
+        A (astronomical) 
+        B (biological)
+        C (cosmological)
+        H (herbal) 
+        P (pharmaceutical)
+        S (stars/recipes)
+        T (text only)
+        Z (zodiac image)
+ K      Has key-like sequences. Value Y (yes).
+ L      Currier's language. Values A or B.
+ P      Page in gathering. Values A-X for first to last, the
+        maximum depending on the quire number.
+ Q      Quire (gathering). Values A-T for 1-20, with P and R
+        not existing (entire quire lost)
+ X      Has extraneous writing. Value Y (yes)
+
+Thus the following command will select all herbal B pages in file
+trans.eva and write these to file hb.eva (without any further
+processing):
+
+vtt +IH +LB  trans.eva  hb.eva
+
+Note that the cumulative effect of page selection options is as follows:
+a page will be included if it matches all of the include options
+and at the same time none of the exclude options. Thus in the 
+above example only those pages that are both herbal and in language
+B are selected.
+If a variable is not defined for a certain page, it is the same as if
+its value was set to 'space'. It will not match any include option
+and it will not match any exclude option. Thus, if the Currier language
+variable is not defined for a given page, the effect of the selection
+option +LA is not to include them in the output file, but -LB will
+include them together with the A-pages.
+
+The variable @ may be used to select or de-select certain locus types.
+Thus it does not operate on pages but on individual lines. The values
+allowed are:
+
+Value   Meaning
+---     ------------------
+P       Normal text loci
+C       Circular writing
+R       Radiating lines
+L       Labels
+S       Scattered words
+B       Scattered text blocks
+
+Thus, all labels in the biological section may be obtained with the
+following command:
+
+vtt +IB +@L  trans.eva  blabel.eva
+
+Finally it should be noted that the user is (of course) free to add
+other variable settings to his own files and use vtt to select pages
+on the basis of these.
+
+2.2 Processing options
+
+Processing options are of the general format: minus sign followed
+by one (lower case) alphabetical character followed by one digit.
+There is one option that does not end with a digit but with
+a capital letter.
+For any option not specified there is a default choice. The default
+is always the same as when specifying a zero for the digit.
+Thus the following two commands will do the same.
+
+  vtt -c3 -f0 -u2 -w0 -c1
+
+  vtt -u2 -c1
+
+The meaning of the processing options is as follows:
+
+  -a0    Leave high ascii and &..; codes unchanged
+  -a1    Represent high ascii values (>127) as &nnn; (best with ascii output)
+  -a2    Represent high ascii values as one byte (best with RTF output format)
+
+  -b0    Keep blanks (whitespace) in file
+  -b1    Remove blanks. This also removes the percent and exclamation
+         placeholders, and causes empty lines not to be written. If combined
+         with the -s1 option, the spaces resulting from dots in the input
+         file are still written to the output file.
+
+  -c0    Keep all comments
+  -c1    Remove hash comments
+  -c2    Remove inline comments
+  -c3    Remove all comments (both types)
+
+  -f0    Keep all foliation information in the file
+  -f1    Remove all foliation information
+
+  -l0    Keep ligature brackets (parentheses)
+  -l1    Remove ligature brackets (but keep text contained between them)
+  -l2    Turn parentheses into square brackets (used to process old
+         style transcription files that use parentheses for alternate
+         readings). This option must be used with care and should
+         not be combined with any -u options.
+  -l3    Turn ligature brackets into capitalisation rule, i.e. turn
+         (cto) into CTo, etc.
+  -l4    Same as -l3 but additionally convert EVA sh, cth, ckh, cph,
+         cfh to Sh, cTh, cKh, cPh and cFh respectively.
+
+  -o0    Output file format 0 (plain ascii)
+  -o1    Output file format 1 (Rich Text File). Automatically invokes
+         -a2 and -l4 options
+
+  -p0    Keep paragraph end and plant gap signs as they are
+  -p1    Remove plant gap signs and strip the paragraph
+         end signs.
+  -p2    Replace plant gap by additional space (using the
+         symbol for 'certain space' as selected with the 
+         -s option) and the paragraph end sign by an
+         additional newline.
+
+  -s0    Keep dot for spaces (those marked with a dot).
+  -s1    Convert spaces to blanks
+  -s2    Remove spaces (automatically invokes the -h2
+         option as well)
+
+  -h0    Keep comma for uncertain spaces (marked with a comma).
+  -h1    Treat uncertain spaces as normal spaces (applying -s option)
+  -h2    Remove uncertain spaces
+  -h3    Turn uncertain spaces into * and at the same time invoke
+         the option to have words containing an * translated into
+         a question mark (not affecting the option for processing
+         uncertain reading brackets) 
+
+  -tX    Select only lines from transcriber 'X', and lines that have
+         no transcriber ID.
+         This is the only option that has no numerical argument but
+         an alphabetical one. It has the side effect of removing all
+         percent and exclamation placeholders from the file.
+         It has no impact on how comments are processed.
+         If this option is omitted, all lines are kept in the file,
+         regardless of the transcriber ID.
+         
+  -u0    Keep all alternate readings as they are (that is, keep the
+         square brackets and everything contained between them)
+  -u1    Pick the first of alternate readings. Thus, k[o|a]iin will be
+         replaced by koiin and chee[*|y] by chee*.
+  -u2    Replace alternate reading by an asterisk. k[o|a]iin will now
+         become k*iin.
+  -u3    Replace words containing alternate or uncertain reading by 
+         a question mark
+  -u4    Remove word containing alternate or uncertain reading from the
+         line
+  -u5    Remove entire line if it contains alternate or uncertain
+         readings
+
+  -w0    Keep line wrapping as is.
+  -w1    Unwrap all lines. Continuation lines are concatenated.
+  -w2    Wrap lines at a maximum of 40 characters, always wrapping 
+         after a hard space (blank or dot). Continuation lines
+         are started with one blank. If spaces are removed from
+         the file with the -s2 option, this has the result that
+         line wrapping may take place anywhere.
+  -wn    With n in the range of 2-9: as -w2 but set the maximum
+         width to 20*n (i.e. 40, 60, ... , 180).
+
+For convenience, there are also a few 'shortcut' options, which can be
+combined with anything else (including other shortcut options). The
+following list shows the equivalent list of options for each of them:
+
+ -x0 = -c1 -p1 -w1 -b1     (To obtain one line per locus)     
+ -x1 = -c3 -f1 -p1 -b1     (To remove non-Voynich text)
+ -x2 = -c3 -f1 -p1 -u1 -b1 (As -x1 but take first of alternate readings)
+ -x3 = -s1 -h1             (Certain and uncertain spaces to blanks)
+ -x4 = -s1 -h2             (Certain spaces to blanks and remove uncertain ones)
+ -x5 = -l1 -a2             (Convert special chars for statistics analysis)
+ -x6 = -l4 -a2             (Prepare special chars for EVA font display)
+ -x7 = (Turn into text-only Ascii file, preserving uncertain spaces) 
+ -x8 = (Turn into text-only Ascii file, removing uncertain spaces) 
+  
+3. Warnings and errors
+
+Warnings will allow the tool to continue. Warnings indicate the
+offending character and the line read up to the point where the
+problem is detected. The following warnings may occur:
+
+| warning:     if square brackets are found without a vertical
+               bar in between, as in old transcription files
+
+# warning:     if a hash sign is found in another position than
+               the first of the line. It is then assumed to be
+               a paragraph end marker (as in old transcription
+               files) and replaced by a =.
+
+$ warning:     if a variable definition is detected in the first
+               line of a folio, but the character following the $
+               is not in the range A-Z. This illegal sequence is
+               then ignored.
+
+{ warning:     if an inline comment is found inside [..] or (..)
+               brackets
+
+} warning:     if an inline comment is not closed on the same line
+               (This is not yet supported. An error will be generated
+                instead)
+
+Errors cause the tool to stop. Errors are generally detected by the
+line parser, and result in one of the following messages:
+
+  Illegal bracket inside <..>
+    if one of: { [ or ( appears inside the foliation.
+  Illegal second open bracket
+    if one of: { [ or ( is not closed before it appears again
+  Illegal close bracket
+    if one of: } ] ) or > appears without a matching open bracket
+  Foliation field too short
+    if > appears too soon after <
+  Illegal bar without [
+    if a | is found without an opening [
+
+These messages are followed by the lines:
+
+  Offending character: X
+  Line parser so far: <line>
+
+Here X is the offending character and <line> was the string of text
+parsed so far. If this happens while reading the line from the input
+file, it is followed by the message:
+
+  Error reading line from stdin
+
+If it happens during a later stage there will be a message indicating
+which processing is on-going and the original line that was read
+in is displayed as well.
+
+Other error messages which require no further explanation are:
+
+  Error parsing command line
+  Error opening file(s)
+
+4. Syntax of supported files.
+
+In general, vtt will work properly on files that are conforming
+to the rules as laid down in the EVMT project description.
+The most important restrictions are:
+- all paired brackets that are opened must be closed on the same line,
+  except if they are inside a comment
+- # and < may only occur at the first position of a line
+- transcriber ID in foliation info is only allowed after a locus ID
+
+Also, plain Ascii files that have passed through vtt once (and may
+have lost some parts) will be supported in subsequent runs of vtt.
+
+5. Operating system
+
+This command works both in Unix (sh and csh) and Windows. In
+Unix the standard input and output may be redirected. If the
+shell is a Bourne shell it is also possible to redirect the
+idagnostics to a file using the 2> redirection symbol.
+
+In windows, vtt should be run in an MS-DOS command tool. File
+redirection (i.e. using the < or > signs) is not possible 
+so file names should be specified as command line options without
+< or >. The diagnostics will appear in a separate window.
+An MS-DOS version that does allow the use of < and > may become
+available as well.
+

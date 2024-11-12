@@ -1,0 +1,70 @@
+#! /bin/csh -f
+
+#Train of 10 copies of a Blow graph
+if `expr 1 - ${?gendir}` set gendir=../Generators/unimf/LINUXELF/
+
+
+set usage = "$0 NV AVGD SEED STAG FLAGS"
+
+# AVGD is the average outdegree (or indegree)
+
+set NV = "$1"; shift
+set avgd = "$1"; shift;
+set seed = "$1"; shift;
+set tag = "$1"; shift;
+set flgs = ( $* )
+
+@ NE = ${NV} * ${avgd}
+
+# Block length:
+
+@ LP = 4
+
+# Skeleton parameters
+
+@ maxNVA = ( ${NV} + ${LP} - 1 ) / ${LP}
+@ NVA = 10
+if ( ${NVA} > ${maxNVA} ) then
+  @ NVA = ${maxNVA}
+endif
+@ NEA = ${NVA} - 1
+@ WA = 1
+@ LA = ${NEA}
+
+# Block parameters:
+
+@ NVP = ( ( ${NV} - ${NVA} ) / ${NEA} ) + 2
+@ WP = ( ${NVP} - 2 ) / ( ${LP} - 1 )
+@ NEP = ${NE} / ${NEA}
+
+if ( ${NVP} < 2 ) then
+  echo "$0"': too few block vertices'
+  exit 1
+endif
+
+@ minNEP = ${WP} * ${LP}
+
+if ( ${NEP} < ${minNEP} ) then
+  echo "average degree too low"; exit 1
+endif
+
+if ( ${NEA} < 1 ) then
+  echo "$0"': too few skeleton edges'
+  exit 1
+endif
+
+if ( ${NVA} < 2 ) then
+  echo "$0"': too few skeleton vertices'
+  exit 1
+endif
+
+set name = /tmp/Blow.jcs
+
+set echo
+${gendir}MaxFlowProbs \
+  -seed ${seed} ${flgs} \
+  -subst 1.00 T -by Rete  -NV ${NVA} -NE ${NEA} -W ${WA} -L ${LA} \
+  -subst 1.00 T -by Rete  -NV ${NVP} -NE ${NEP} -W ${WP} -L ${LP} \
+  | sort -r
+
+

@@ -1,0 +1,31 @@
+#! /bin/csh -f
+# Last edited on 2005-10-29 06:52:11 by stolfi
+
+set runs = ( \
+  h-d7c1/USOL/Fqrtx \
+  nh-d6c1/USOL/Fqrtx \
+  h-d7c1/USOL/Fsqrx \
+  nh-d6c1/USOL/Fsqrx \
+  h-d7c1/USOL/Fcubx \
+  nh-d6c1/USOL/Fcubx \
+  h-d7c1/USOL/Fsepx \
+  nh-d6c1/USOL/Fsepx \
+  h-d7c1/USOL/Foctx \
+  nh-d6c1/USOL/Foctx \
+  h-d7c1/USOL/Fcosx \
+  nh-d6c1/USOL/Fcosx \
+  h-d7c1/USOL/Fsinx \
+  nh-d6c1/USOL/Fsinx \
+  h-d7c1/USOL/Fexpx \
+  nh-d6c1/USOL/Fexpx \
+  h-d7c1/USOL/Fmcos \
+  nh-d6c1/USOL/Fmcos \
+  h-d7c1/USOL/Fmexp \
+  nh-d6c1/USOL/Fmexp \
+)
+
+foreach r ( ${runs} )
+  set f = "../../data/sp/pw/icosa/raw/${r}/s.log"
+  echo "=== $f ==="
+  cat $f | summary-from-log 
+end

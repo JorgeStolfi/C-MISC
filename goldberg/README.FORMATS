@@ -1,0 +1,21 @@
+Our implementations all use an extended dimacs input format.
+An example of of a small input instance for bipartite matching
+can be found in bip-match.input.example and unit capacity flow
+example can be found in unit-flow.input.example
+
+BIPARTITE GRAPH:
+Requires problem desription line of the form
+	p bipartite-matching n1 n2 m
+where n1 is the size of one partition, n2 is the size of the second
+partition and m if the number of edeges in the graph
+
+For each edge requires an arc description line of the form
+	a u v
+Where u is an integer ranging from 1 to n1, and v is an integer from 
+1 to n2.
+
+UNIT-CAPACITY FLOW GRAPH:
+
+This is standard dimacs format for max-flow problems where all
+capacities are required to be 1.
+

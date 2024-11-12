@@ -1,0 +1,145 @@
+/* aanrange - compute joint range of N affine forms */
+/* Last edited on 2002-12-06 21:02:47 by stolfi */
+
+Data is N affine forms X[i], i = 0..N-1.
+All data are assumed to integers of bounded size.
+
+For this task, an /oriented polytope/ of dimension d (rank d+1), or
+/d-polytope/ for short, consists of an (oriented) flat of dimension d
+(rank d+1), denoted span(P), and a strictly convex set pts(P), which
+are contained in span(P) but not in any flat of lower rank, and which
+are the convx hull of a finite set of points.
+
+For any d >= 0, the boundary of a d-polytope P, relative to its
+spanning flat, is the union of finitely many polytopes of dimension
+d-1, which are the /facets/ (or /hyperfaces/) of P. The /faces/ of P
+are P itself and the faces of its facets. Note that faces of dimension
+k < d-1 are usually shared among two or more facets of P.
+
+The set of faces of P, with the order relation "<<=" defined by "x <<=
+y iff x is a face of y", constitutes the /facial lattice/ of P.
+
+We assume the following representation for P: each face F of P with
+rank r is represented by a node, which contains the integer field
+rank(F), a list basis(F) of r independent vertices of F that define
+the flat span(F), and a list facets(F) of pointers to the nodes which
+represent the facets of F.
+
+We also assume that each face F of P has a unique ID number num(F), 
+sequential from 0, such that F <<= G implies num(F) <= num(G); and a
+field label(F) which may assume the values -1, 0, +1, or "?".
+
+A polytope P is represented by a node which contains a pointer to its
+main face root(P) (the entire polytope), and a vector faces(P)
+containing pointers to all faces of P, such that faces(P)[i] = F iff
+num(F) = i.
+
+polytope aarange(int N, AAform X[])
+  /* The input is a list of N affine forms X[0..N-1]. The result is a
+    convex polytope in R^N consisting of all points (x[0], x[1], ...,
+    x[n]), where x[i] is the true value of the variable represented by
+    X[i], which are simultaneously consistent with those affine forms. */
+  { 
+    Let P = trivial(dimension 0) polytope consisting of the point
+     (X[i][0] : i = 0..N-1).
+    For each noise variable j
+      { Let v = (X[i][j] : i = 0..N-1) (a vector of R^N).
+        classify_faces(root(P), v);
+        Let P = stretch(P,v).
+      }
+  }
+  
+void classify_faces(Polytope P, int N, double v[])
+  /* Sets label(F) for every face F of P, according to its 
+    position relative to the direction v.
+    
+    Each facet F of P is labeled with the sign of the dot product 
+    of its out-normal with v.  A lower-dimensional face F is
+    labeled +1 if (and only if) it belongs to at least one +1 facet but doesn't
+    belong to any -1 facet; and the -1 label is specified by 
+    the symmetric rule.  Faces that do not fit either criterion are
+    labeled 0.   */ 
+  { 
+    for each G in faces(P) do label(G) = "?";
+
+    for each F in facets(root(P)), do
+      { label(F) = sign(dot(v, normal(span(F)))); }
+
+    for each F in faces(P), in order of DECREASING dimension,
+      except root(P) itself, do
+        if label(F) != 0, then
+          for each G in facets(F) do
+            if (label(G) == "?"), then
+              label(G) = label(F)
+            else if (label(G) != label(F)), then
+              label(G) = 0
+              
+    for each F in faces(P) do
+      if label(F) == "?", then 
+        label(F) = 0
+  }
+
+polytope stretch(Polytope P, vector v)
+  /* Returns a polytope Q that is the Minkowski sum of P and the
+    line segment { c*v : -1 \leq c \leq +1 }.  Assumes that 
+    the faces of P have been labeled by classify_faces. */
+  { 
+    int NQ = 0;
+    int NP = |faces(P)|;
+    LIST(Face*) Qfaces = ();
+    Face *map[0..NP-1][Sign];
+      /* map[i,s] is the new face of Q that 
+        coresponds to face i of P, either displaced in the 
+        direction s*v (when s != 0) or stretched by +/- v
+        (when s = 0). */
+
+    Point w = point at infinity in the direction v. 
+
+    void copy_face(Face *F, Sign s)
+      /* Adds to Q a new face G that is a copy of F translated by s*v. */
+      { Face *G = create_new_face;
+        span(G) = translate(span(F), s*v);
+        basis(G) = translate(basis(F), s*v);
+        for each H in facets(F), do
+          add map[num(H),s] to facets(G) 
+        num(G) = NQ; NQ++;
+        QFaces = cons(G, QFaces);
+        map[num(F),s] = num(G);
+      }
+      
+    void stretch_face(Face *F)
+      /* Adds to Q a new face G that is the Minkowsky sum of F and +/- v,
+        and also possibly dispaced copies of G by +v and -v. */
+      { Face *G = create_new_face;
+        if (w lies on span(F))
+          { span(G) = span(F);
+            basis(G) = basis(F);
+            for each H in facets(F), do ???
+              add map[num(H),s] to facets(G) 
+              for each K in facets(H), do
+                if label(K) == 0, then
+                  add map[num(K),0] to facets(G)
+          }
+        else
+          { copy_face(F,+1);
+            copy_face(F,-1);
+            num(G) = NQ; NQ++;
+            ???
+          }
+        QFaces = cons(G, QFaces);
+        map[num(F),s] = num(G);
+      }
+    
+    
+    for each F in faces(P), do
+      for each s in {-1,0,+1}, do
+        map[num(F),s] = NULL;
+
+    for each F in faces(P), in order of INCREASING dimension, do
+      { 
+        if (label(F) != 0), then
+          { copy_face(F, label(F)); }
+        else
+          { stretch_Face(F); }
+      }
+  }

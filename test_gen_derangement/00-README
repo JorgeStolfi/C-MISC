@@ -1,0 +1,4 @@
+# Last edited on 2012-12-22 12:26:02 by stolfilocal
+
+Computes matching sets of weights for downsampling and upsampling
+by factors of 2.

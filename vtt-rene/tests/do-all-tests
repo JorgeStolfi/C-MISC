@@ -1,0 +1,50 @@
+#! /bin/bash 
+# Last edited on 2011-06-06 21:18:33 by stolfi
+
+cmd="${0##*/}"
+usage="${cmd}" 
+
+# Runs several tests of the VTT tool modified for Stolfi's EVA interlinear
+
+if [ $# -ne 0 ]; then 
+  echo "usage: ${usage}" 1>&2; exit 1;
+fi
+
+# Executable program
+prog="../vtt"
+
+# Input file in Stolfi's interlinear format
+infile="text16e6.evt"
+
+# Dierctory for output file names:
+outdir="out"
+
+# Directory with reference files:
+cmpdir="cmp"
+
+function dotest()
+{
+  echo '==============================================='
+  n="$1"; shift;
+  outfile="${outdir}/${n}.evt"
+  cmpfile="${cmdpir}/${n}.evt"
+  ${prog} $@ ${infile} ${outfile}
+  echo '=== differences ==='
+  diff -Bb ${outfile} ${cmpfile}
+  echo '==============================================='
+}
+
+# Basic no-op run:
+dotest "01" 
+
+# Select Herbal-A pages:
+dotest "02" +IH +LA
+
+# Select quire 3 minus page 2 (f17v):
+dotest "03" +QC -PB
+
+# Select "L" units in the biological section only:
+dotest "04" +IB +@L
+
+# Select "U" transcriber in Currier hand 2 pages:
+dotest "05" +H2 -tU

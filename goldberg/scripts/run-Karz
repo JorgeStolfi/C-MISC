@@ -1,0 +1,50 @@
+#!/bin/sh
+
+bindir=${bindir-../bin/}; export bindir
+
+resultsdir=${resultsdir-../results/}; export resultsdir
+
+prognames=${prognames-"uf_fifo uf_lo uf_hi uf_ar uf_dfs uf_bfs uf_ld"}; export prognames
+
+klist=${klist-"10"}; export klist
+
+cutnumseeds=${cutnumseeds-1}; export cutnumseeds
+
+seedlist=${seedlist-`awk "BEGIN {s=28431; for(i=0; i<${cutnumseeds};i++) {s+=10; print s}}"`}; export seedlist
+
+tempfile=/tmp/Karz`date +%s`
+suffix=Karz
+l=10
+
+for prog in $prognames
+  do
+    rm -f ${resultsdir}$prog.$suffix
+    echo "$prog.$suffix" >> ${resultsdir}$prog.$suffix
+    echo "   Nodes     Arcs     Size  Op. Cnt.        Time"  >> ${resultsdir}$prog.$suffix
+  done
+gs=1
+
+
+for k in $klist
+do
+  sd=1  	
+  a=`expr $k "*" $k`
+  f=`expr $a / 2`   
+  	for prog in $prognames
+	  do
+	    echo "-1 $a $f" >> ${resultsdir}$prog.$suffix
+	  done
+  for seed in $seedlist
+  do
+    echo "c Generator setting:  $gs       Seed #:  $sd"
+    echo "${bindir}Karz -k$k -l$l -a$a -d10 -f$f -s$seed| sort -r > $tempfile"
+    ${bindir}Karz -k$k -l$l -a$a -d10 -f$f -s$seed | sort -r > $tempfile
+        for prog in $prognames
+          do
+	    ex-prog $prog $tempfile $suffix
+          done    
+    rm -f $tempfile
+    sd=`expr $sd + 1`
+  done
+  gs=`expr $gs + 1`
+done

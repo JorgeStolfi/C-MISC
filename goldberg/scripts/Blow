@@ -1,0 +1,35 @@
+#! /bin/csh -f
+
+# Fat sausage, simple:
+if `expr 1 - ${?gendir}` set gendir=../Generators/unimf/LINUXELF/
+
+set usage = "$0 NV AVGD SEED STAG FLAGS"
+
+# AVGD is the average outdegree (or indegree)
+
+set NV = "$1"; shift
+set avgd = "$1"; shift;
+set seed = "$1"; shift;
+set tag = "$1"; shift;
+set flgs = ( $* )
+
+@ L = 5
+@ W = ( ${NV} - 2 ) / ( ${L} - 1 )
+
+@ NE = ${NV} * ${avgd}
+@ minNE = ${W} * ${L}
+
+if ( ${NE} < ${minNE} ) then
+  echo "average degree too low"; exit 1
+endif
+
+set name = /tmp/Blow.jcs
+
+set echo
+${gendir}MaxFlowProbs \
+  -seed ${seed} ${flgs} \
+  -subst 1.00 T -by Rete  -NV ${NV} -NE ${NE} -W ${W} -L ${L} \
+  | sort -r
+
+
+

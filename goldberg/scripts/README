@@ -1,0 +1,42 @@
+This directory contains scripts to create test instances from
+various problem classes and then run several implementations on 
+those instances.  All scripts work by
+writing an instance to a temporary file and then running each
+specified implementation on that instance.  Output is placed
+in appropiately named files in the results directory.  
+
+There are several parameter values affecting behaviour which can
+either be set as environment variables or in the scripts. These
+include:
+
+bindir		binary locatation
+resultsdir	results directory
+prognames	list of implementations to execute
+numvertices	list of graph sizes (not used by Karz)
+typelist	list of graph types for unibm or unimf 
+cutnumseeds	number of seeds used for each graph size
+seedlist	list of seeds to use
+
+
+The files in this directory include:
+
+ Blow 		script used to create family of unimf
+ Dobl		"
+ Puff		"
+ Saus		"
+ Squa		"
+ Wave		"
+ Makefile	used to pow
+
+ apsqrt		calculates approx. square root (used by unimf scripts)
+ ex-prog	set arguments required for specific implementatiosn
+ pow.c		calculate exponentiation (used by run-rmfu)
+ run-HiLo	runs HiLo generator
+ run-Karz	runs Karz generator
+ run-all	run all problem generators
+ run-bim	run all bipartite matching generators
+ run-rbg2	run rgb2 generator (takes fewg or manyg as parameter)
+ run-rmfu	run rmfu generator (takes wide, cube or long ar parameter)
+ run-uf		run all unit-flow generators
+ run-unibm	run unibm generator (takes list of classes as parameter)
+ run-unimf	run unibm generator (takes list of classes as parameter)

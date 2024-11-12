@@ -1,0 +1,101 @@
+# Last edited on 2008-01-14 18:21:05 by stolfi
+
+ATTENTION
+
+  Check also ~anamaria/progs/c/spherical-splines
+
+SPComputeApprox
+
+  Tests with the "hrm2" function:
+
+    ../../progs/SPComputeApprox \
+                -funcName ../../data/fn/proc/hrm2/f \
+                -basisName ../../data/sp/pw/icosa/raw/nh-d6c1/b \
+                -outName ../../data/sp/pw/icosa/raw/nh-d6c1/APP/proc/hrm2/f \
+                -linearSys SVD \
+                -smpOrder 40 \
+                -plot \
+                -paperSize a3 -figSize 80 -meshSize 1.5 \
+                -caption "proc/hrm2:pw/icosa/raw/nh-d6c1" \
+              2>&1 | tee ../../data/sp/pw/icosa/raw/nh-d6c1/APP/proc/hrm2/f.log
+
+      summary for initial solution:
+      basis = ../../data/sp/pw/icosa/raw/nh-d6c1/b dimension = 332
+      max(fabs(fAppr)) =   0.666666666669
+      max(fabs(fCorr)) =   0.666666666667
+      max(fabs(fAppr-fCorr)) =   0.000000000014
+      rms(fAppr-fCorr) =   0.000000000009
+
+      ../../progs/SPComputeApprox \
+                  -funcName ../../data/fn/proc/hrm2/f \
+                  -basisName ../../data/sp/pw/icosa/raw/h-d7c1/b \
+                  -outName ../../data/sp/pw/icosa/raw/h-d7c1/APP/proc/hrm2/f \
+                  -linearSys SVD \
+                  -smpOrder 40 \
+                  -plot \
+                  -paperSize a3 -figSize 80 -meshSize 1.5 \
+                  -caption "proc/hrm2:pw/icosa/raw/h-d7c1" \
+                2>&1 | tee ../../data/sp/pw/icosa/raw/h-d7c1/APP/proc/hrm2/f.log
+
+      summary for initial solution:
+      basis = ../../data/sp/pw/icosa/raw/h-d7c1/b dimension = 306
+      max(fabs(fAppr)) =   0.666667515875
+      max(fabs(fCorr)) =   0.666666666667
+      max(fabs(fAppr-fCorr)) =   0.000042423148
+      rms(fAppr-fCorr) =   0.000030243675
+
+  Tests with Larry's test function:
+
+      ../../progs/SPComputeApprox \
+                  -funcName ../../data/fn/proc/lrry/f \
+                  -basisName ../../data/sp/gl/harm/d006/b \
+                  -outName ../../data/sp/gl/harm/d006/APP/proc/lrry/f \
+                  -linearSys SVD \
+                  -smpOrder 40 \
+                  -plot \
+                  -paperSize a3 -figSize 80 -meshSize 1.5 \
+                  -caption "proc/lrry:gl/harm/d006" \
+                2>&1 | tee ../../data/sp/gl/harm/d006/APP/proc/lrry/f.log
+
+      summary for initial solution:
+      basis = ../../data/sp/gl/harm/d006/b dimension = 49
+      max(fabs(fAppr)) =  22.164917015962
+      max(fabs(fCorr)) =  23.472640247327
+      max(fabs(fAppr-fCorr)) =  13.429109333535
+      rms(fAppr-fCorr) =  18.405952694592
+
+      ../../progs/SPComputeApprox \
+                  -funcName ../../data/fn/proc/lrry/f \
+                  -basisName ../../data/sp/pw/icosa/raw/h-d7c1/b \
+                  -outName ../../data/sp/pw/icosa/raw/h-d7c1/APP/proc/lrry/f \
+                  -linearSys SVD \
+                  -smpOrder 40 \
+                  -plot \
+                  -paperSize a3 -figSize 80 -meshSize 1.5 \
+                  -caption "proc/lrry:pw/icosa/raw/h-d7c1" \
+                2>&1 | tee ../../data/sp/pw/icosa/raw/h-d7c1/APP/proc/lrry/f.log
+
+      summary for initial solution:
+      basis = ../../data/sp/pw/icosa/raw/h-d7c1/b dimension = 306
+      max(fabs(fAppr)) =  23.472413186264
+      max(fabs(fCorr)) =  23.472640247327
+      max(fabs(fAppr-fCorr)) =   0.006700338278
+      rms(fAppr-fCorr) =   0.003055603883
+
+      ../../progs/SPComputeApprox \
+                  -funcName ../../data/fn/proc/lrry/f \
+                  -basisName ../../data/sp/pw/icosa/raw/nh-d6c1/b \
+                  -outName ../../data/sp/pw/icosa/raw/nh-d6c1/APP/proc/lrry/f \
+                  -linearSys SVD \
+                  -smpOrder 40 \
+                  -plot \
+                  -paperSize a3 -figSize 80 -meshSize 1.5 \
+                  -caption "proc/lrry:pw/icosa/raw/nh-d6c1" \
+                2>&1 | tee ../../data/sp/pw/icosa/raw/nh-d6c1/APP/proc/lrry/f.log
+
+      summary for initial solution:
+      basis = ../../data/sp/pw/icosa/raw/nh-d6c1/b dimension = 332
+      max(fabs(fAppr)) =  23.472107839990
+      max(fabs(fCorr)) =  23.472640247327
+      max(fabs(fAppr-fCorr)) =   0.002123406066
+      rms(fAppr-fCorr) =   0.001779941484

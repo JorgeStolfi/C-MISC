@@ -1,0 +1,36 @@
+# Last edited on 2023-05-31 21:19:56 by stolfi
+# To be loaded into {gnuplot} scripts plotting things per generation.
+# The loading script musst define the variables {yStart,yStop}.
+
+  ny = yStop - yStart + 1
+  xpmin = 0.5
+  xpmax = ny -  50
+  
+  grcolor = '#ffeedd'
+  
+  set logscale x
+  set xrange [xpmin:xpmax]
+  set xlabel "years before present"
+  set format x "%.0f"
+    
+  set xtics ( \
+    1 0, 2 0, "" 3 0, "" 4 0, 5 0, "" 6 0, "" 7 0, "" 8 0, "" 9 0, \
+    10 0, 20 0, "" 30 0, "" 40 0, 50 0, "" 60 0, "" 70 0, "" 80 0, "" 90 0, \
+    100 0, 200 0, "" 300 0, "" 400 0, 500 0, "" 600 0, "" 700 0, "" 800 0, "" 900 0, \
+    1000 0, 2000 0, "" 3000 0, "" 4000 0, 5000 0, "" 6000 0, "" 7000 0, "" 8000 0, "" 9000 0, \
+    10000 0, 20000 0, "" 30000 0, "" 40000 0, 50000 0, "" 60000 0, "" 70000 0, "" 80000 0, "" 90000 0 \
+  )
+  set nomxtics
+  set grid xtics  lt 1 lw 3 lc rgb (grcolor)
+  
+  # Hacks to show error bars only on a few points:
+  ten(x) = 10**int(log10(x) + 1.0e-8)
+  intp(z) = int(z - 1.0e-8) != int(z + 1.0e-8)
+  special(d) = (d == 1) || (d == 2) || (d == 3) || (d == 5) || (d == 7)
+  nice(z) = (intp(z)) && (special(int(z + 1.0e-8)))
+  notable(x) = (x > 0) && (nice(x/ten(x)))
+  ybp(kcol) = yStop - column(kcol)
+  t(kcol) = (ybp(kcol) > 0 ? ybp(kcol) : 0/0)
+  s(kcol) = (notable(ybp(kcol)) ? ybp(kcol) : 0/0)
+  v(kcol) = column(kcol)
+  pct(kcol,tcol) = 100*column(kcol)/column(tcol)

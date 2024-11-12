@@ -1,0 +1,190 @@
+Voynich Transcription Tool
+
+R.Zandbergen
+26-9-1996
+
+
+1. Introduction
+
+The Voynich Transcription Tool (vtt) may be used to modify
+transcription files in various ways. It is invoked by the
+command 'vtt' followed by various options. It will read
+a transcription file (or other text file) from standard
+input, write the output (processed) file to standard
+output and it will write some information to standard
+error output. It is most conventient to use the standard
+I/O redirection symbols to read from a file and
+write to a file. For example the following command:
+
+vtt <trans.eva >trans.out
+
+will read file trans.eva, write it out to trans.out without
+any modification, and it will write to the terminal the
+following messages:
+
+  Voynich Transcription Tool
+
+  Leaving comments in
+  Leaving foliation in
+  Keep ligature brackets
+  Use comma for uncertain spaces
+  Use dot for normal spaces
+  Keep white space as is
+  Keep % and ! interlinear placeholders
+  Leave alternate readings as is
+  Leave paragraph end sign as is
+  Leave plant gap sign as is
+  Ignore transcriber ID
+
+  Starting...
+
+...possibly followed by some warnings or error messages about
+the input file.
+This command works both in Unix (sh and csh) and MS-DOS. In
+a Bourne shell it is also possible to redirect the idagnostics
+to a file using the 2> redirection symbol. See below for a method
+to redirect these to a file in the Unix csh environment.
+
+
+2. Options
+
+All options should be placed on the command line and start with a minus
+sign. There can be as many options as you like, but each should be
+preceded by its own minus sign and be separated from the others by
+at least one space. They can also be in any order, but it must be realised
+they are interpreted from left to right. Contradicting options are allowed;
+the rightmost one will take precedence.
+The options are of the general format: minus sign followed
+by one (lower case) alphabetical character followed by one digit
+from 0 to 3. There is one option that does not end with a digit but with
+a capital letter.
+For any option not specified there is a default choice. The default
+is generally the same as when specifying a zero for the digit.
+Thus the following two commands will do the same.
+
+  vtt -c1 -f0 -u2 -w0
+
+  vtt -u2 -c1
+
+The meaning of the options is as follows:
+
+  -c0    Keep all comments in the file
+  -c1    Strip comments (both hash- and inline comments)
+
+  -f0    Keep all foliation information in the file
+  -f1    Remove all foliation information
+
+  -p0    Leave paragraph end and plant gap signs as is
+  -p1    Replace plant gap by two spaces (using the sign
+         for 'certain space' as selected with the -s option).
+         At the same time strip the paragraph end sign.
+  -p2    Replace plant gap by two spaces and paragraph end sign
+         by an additional newline.
+
+  -l0    Leave ligature brackets (parentheses) as is
+  -l1    Remove ligature brackets (but keep text contained between them)
+  -l2    Turn parentheses into square brackets (used to process old
+         style transcription files that use parantheses for alternate
+         readings)
+  -l3    Turn ligature brackets into capitalisation rule (future expansion)
+
+  -s0    Leave certain spaces (marked with a dot) and uncertain
+         spaces (marked with a comma) as they are.
+  -s1    Change both dot and comma into a normal space
+  -s2    Change dot into normal space but remove uncertain spaces
+  -s2    Remove all spaces (dot and comma)
+
+  -tX    Select only lines from transcriber 'X', and lines that have
+         no transcriber ID.
+         This is the only option that has no numerical argument but
+         an alphabetical one. It has the side effect of removing all
+         percent and exclamation placeholders from the file.
+         It has no impact on how comments are processed.
+         If this option is omitted, all lines are kept in the file,
+         regardless of the transcriber ID.
+         
+  -u0    Keep all alternate readings as they are (that is, keep the
+         square brackets and everything contained between them)
+  -u1    Pick the first of alternate readings. Thus, k[o|a]iin will be
+         replaced by koiin and chee[*|y] by chee*.
+  -u2    Replace alternate reading by an asterisk. k[o|a]iin will now
+         become k*iin.
+  -u3    Future expansion, replace word containing alternate or uncertain
+         reading by question mark
+
+  -w0    Keep whitespace in file
+  -w1    Remove whitespace. This also removes the percent and exclamation
+         placeholders, and causes empty lines not to be written. If combined
+         with the -s1 or -s2 option, the spaces resulting from dot and/or
+         comma are still written to the output file.
+
+For convenience, there are also a few 'shortcut' options, which can be
+combined with anything else:
+
+  -x0    = -c1 -f1 -w1
+  -x1    = -c1 -f1 -s1 -w1
+  -x2    = -c1 -f1 -s2 -w1
+  -x3    = -c1 -f1 -s3 -w1
+  -x4    = -c1 -f1 -u1 -w1
+  -x5    = -c1 -f1 -u2 -w1
+
+Example:
+
+vtt -c1 -f1 -s2 -u1 -w1 <file1 >file2 will provide the following info:
+
+  Voynich Transcription Tool
+
+  Stripping comments
+  Stripping foliation
+  Keep ligature brackets
+  Strip uncertain spaces
+  Use space for normal spaces
+  Remove white space
+  Remove % and ! interlinear placeholders
+  Take first of alternate readings
+  Leave paragraph end sign as is
+  Leave plant gap sign as is
+  Ignore transcriber ID
+
+  Starting...
+
+The following combination of options make sure nothing is written
+to the output file, and thus allow redirection of the diagnostics
+output to a file:
+
+vtt -x1 -tQ -w1 <file1 >&file1.info
+
+
+3. Warnings and errors
+
+Warnings will allow the tool to continue. Warnings indicate the
+offending character and the line read up to the point where the
+problem is detected. The following warnings may occur:
+
+| warning:     if square brackets are found without a vertical
+               bar in between, as in old transcription files
+
+# warning:     if a hash sign is found in another position than
+               the first of the line. It is then assumed to be
+               a paragraph end marker (as in old transcription
+               files) and replaced by a =.
+
+Errors cause the tool to stop. Error messages include the complete
+line as it was read, or how it has been processed up to the point
+where the error occurs, together with a description of the error,
+and usually the offending character (complete list when I have more
+time).
+
+
+4. Syntax of supported files.
+
+In general, vtt will work properly on files that are conforming
+to the rules as laid down in the EVMT project description.
+The most important restrictions are:
+- all paired brackets that are opened must be closed on the same line,
+  except if they are inside a comment
+- # and < may only occur at the first position of a line
+- author ID in foliation info is only allowed after a locus ID
+
+Also files that have passed through vtt once (and may have lost 
+some parts) will be supported in subsequent runs of vtt.

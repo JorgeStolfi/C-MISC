@@ -1,0 +1,20 @@
+#!/bin/sh
+ulimit -t 3600
+
+binary=$1 
+if [ $1 = bim_ld ]
+then
+	opt=2
+fi
+
+if [ $1 = uf_ld ]
+then
+	opt=2
+fi
+
+if [ $1 = uf_ar ]
+then
+	opt=1
+fi
+
+${bindir}$binary $opt < $2 >> ${resultsdir}$1.$3

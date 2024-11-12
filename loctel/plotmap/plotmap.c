@@ -3,7 +3,7 @@
 #define PROG_VERS "2023-02-21"
 
 #define PROG_COPYRIGHT "Copyright © 2023 Universidade Estadual de Campinas (UNICAMP)"
-/* Last edited on 2023-02-25 16:16:07 by stolfi */
+/* Last edited on 2024-06-22 17:39:34 by stolfi */
 
 #define PROG_HELP \
   "  PROG_NAME \\\n" \
@@ -170,7 +170,7 @@ void plot_map(epswr_figure_t *eps, Map *m, options_t *o)
     for (i = 0; i < o->nRect; i++)
       { Interval *xr = &(o->xRect[i]);
         Interval *yr = &(o->yRect[i]);
-        epswr_rectangle(eps, xr->lo, xr->hi, yr->lo,  yr->hi, FALSE, TRUE);
+        epswr_rectangle(eps, xr->lo,xr->hi, yr->lo,yr->hi, FALSE, TRUE);
       }
 
     /* Draw circles: */

@@ -1,0 +1,37 @@
+#! /bin/csh -f
+# Last edited on 2005-10-29 00:21:18 by stolfi
+
+set datadir = ${STOLFIHOME}/programs/c/sphere-splines/data
+
+foreach s ( \
+  pw/icosa/raw/{h-d7c1,nh-d6c1}-OLD-NO \
+  pw/icosa/raw/{h-d7c1,nh-d6c1}-NO \
+  pw/icosa/raw/{h-d7c1,nh-d6c1}-OLD \
+  pw/icosa/raw/{h-d7c1,nh-d6c1} \
+  gl/harm/{d017,d018} \
+  )
+  echo "=== $s ============================="
+  foreach f ( \
+    b.bas \
+    b-ev.mat \
+    b-ev-choL.mat \
+    b-ev-svdL.mat b-ev-svdD.vec b-ev-svdR.mat \
+    b-vg.mat \
+    b-sl.mat \
+    \
+    b-ev.pgm \
+    b-ev-choL.pgm \
+    b-ev-svdL.pgm \
+    b-vg.pgm \
+    b-sl.pgm \
+  )
+    ls -lG -T999 --time-style='+%Y-%m-%d-%H%M%S' ${datadir}/sp/$s/${f} \
+      |& sed -e 's:'"${datadir}"'::' \
+      | gawk \
+          ' /^[dlrxw-]+[ ]/{ s=$4; d=$5; n=$6; x="" } \
+            /No su/{ s=0; d="--"; n=$2; gsub(/[:]$/,"",n); x="**" } \
+            //{ printf "%10d %17s %s %s\n", s, d, n, x; } \
+          '
+  end 
+end
+

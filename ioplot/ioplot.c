@@ -1,7 +1,7 @@
 #define PROG_NAME "ioplot"
 #define PROG_DESC "create a sliced-ham in-out plot in Encapsulated Postscript"
 #define PROG_VERS "2013-10-27"
-/* Last edited on 2023-10-01 19:39:45 by stolfi */
+/* Last edited on 2024-06-22 17:39:38 by stolfi */
 
 #define PROG_COPYRIGHT "© 2005  State University of Campinas (UNICAMP)"
 
@@ -959,7 +959,7 @@ void plot_slices
             /* Set corner Ys of slice: */
             if (pass == 0)
               { /* Fill slice: */
-                epswr_rectangle(eps, xini, xfin, ybot, ytop, TRUE, FALSE);
+                epswr_rectangle(eps, xini,xfin, ybot,ytop, TRUE, FALSE);
               }
             else if (pass == 1)
               { /* Draw outline of slice: */

@@ -1,0 +1,85 @@
+#!/bin/sh
+bindir=${bindir-../bin/}; export bindir
+
+resultsdir=${resultsdir-../results/}; export resultsdir
+
+prognames=${prognames-"uf_fifo uf_lo uf_hi uf_ar uf_dfs uf_bfs uf_ld"}; export prognames
+
+numvertices=${numvertices-"1000"}; export numvertices
+
+cutnumseeds=${cutnumseeds-1}; export cutnumseeds
+
+seedlist=${seedlist-`awk "BEGIN {s=28431; for(i=0; i<${cutnumseeds};i++) {s+=10; print s}}"`}; export seedlist
+
+
+
+tempfile=/tmp/rmfu`date +%s`
+usage="usage:    run-rmfu wide|long|cube"
+
+if [ $# -eq 0 ]
+then
+echo $usage
+exit
+else if [ $1 = cube ]
+then suffix=rmfuC
+else if [ $1 = wide ]
+then suffix=rmfuW
+else if [ $1 = long ]
+then suffix=rmfuL
+else
+echo $usage
+exit
+fi fi fi fi
+
+for prog in $prognames
+  do
+    rm -f ${resultsdir}$prog.$suffix
+    echo "$prog.$suffix" >> ${resultsdir}$prog.$suffix
+    echo "   Nodes     Arcs     Size  Op. Cnt.        Time"  >> ${resultsdir}$prog.$suffix
+  done
+
+gs=1
+for N in $numvertices
+do
+    if [ $suffix = rmfuC ]
+    then
+	a=`pow $N 0.333333334`
+	b=$a
+	c=`expr $a "*" $a "*" 3 / 10`
+    else if [ $suffix = rmfuW ]
+    then
+	t=`expr $N / 10`
+	a=`pow $t 0.5`
+	b=10
+	c=`expr $a "*" $a "*" 3 / 10`
+    else if [ $suffix = rmfuL ]
+    then
+	a=10
+	b=`expr $N / 100`
+	c=50
+    fi fi fi
+
+    n=`expr $a "*" $a "*" $b`
+    m=`expr $b "*" $c + 4 "*" $n`
+
+    sd=1  	
+
+    for prog in $prognames
+    do
+	echo "-1 $n $m" >> ${resultsdir}$prog.$suffix
+    done
+
+    for seed in $seedlist
+    do
+	echo $"c Generator setting:  $gs       Seed #:  $sd"
+	echo "${bindir}rmfu -a$a -b$b -c$c -s$seed| sort -r > $tempfile"
+	${bindir}rmfu -a$a -b$b -c$c -s$seed | sort -r > $tempfile
+	for prog in $prognames
+	do
+	    ex-prog $prog $tempfile $suffix
+	done
+	rm -f $tempfile
+	sd=`expr $sd + 1`
+    done
+    gs=`expr $gs + 1`
+done

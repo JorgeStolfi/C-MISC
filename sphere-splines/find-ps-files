@@ -1,0 +1,7 @@
+#! /bin/csh -f
+# Last edited on 2005-10-28 21:04:38 by stolfi
+
+find ./ \
+  -type f \
+  \( -name '*.ps' -o -name '*.eps' \) \
+  -printf '%TY-%Tm-%Td-%TH%TM%TS %10s %P\n'

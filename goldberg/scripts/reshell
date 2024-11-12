@@ -1,0 +1,26 @@
+#!/bin/sh
+# This script 
+
+if [ $# -le 2 ]
+then
+  echo "usage: $0 old-shell new-shell files..."
+  echo ""
+  echo "  The point of this script is to change the shell that processes"
+  echo "  a script. For each file, if it is a shell script that uses old-shell,"
+  echo "  it is updated to use new-shell."
+  echo ""
+  echo "  For example to use bash instead of sh for myscript you might do:"
+  echo ""
+  echo "  $0 '/bin/sh' '/usr/gnu/bin/bash' myscript"
+  echo ""
+  exit
+fi
+
+osh=$1; shift
+nsh=$1; shift
+
+for scr in $*
+do
+  awk '{if (FNR==1) sub("'$osh'", "'$nsh'", $0); print $0}' $scr >/tmp/`basename $scr`.tmp
+  mv /tmp/`basename $scr`.tmp $scr
+done

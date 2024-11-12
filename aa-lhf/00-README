@@ -1,0 +1,9 @@
+# Last edited on 2009-01-07 17:28:26 by stolfi
+
+This directory contains an old version of Luiz Henrique Figueiredo's
+package for Affine Arithmetic. It uses the vector representation
+without rounding control.
+
+The original source files by LHF are dated from around 1994-11-30.
+They were updated to account for environmet changes by J. Stolfi on
+several occasions between 1994 and 2004.

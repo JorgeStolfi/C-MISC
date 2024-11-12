@@ -1,1 +1,1 @@
-/home/stolfi/posters/bench_closet/out/pieces.txt
+../../../../../../posters/bench_closet/out/pieces.txt

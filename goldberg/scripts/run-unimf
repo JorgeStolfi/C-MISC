@@ -1,0 +1,56 @@
+#!/bin/sh
+bindir=${bindir-../bin/}; export bindir
+
+gendir=${gendir-../Generators/unimf/LINUXELF/}; export gendir
+
+resultsdir=${resultsdir-../results/}; export resultsdir
+
+prognames=${prognames-"uf_fifo uf_lo uf_hi uf_ar uf_dfs uf_bfs uf_ld"}; export prognames
+
+numvertices=${numvertices-"1000"}; export numvertices
+
+cutnumseeds=${cutnumseeds-1}; export cutnumseeds
+
+seedlist=${seedlist-`awk "BEGIN {s=25; for(i=0; i<${cutnumseeds};i++) {s+=10; print s}}"`}; export seedlist
+
+tempfile=/tmp/unimf`date +%s`
+typelist=$@
+avdg=10
+
+for type in $typelist
+do
+  for prog in $prognames
+  do
+    rm -f ${resultsdir}$prog.$type
+    echo "$prog.$type" >> ${resultsdir}$prog.$type
+    echo "   Nodes     Arcs     Size  Op. Cnt.        Time"  >> ${resultsdir}$prog.$type  
+done
+
+gs=1
+for n in $numvertices
+do
+  sd=1  	
+  m=`expr $n "*" $avdg`
+    for prog in $prognames
+    do
+	echo "-1 $n $m" >> ${resultsdir}$prog.$type
+    done
+  for seed in $seedlist
+  do
+    echo "c Generator setting:  $gs       Seed #:  $sd"
+    rm -f $tempfile
+    echo "$type $n $avdg $seed -s-f > $tempfile"
+    $type $n $avdg $seed -s-f > $tempfile
+    head $tempfile
+    for prog in $prognames
+    do
+	ex-prog $prog $tempfile $type	
+    done
+#    rm -f $tempfile
+    sd=`expr $sd + 1`
+  done
+  gs=`expr $gs + 1`
+done
+done
+
+

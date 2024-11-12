@@ -1,0 +1,61 @@
+#! /bin/csh -f
+
+# Squarish, each maxflow edge split in two.
+if `expr 1 - ${?gendir}` set gendir=../Generators/unimf/LINUXELF/
+
+
+set usage = "$0 NV AVGD SEED STAG FLAGS"
+
+# AVGD is the average outdegree (or indegree)
+
+set NV = "$1"; shift
+set avgd = "$1"; shift;
+set seed = "$1"; shift;
+set tag = "$1"; shift;
+set flgs = ( $* )
+
+@ NE = ${NV} * ${avgd}
+
+# Block parameters:
+
+@ NEP = 2
+@ NVP = ${NEP} + 1
+@ WP = 1
+@ LP = 2
+
+# Compute shape of skeleton
+
+@ A = ${NVP} - 1
+@ B = ${NVP} - 2
+@ C = ${NV} - 2
+@ T = ( ${B} * ${B} ) + ( 4 * ( ${A} * ${C} ) ) 
+set R = `apsqrt ${T}`
+@ WA = ( ${R} - ${B} ) / ( ${A} + ${A} )
+@ LA = ( ( ${NV} - 2 ) + ${WA} ) / ( ${WA} * ( ${NVP} - 1 ) )
+
+@ NERA = ${WA} * ${LA}
+@ NEGA = ${NE} - ( ${NERA} * ${NEP} )
+@ NEA = ${NERA} + ${NEGA}
+
+@ NVA = ${NV} - ${NERA} 
+
+if ( ${NEA} < 1 ) then
+  echo "$0"': too few skeleton edges'
+  exit 1
+endif
+
+if ( ${NVA} < 2 ) then
+  echo "$0"': too few skeleton vertices'
+  exit 1
+endif
+
+set name = /tmp/Dobl.jcs
+
+set echo
+${gendir}MaxFlowProbs \
+  -seed ${seed} ${flgs} \
+  -subst 1.00 T -by Rete  -NV ${NVA} -NE ${NEA} -W ${WA} -L ${LA} \
+  -subst 1.00 T -by Rete  -NV ${NVP} -NE ${NEP} -W ${WP} -L ${LP} \
+  | sort -r
+
+

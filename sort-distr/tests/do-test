@@ -1,0 +1,21 @@
+# /bin/csh -f
+
+echo "circle, euclidean, prob"
+sort-distr -p tst-cr-eu-pr.ppm  -n 6 -w 1    < tst-circle.inp
+
+echo "path, euclidean, prob"
+sort-distr -p tst-pt-eu-pr.ppm  -n 6 -w 1    < tst-path.inp
+
+echo "multi-weight, euclidean, prob"
+sort-distr -p tst-mw-eu-pr.ppm  -n 6 -w 1    < tst-weight.inp
+
+echo "multi-weight, euclidean, discr"
+sort-distr -p tst-mw-eu-ds.ppm  -n 6 -w 1 -d < tst-weight.inp
+
+echo "disjoint, euclidean, prob"
+sort-distr -p tst-dj-eu-pr.ppm  -n 6 -w 1    < tst-geom.inp
+
+echo "disjoint, geometric, prob"
+sort-distr -p tst-dj-gm-pr.ppm  -n 6 -w 1 -g < tst-geom.inp
+
+

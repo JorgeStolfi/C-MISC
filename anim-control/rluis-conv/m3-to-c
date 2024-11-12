@@ -1,0 +1,236 @@
+#! /usr/bin/gawk -f
+# Last edited on 2003-01-17 11:16:12 by anamaria
+
+# Does a first approximation of converting Modula-3 code to C.
+
+BEGIN {
+  is_interface = 0;
+  prev = "";
+}
+
+/INTERFACE/{ is_interface = 1; }
+
+//{
+  # VAR declarations (and VAR arguments):
+  $0 = gensub(/^( *)VAR +([a-zA-Z0-9_, ]+)[:] *([a-zA-Z0-9_.]+) *([;)])/, "\\1\\3 *?\\2\\4", "g", $0);
+  $0 = gensub(/^( *)READONLY +([a-zA-Z0-9_, ]+)[:] *([a-zA-Z0-9_.]+) *([;)])/, "\\1\\3 *\\2\\4;", "g", $0);
+  $0 = gensub(/^( *)VAR +([a-zA-Z0-9_, ]+)[:] *([a-zA-Z0-9_.]+) *[:][=] *(.*)[;]/, "\\1\\3 *?\\2 := \\4;", "g", $0);
+  
+  # Continuation of VAR declarations:
+  $0 = gensub(/^( *)([a-zA-Z0-9_, ]+)[:] *([a-zA-Z0-9_.]+) *[;]/, "\\1\\3 \\2;", "g", $0);
+  $0 = gensub(/^( *)([a-zA-Z0-9_, ]+)[:] *([a-zA-Z0-9_.]+) *[:][=] *(.*)[;]/, "\\1\\3 \\2 := \\4;", "g", $0);
+  # Procedure arguments:
+  $0 = gensub(/\<([a-zA-Z0-9_]+) *[:] *([a-zA-Z0-9_.]+) *[;,]/, "\\2 \\1,", "g", $0);
+  $0 = gensub(/\<([a-zA-Z0-9_]+) *[:] *([a-zA-Z0-9_.]+) *[)]/, "\\2 \\1)", "g", $0);
+  
+  # Arrays:
+  $0 = gensub(/(VAR|READONLY|REF) *([a-zA-Z_.0-9]+) *[:] *ARRAY *OF *([a-zA-Z0-9_.]+) */, "\\3_vec \\2", "g", $0);
+  $0 = gensub(/NEW *[(] *REF *ARRAY *OF *([a-zA-Z0-9_.]+) *[,] */, "\\1_vec_new(", "g", $0);
+  $0 = gensub(/REF *ARRAY *OF *([a-zA-Z0-9_.]+)/, "\\1_vec", "g", $0);
+  $0 = gensub(/NUMBER *[(]([a-zA-Z0-9_, ]+)[\^]*[)]/, "\\1.nel", "g", $0);
+  $0 = gensub(/LAST *[(]([a-zA-Z0-9_, ]+)[\^]*[)]/, "((\\1.nel - 1)|?|MAX_\\1)", "g", $0);
+  
+  # Procedures and RAISES clauses
+  $0 = gensub(/ *RAISES *[{]([a-zA-Z0-9_ ,.]+)[}] *([=;])/, " \\2\n/* Raises \\1 */", "g", $0);
+
+  $0 = gensub(/PROCEDURE *([a-zA-Z0-9_]+) *[(](.*)[)] *[=]/, "void \\1(\\2)", "g", $0);
+  $0 = gensub(/PROCEDURE *([a-zA-Z0-9_]+) *[(](.*)[)] *[;]/, "void \\1(\\2);", "g", $0);
+  $0 = gensub(/PROCEDURE *([a-zA-Z0-9_]+) *[(](.*)[)] *[:] *([a-zA-Z0-9_.]+) *[=]/, "\\3 \\1(\\2)", "g", $0);
+  $0 = gensub(/PROCEDURE *([a-zA-Z0-9_]+) *[(](.*)[)] *[:] *([a-zA-Z0-9_.]+) *[;]/, "\\3 \\1(\\2);", "g", $0);
+  
+  # Comments
+  $0 = gensub(/[(][*]/, "/*", "g", $0);
+  $0 = gensub(/[*][)]/, "*/", "g", $0);
+  
+  # Input/output:
+  $0 = gensub(/Wr.PutText *[(] *([a-zA-Z_0-9]+) *[,] ["]([^"%]+)["] *[)]/, "fprintf(\\1, \"\\2\")", "g", $0);
+  $0 = gensub(/Wr.PutText *[(] *([a-zA-Z_0-9]+) *[,]/, "fprintf(\\1, \"%s\", ", "g", $0);
+  $0 = gensub(/Wr[.]Flush *[(] *([a-zA-Z_0-9]+) *[)]/, "fflush(\\1)", "g", $0);
+  $0 = gensub(/Wr[.]Close *[(] *([a-zA-Z_0-9]+) *[)]/, "fclose(\\1)", "g", $0);
+  
+  $0 = gensub(/OpenWrite *[(]/, "open_write(", "g", $0);
+  $0 = gensub(/OpenRead *[(]/, "open_read(", "g", $0);
+  
+  $0 = gensub(/FPut.Char *[(] *([a-zA-Z_0-9]+) *[,] *['](.)['] *[)]/, "fputc('\\2', \\1)", "g", $0);
+  $0 = gensub(/FPut.Int *[(] *([a-zA-Z_0-9]+) *[,] */, "fprintf(\\1, \"%d\"", "g", $0);
+  $0 = gensub(/FPut.EOL *[(]/, "fputc('\\\\n', ", "g", $0);
+  $0 = gensub(/NPut.Int *[(] *([a-zA-Z_0-9]+) *[,] *["]([a-zA-Z0-9_]+)["]/, "fprintf(\\1, \"\\2 := %d\"", "g", $0);
+  $0 = gensub(/NGet./, "nget_", "g", $0);
+  $0 = gensub(/FGet./, "fget_", "g", $0);
+  
+  # Control statements
+  $0 = gensub(/FOR *([a-zA-Z_0-9]+) *[:][=] *(.*) *TO *(.*) *DO */, "for (\\1 := \\2; \\1 <= \\3; \\1++) {", "g", $0);
+  $0 = gensub(/FOR *([a-zA-Z_0-9]+) *[:][=] *(.*) *DOWNTO *(.*) *DO */, "for (\\1 := \\2; \\1 <= \\3; \\1--) {", "g", $0);
+  $0 = gensub(/[;] *([a-zA-Z][a-zA-Z0-9]*) *[<][=] *([^;, ]*) *[-] *[1] *[;]/, "; \\1 < \\2;", "g", $0);
+  
+  $0 = gensub(/WHILE *(.*) *DO/, "while (\\1) {", "g", $0);
+  $0 = gensub(/WHILE /, "while (??)", "g", $0);
+  $0 = gensub(/LOOP */, "while (1) {", "g", $0);
+  $0 = gensub(/ELSIF *(.*) *THEN/, "} else if ((\\1)) {", "g", $0);
+  $0 = gensub(/ELSIF */, "} else if ((??))", "g", $0);
+  $0 = gensub(/\<IF *(.*) *THEN/, "if ((\\1)) {", "g", $0);
+  $0 = gensub(/\<IF\> */, "if ((??))", "g", $0);
+  $0 = gensub(/\<DO\>/, ") {", "g", $0);
+  $0 = gensub(/\<THEN\>/, ")) {", "g", $0);
+  $0 = gensub(/\<ELSE\>/, "} else {", "g", $0);
+  $0 = gensub(/RETURN/, "return", "g", $0);
+  $0 = gensub(/REPEAT/, "do {", "g", $0);
+  $0 = gensub(/UNTIL *(.*) *[;]?$/, "} while (! ((\\1)))", "g", $0);
+  $0 = gensub(/UNTIL/, "} while (! ??)", "g", $0);
+  $0 = gensub(/\<TYPE\>/, "typedef", "g", $0);
+  $0 = gensub(/RECORD/, " struct ?? {", "g", $0);
+  $0 = gensub(/BEGIN/, "{", "g", $0);
+  $0 = gensub(/END *([a-zA-Z0-9_]+)/, ";} /* \\1 */", "g", $0);
+  $0 = gensub(/END/, ";}", "g", $0);
+  $0 = gensub(/WITH */, "{ /* with*/ ", "g", $0);
+  $0 = gensub(/[<][*] *ASSERT /, "assert(", "g", $0);
+  $0 = gensub(/[*][>]/, ", \"??\");", "g", $0);
+  $0 = gensub(/NIL/, "NULL", "g", $0);
+  $0 = gensub(/^ *[}] *[a-zA-Z_]*[.] *$/, "\n#endif\n", "g", $0);
+  $0 = gensub(/ OR /, ") || (", "g", $0);
+  $0 = gensub(/ AND /, ") \\&\\& (", "g", $0);
+  $0 = gensub(/\<NOT\>/, "!", "g", $0);
+  $0 = gensub(/\<ABS\>/, "f?abs", "g", $0);
+  $0 = gensub(/\<MAX\>/, "max", "g", $0);
+  $0 = gensub(/\<MIN\>/, "min", "g", $0);
+  $0 = gensub(/\<MOD\>/, "%", "g", $0);
+  $0 = gensub(/\<TEXT\> */, "char *", "g", $0);
+  $0 = gensub(/\<TEXT_vec/, "string_vec", "g", $0);
+  $0 = gensub(/\<CHAR\>/, "char", "g", $0);
+  $0 = gensub(/\<CHAR_vec/, "char_vec", "g", $0);
+  $0 = gensub(/\<CARDINAL\>/, "nat", "g", $0);
+  $0 = gensub(/\<CARDINAL_vec/, "nat_vec", "g", $0);
+  $0 = gensub(/\<NAT\>/, "nat", "g", $0);
+  $0 = gensub(/\<NAT_vec/, "nat_vec", "g", $0);
+  $0 = gensub(/\<LONGREAL\>/, "double", "g", $0);
+  $0 = gensub(/\<LONGREAL_vec/, "double_vec", "g", $0);
+  $0 = gensub(/\<LONG\>/, "double", "g", $0);
+  $0 = gensub(/\<LONG_vec/, "double_vec", "g", $0);
+  $0 = gensub(/LongReal\>/, "Double", "g", $0);
+  $0 = gensub(/\<INTEGER\>/, "int", "g", $0);
+  $0 = gensub(/\<INTEGER_vec/, "int_vec", "g", $0);
+  $0 = gensub(/\<INT\>/, "int", "g", $0);
+  $0 = gensub(/\<INT_vec/, "int_vec", "g", $0);
+  $0 = gensub(/\<BOOLEAN\>/, "bool", "g", $0);
+  $0 = gensub(/\<BOOLEAN_vec/, "bool_vec", "g", $0);
+  $0 = gensub(/\<BOOL\>/, "bool", "g", $0);
+  $0 = gensub(/\<BOOL_vec/, "bool_vec", "g", $0);
+
+  $0 = gensub(/\<FLOOR\>/, "floor", "g", $0);
+  $0 = gensub(/\<CEILING\>/, "ceil", "g", $0);
+  $0 = gensub(/\<ROUND\>/, "round", "g", $0);
+
+  $0 = gensub(/\<INC *[(]([^()]+)[)] */, "\\1++", "g", $0);
+  $0 = gensub(/\<DEC *[(]([^()]+)[)] */, "\\1--", "g", $0);
+  
+  # Constructors
+  $0 = gensub(/\<([a-zA-Z0-9_.]+){/, "(\\1){", "g", $0);
+  
+  # FLOAT()
+  $0 = gensub(/\<FLOAT *[(]([^()]+)[,] *([A-Za-z0-9_.]+) *[)]/, "((\\2)\\1)", "g", $0);
+  
+  # String concatenation
+  $0 = gensub(/\<([A-Za-z0-9_.]+) *[&] *(["][^"\\]*["])/, "txtcat(\\1, \\2)", "g", $0);
+  
+  # SPECIFIC TRANSFORMATIONS
+  
+  # Readers and writers
+  $0 = gensub(/\<Rd[.]T\> */, "FILE *", "g", $0);
+  $0 = gensub(/\<Wr[.]T\> */, "FILE *", "g", $0);
+  
+  $0 = gensub(/\<([a-zA-Z0-9_.]+)[.]edge\>/, "Edge(\\1)", "g", $0);
+  $0 = gensub(/[.]edge\>/, ".Edge()", "g", $0);
+  
+  $0 = gensub(/void  *Main[(][)]/, "int main(int argn, char **argc)", "g", $0);
+  $0 = gensub(/Options  *GetOptions[(][)]/, "Options GetOptions(int argn, char **argc)", "g", $0);
+  $0 = gensub(/GetOptions[(][)]/, "GetOptions(argn, argc)", "g", $0);
+  
+  $0 = gensub(/\<HLR3\>/, "hr3", "g", $0);
+
+  $0 = gensub(/\<LR2\>/, "r2", "g", $0);
+  $0 = gensub(/\<LR2x2\>/, "r2x2", "g", $0);
+
+  $0 = gensub(/\<LR3\>/, "r3", "g", $0);
+  $0 = gensub(/\<LR3x3\>/, "r3x3", "g", $0);
+
+  $0 = gensub(/\<LR4\>/, "r4", "g", $0);
+  $0 = gensub(/\<LR4x4\>/, "r4x4", "g", $0);
+
+  $0 = gensub(/\<SPBasis\>/, "SPBezSplineBasis", "g", $0);
+  $0 = gensub(/\<SPNLFunction\>/, "SPFuncMap", "g", $0);
+  $0 = gensub(/\<SPPWAnalyticFunction\>/, "SPProcFunction", "g", $0);
+  $0 = gensub(/\<SPBezier[PW]*Function\>/, "SPHBezFunction", "g", $0);
+  $0 = gensub(/\<SPBezPoly[PW]*Function\>/, "SPNHBezFunction", "g", $0);
+  $0 = gensub(/\<SPLinearSystem\>/, "SPApprox", "g", $0);
+
+  $0 = gensub(/\<ParseParams\>/, "Params", "g", $0);
+
+  $0 = gensub(/(\<SP[A-Za-z_]+)[.]/, "\\1_", "g", $0);
+  $0 = gensub(/(\<[h]*[r][2-4x]+)[.]/, "\\1_", "g", $0);
+
+  $0 = gensub(/\<ControlValues\>/, "BezCoeff_vec", "g", $0);
+  $0 = gensub(/\<BuildHBasis\>/, "SPBezSplineBasis_BuildH", "g", $0);
+  $0 = gensub(/\<BuildNHBasis\>/, "SPBezSplineBasis_BuildNH", "g", $0);
+  
+  $0 = gensub(/hr3_T/, "SPHR3_Point", "g", $0);
+  $0 = gensub(/r2_T/, "r2_t", "g", $0);
+  $0 = gensub(/r2x2_T/, "r2x2_t", "g", $0);
+  $0 = gensub(/r3_T/, "r3_t", "g", $0);
+  $0 = gensub(/r3x3_T/, "r3x3_t", "g", $0);
+  $0 = gensub(/r4_T/, "r4_t", "g", $0);
+  $0 = gensub(/r4x4_T/, "r4x4_t", "g", $0);
+ 
+  $0 = gensub(/\<pp[-.>]+([a-zA-Z_]+) *[(] */, "SPParams_\\1(pp, ", "g", $0);
+  $0 = gensub(/Params_g/, "SPParams_G", "g", $0);
+  $0 = gensub(/Params_k/, "SPParams_K", "g", $0);
+  $0 = gensub(/Params_t/, "SPParams_T", "g", $0);
+  $0 = gensub(/Params_s/, "SPParams_S", "g", $0);
+  $0 = gensub(/Params_f/, "SPParams_F", "g", $0);
+  $0 = gensub(/Params_e/, "SPParams_E", "g", $0);
+
+  # Modules and interfaces (careful with "#include <SPFoo.h>)
+  $0 = gensub(/INTERFACE *([a-zA-Z0-9_]+) *[;]/, "#ifndef \\1_H\n#define \\1_H\n\n", "g", $0);
+  $0 = gensub(/MODULE *([a-zA-Z0-9_]+) *EXPORTS *([a-zA-Z0-9_]+) *[;]/, "/* \\1 */", "g", $0);
+  $0 = gensub(/MODULE *([a-zA-Z0-9_]+) *[;]/, "#include <\\1.h>\n\n", "g", $0);
+
+  # IMPORTS
+  if (match($0, /^ *\<IMPORT\>/))
+    { $0 = gensub(/^ *IMPORT */, "#include <", "g", $0);
+      $0 = gensub(/[,] */, ".h>\n#include <", "g", $0);
+      $0 = gensub(/[;]/, ".h>", "g", $0);
+    }
+  if (match($0, /^ *FROM\>.*\<IMPORT\>/))
+    { $0 = gensub(/^ *FROM */, "#include <", "g", $0);
+      $0 = gensub(/ *IMPORT.*$/, ".h>", "g", $0);
+    }
+  $0 = gensub(/Stdio[.]h/, "stdio.h", "g", $0);
+  
+  # Exponents of "double" literals (watch out for DeCasteljau temps!):
+  $0 = gensub(/\([.][0-9]+\)d0/, "\\1", "g", $0);
+
+  # Comparison, assignment
+  $0 = gensub(/ *([^<>:])[=] */, " \\1== ", "g", $0);
+  $0 = gensub(/([^ \n]) *[#] */, "\\1 != ", "g", $0);
+  $0 = gensub(/ *[:][=] */, " = ", "g", $0);
+  $0 = gensub(/ *[=][=] */, " == ", "g", $0);
+
+  $0 = gensub(/[,] *[)]/, ")", "g", $0);
+  $0 = gensub(/\([^ ]\) +[)]/, "\\1)", "g", $0);
+  $0 = gensub(/( *)[;]/, ";\\1", "g", $0);
+  $0 = gensub(/[}][;]/, "}", "g", $0);
+
+  # Move leading ";" to previous line:
+  while (match($0, /^[;]/)) { prev = (prev ";"); $0 = substr($0, 2); }
+  prev = gensub(/[;][;]/, ";", "g", prev);
+  prev = gensub(/[;] *[}][;]/, ";", "g", prev);
+  # split lines:
+  prev = gensub(/^\( *\)  [}] *else/, "\\1  }\n\\1else", "g", prev);
+  print prev;
+  prev = $0;
+}
+
+END {
+  if (prev != "") { print prev; }
+  if(is_interface) { printf "\n#endif\n"; }
+}
+

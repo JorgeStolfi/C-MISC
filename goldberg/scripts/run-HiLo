@@ -1,0 +1,52 @@
+#!/bin/sh
+bindir=${bindir-../bin/}; export bindir
+
+resultsdir=${resultsdir-../results/}; export resultsdir
+
+prognames=${prognames-"bim_fifo bim_lo bim_hi bim_ar bim_dfs bim_bfs bim_ld"}; export prognames
+
+numvertices=${numvertices-"100"}; export numvertices
+
+cutnumseeds=${cutnumseeds-1}; export cutnumseeds
+
+seedlist=${seedlist-`awk "BEGIN {s=28431; for(i=0; i<${cutnumseeds};i++) {s+=10; print s}}"`}; export seedlist
+
+tempfile=/tmp/HiLo`date +%s`
+suffix=HiLo
+avdegree=10
+
+for prog in $prognames
+  do
+    rm -f ${resultsdir}$prog.$suffix
+    echo "$prog.$suffix" >> ${resultsdir}$prog.$suffix
+    echo "   Nodes     Arcs     Size  Op. Cnt.        Time"  >> ${resultsdir}$prog.$suffix
+  done
+
+
+gs=1
+for n in $numvertices
+do
+  l=1
+  k=`expr $n / $l` 
+  m=`expr $n "*" $avdegree`
+  sd=1
+  	for prog in $prognames
+	  do
+	    echo "-1 $n $m" >> ${resultsdir}$prog.$suffix
+	  done
+
+  for seed in $seedlist
+  do
+    echo "c Generator setting:  $gs       Seed #: $sd"
+    rm -f $tempfile
+    echo "${bindir}HiLo $k -l$l -d$avdegree -p$seed | sort -r > $tempfile"
+    ${bindir}HiLo $k -l$l -d$avdegree -p$seed | sort -r > $tempfile
+        for prog in $prognames
+          do
+	    ex-prog $prog $tempfile $suffix
+          done
+    rm -f $tempfile
+    sd=`expr $sd + 1`
+  done
+  gs=`expr $gs + 1`
+done

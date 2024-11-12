@@ -1,0 +1,5 @@
+INTERFACE FrameManager;
+
+~
+
+END FrameManager.

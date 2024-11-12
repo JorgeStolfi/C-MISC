@@ -1,0 +1,36 @@
+Voynich Transcription Tool
+
+by R.Zandbergen
+(rzandber@esoc.esa.de)
+25-9-1996
+
+This is freeware with no commercial value. It may be distributed
+freely, on the condition that it comes with this file (README.DOC)
+unmodifided.
+The author does not accept any responsibility for damage to files
+or file systems caused by the use of this software (but be assured
+that it should not do any damage to either when used properly and
+without modification).
+
+Comments of any (polite) kind will find a friendly ear from me.
+
+Now that you can read this file you have already figured out
+most of what to do. You have successfully uudecoded, unzipped
+and untarred it.
+
+You should see the following files:
+
+README.DOC : This file
+vtt.c      : Source code
+vtt.doc    : Documentation
+vtt.exe    : MS-DOS executable
+vtt        : Solaris 2.4 executable
+
+The MS-DOS executable was kindly compiled and linked by
+Martin McCarthy.
+The Solaris 2.4 executable uses dynamic libraries.
+If this turns out to be a problem, try to relink it statically
+yourself, or if all fails get in touch with me.
+I would appreciate if the first Mac user to build an executable 
+successfully send a copy to me so that it can be added to the
+package.

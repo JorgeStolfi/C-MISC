@@ -1,0 +1,24 @@
+# Last edited on 2009-01-11 23:07:12 by stolfi
+# Rene Zandbergen's VTT tool, with mods by Jorge Stolfi
+
+   22482 Sep 25  1996 1.3-rz/VTT.C
+   
+     File "VTT.C" as fetched within vtt.zip from 
+     http://www.geocities.com/ctesibos/hampton/tools/vtt.zip
+
+   50791 Sep 30  1997 1.6-rz/VTT.C 
+   
+   49163 Sep  7 17:34 1.7-rz/vtt2.c
+
+   49278 Dec  8  1998 1998-12-08/vtt.c
+
+     Version 1.7 with a few mods by Jorge Stolfi.
+
+   49278 Dec  8  1998 vtt-js.c
+
+     Version with a few mods by Jorge Stolfi.
+     
+   50219 Sep  7  2004 vtt.c
+
+    latest version with several 
+    chanes by J. Stolfi.  See the source.

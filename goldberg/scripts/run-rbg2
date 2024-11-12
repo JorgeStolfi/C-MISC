@@ -1,0 +1,68 @@
+#!/bin/sh
+
+bindir=${bindir-../bin/}; export bindir
+
+resultsdir=${resultsdir-../results/}; export resultsdir
+
+prognames=${prognames-"bim_fifo bim_lo bim_hi bim_bfs "}; export prognames
+
+numvertices=${numvertices-"10000"}; export numvertices
+
+cutnumseeds=${cutnumseeds-1}; export cutnumseeds
+
+seedlist=${seedlist-`awk "BEGIN {s=28431; for(i=0; i<${cutnumseeds};i++) {s+=10; print s}}"`}; export seedlist
+
+usage="usage:    run-rbg2 fewg|manyg"
+avdegree=5
+suffix=$1
+tempfile=/tmp/${suffix}`date +%s`
+if [ $# -eq 0 ]
+then
+echo $usage
+exit
+else if [ $1 = fewg ]
+then ngroups=32;
+else if [ $1 = manyg ]
+then ngroups=128;
+else
+echo $usage
+exit
+fi fi fi
+
+for prog in $prognames
+  do
+    rm -f ${resultsdir}$prog.$suffix
+    echo "$prog.$suffix" >> ${resultsdir}$prog.$suffix
+    echo "   Nodes     Arcs     Size  Op. Cnt.        Time"  >> ${resultsdir}$prog.$suffix
+  done
+
+gs=1
+for n in $numvertices
+do
+  sd=1  	
+  k=`expr $n / $ngroups`  
+  m=`expr $n "*" $avdegree`
+
+  	for prog in $prognames
+	  do
+	    echo "-1 $n $m" >> ${resultsdir}$prog.$suffix
+	  done
+  for seed in $seedlist
+  do
+    echo "c Generator setting:  $gs       Seed #:  $sd"
+    rm -f $tempfile
+    echo "${bindir}rbg2 $k $ngroups $avdegree $seed | sort -r > $tempfile"
+    ${bindir}rbg2 $k $ngroups $avdegree $seed | sort -r > $tempfile
+        for prog in $prognames
+          do
+	    ex-prog $prog $tempfile $suffix
+          done
+    rm -f $tempfile
+    sd=`expr $sd + 1`
+  done
+  gs=`expr $gs + 1`
+done
+
+
+
+

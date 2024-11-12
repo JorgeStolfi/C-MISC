@@ -1,0 +1,29 @@
+# Last edited on 2004-09-07 22:32:06 by stolfi
+
+Voynich Transcription Tool
+by Rene Zandbergen
+
+Version 1.7e1 (2004/09/07) by J.Stolfi
+
+Derived from version 1.7 (1998/05/09) by R.Zandbergen
+
+This is freeware with no commercial value. It may be distributed
+freely, on the condition that it comes with this file (README.DOC)
+unmodifided. Neither the authors nor their employers accept any
+responsibility for damage to files or file systems caused by the use
+of this software.
+
+In the archive you should get the following files:
+
+README.DOC : This file
+Makefile   : Makefile (for Unix)
+vtt.c      : Source code
+vtt.doc    : Documentation
+vtt.diffs  : Differences between vtt.c and previous version
+
+You will also get some files for testing the compiled program:
+
+tests/Makefile     : Makefile for testing (for Unix)
+tests/do-all-tests : Script that runs several tests (for Unix bash)
+tests/text16e6.evt : Test input file (EVA interlinear 1.6e6)
+tests/cmp*.evt     : Expected outputs of test runs
