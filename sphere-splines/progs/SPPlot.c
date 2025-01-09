@@ -1807,21 +1807,21 @@ char *SPPlot_ExpandCaptionLine
             else 
               { char *sub = NULL;
                 if (d == 'T')
-                  { asprintf(&sub, "%+7.4f", time); }
+                  { char *sub = jsprintf("%+7.4f", time); }
                 else if (d == 'E')
-                  { asprintf(&sub, "%+8.1e", error); }
+                  { char *sub = jsprintf("%+8.1e", error); }
                 else if (d == 'S')
-                  { asprintf(&sub, "%s", (side > 0 ? "f" : "r")); }
+                  { char *sub = jsprintf("%s", (side > 0 ? "f" : "r")); }
                 else if (d == 'I')
-                  { asprintf(&sub, "%06d", index); }
+                  { char *sub = jsprintf("%06d", index); }
                 else if (d == 'N')
-                  { asprintf(&sub, "%s", name); }
+                  { char *sub = jsprintf("%s", name); }
                 else if (d == 'R')
-                  { asprintf(&sub, "%10.3e", fRange); }
+                  { char *sub = jsprintf("%10.3e", fRange); }
                 else if (d == 'D')
-                  { asprintf(&sub, "%10.3e", fStep); }
+                  { char *sub = jsprintf("%10.3e", fStep); }
                 else
-                  { asprintf(&sub, "%%%c", d); }
+                  { char *sub = jsprintf("%%%c", d); }
                 int ns = strlen(sub);
                 char_vec_expand(&cap, ic + ns - 1);
                 int is;

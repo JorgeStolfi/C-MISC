@@ -1,4 +1,4 @@
-/* Last edited on 2023-02-09 07:56:40 by stolfi */
+/* Last edited on 2024-12-21 11:56:58 by stolfi */
 
 #define PROG_NAME "bxor"
 #define PROG_DESC "Reads two files, outputs their bitwise XOR."
@@ -55,7 +55,6 @@
   "\n" \
   argparser_help_info_STANDARD_RIGHTS
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>

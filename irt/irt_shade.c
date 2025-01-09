@@ -1,5 +1,5 @@
 /* See {irt_shade.h}. */
-/* Last edited on 2023-02-22 19:54:18 by stolfi */
+/* Last edited on 2024-11-15 18:30:06 by stolfi */
 
 #define _GNU_SOURCE
 #include <stdint.h>
@@ -180,7 +180,7 @@ frgb_t irt_compute_hit_color
     frgb_t shiny_light; /* Shiny-scatter component of light */
     frgb_t mirrr_light; /* Mirror component of light */
     
-    int32_t lnum;
+    uint32_t lnum;
 
     irt_compute_mean_hit_point(npt, fpt, &mpt);
     

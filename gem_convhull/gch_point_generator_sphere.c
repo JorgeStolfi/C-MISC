@@ -1,12 +1,14 @@
-/* Last edited on 2014-07-22 01:31:57 by stolfilocal */
+/* Last edited on 2024-12-21 11:26:20 by stolfi */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
+#include <jsrandom.h>
+
 #define MAX_DIM 10
 
-int main(int argc, char **argv)
+int32_t main(int32_t argc, char **argv)
   {
     if (argc != 5)
       { fprintf(stderr,"usage: %s <filename>  <numPoints>  <dimensions>  <radius> ", argv[0]);
@@ -14,9 +16,9 @@ int main(int argc, char **argv)
       }
 
     char *fname = argv[1];
-    int numPoints = atoi(argv[2]);
-    int dim = atoi(argv[3]);
-    int radius = atoi(argv[4]);
+    int32_t numPoints = atoi(argv[2]);
+    int32_t dim = atoi(argv[3]);
+    int32_t radius = atoi(argv[4]);
 
     /* Writes to file "{fname}" a list of {numPoints} random points of {R^{dim}}
       with integer coordinates, located approximately at distance {radius}
@@ -29,23 +31,22 @@ int main(int argc, char **argv)
 
     fprintf(fp, "%d %d\n", dim, numPoints);
 
-    int nt = 0; /* Number of points tried so far. */
-    int np = 0; /* Number of points written so far. */
+    int32_t nt = 0; /* Number of points tried so far. */
+    int32_t np = 0; /* Number of points written so far. */
     while (np < numPoints)
       { /* Generate a random point {v} in the cube {[-1 _ +1]^dim}: */
         length = 0.0;
-        int j;
-        for (j = 0; j < dim; j++)
-          { v[j] = ((double)rand()*2.0)/(double)RAND_MAX - 1.0;
+        for (int32_t j = 0; j < dim; j++)
+          { v[j] = abrandom(-1.0,+1.0);
             length += v[j]*v[j];
           }
         length = sqrt(length);
 
         /* If inside the unit ball, project to the surface: */
         if (length <= 1.0)
-          { for (j = 0; j < dim; j++)
+          { for (int32_t j = 0; j < dim; j++)
               { if (j != 0) fprintf(fp, " ");
-                int val = (int)((double)radius*v[j]/length);
+                int32_t val = (int32_t)((double)radius*v[j]/length);
                 fprintf(fp, "%d", val);
               }
             fprintf(fp,"\n");

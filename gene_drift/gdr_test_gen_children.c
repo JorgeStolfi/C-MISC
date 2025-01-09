@@ -113,7 +113,7 @@ void gdr_tgc_test_throw_children
     double_vec_expand(cFreq, cMax);
     
     int32_t cAge[cMax+1]; /*Children of an individual. */
-    for (int32_t it = 0; it < nt; it++)
+    for (uint32_t it = 0;  it < nt; it++)
       { int32_t cNum;
         gdr_demo_throw_children(cProb, dmp->fMin, dmp->fMax, &cNum, cAge);
         

@@ -4,7 +4,7 @@
 
 #define linear_fit_C_COPYRIGHT \
   "Copyright © 2013 by the State University of Campinas (UNICAMP)"
-/* Last edited on 2023-10-14 21:08:35 by stolfi */
+/* Last edited on 2024-12-21 11:55:58 by stolfi */
     
 #define PROG_HELP \
   "  " PROG_NAME " \\\n" \
@@ -149,7 +149,6 @@
 #define stringify(x) strngf(x)
 #define strngf(x) #x
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -164,7 +163,7 @@
 #include <fget.h>
 #include <rn.h>
 #include <rmxn.h>
-#include <gauss_elim.h>
+#include <gausol_solve.h>
 
 typedef struct lif_options_t
   { int32_t terms;       /* Number of known variables in formula. */
@@ -322,7 +321,7 @@ void lif_read_data(FILE *rd, bool_t weighted, int32_t *NZp, char ***IDp, double 
         else
           { W.e[NZ] = 1.0; }
         double *Xi = &(X.e[NZ*NX]); /* Row of {X} for this input line. */
-        for (int32_t k = 0; k < NX; k++) { Xi[k] = fget_double(rd); }
+        for (uint32_t k = 0;  k < NX; k++) { Xi[k] = fget_double(rd); }
         NZ++;
         fget_comment_or_eol(rd, '#', NULL);
       }
@@ -359,7 +358,7 @@ void lif_build_model
     rmxn_zero(NC, NC, A);
     
     /* Accumulate the matrix and vector of the least squares system: */
-    for (int32_t i = 0; i < NZ; i++)
+    for (uint32_t i = 0;  i < NZ; i++)
       { double *Xi = &(X[i*NX]); 
         lif_accum_system(Z[i], W[i], NX, Xi, unitTerm, NC, A, B);
       }
@@ -367,7 +366,8 @@ void lif_build_model
     
     if (verbose) { fprintf(stderr, "solving system...\n"); }
     double tiny = 1.0e-8;
-    int32_t rank = gsel_solve(NC, NC, A, 1, B, C, tiny);
+    uint32_t rank;
+    gausol_solve(NC, NC, A, 1, B, C, TRUE,TRUE, tiny, NULL, &rank);
     if (rank < NC) { fprintf(stderr, "!! warning: system rank = %d\n", rank); }
     if (verbose) { rmxn_gen_print(stderr, NC, 1, C, "%+18.9f", "  ","\n  ","\n", "[ "," "," ]"); }
     
@@ -376,10 +376,10 @@ void lif_build_model
     
 void lif_accum_system(double Zi, double Wi, int32_t NX, double Xi[], bool_t unitTerm, int32_t NC, double *A, double *B)
   { 
-    for (int32_t k = 0; k < NC; k++)
+    for (uint32_t k = 0;  k < NC; k++)
       { double Xik = (k == NX ? 1 : Xi[k]);
         B[k] += Wi*Zi*Xik;
-        for (int32_t j = 0; j < NC; j++)
+        for (uint32_t j = 0;  j < NC; j++)
           { double Xij = (j == NX ? 1 : Xi[j]);
             A[k*NC + j] += Wi*Xik*Xij;
           }
@@ -389,10 +389,10 @@ void lif_accum_system(double Zi, double Wi, int32_t NX, double Xi[], bool_t unit
 void lif_apply_model(int32_t NZ, int32_t NX, double X[], bool_t unitTerm, int32_t NC, double C[], double Y[])
   { 
     assert(NC == NX + (unitTerm ? 1 : 0));
-    for (int32_t i = 0; i < NZ; i++)
+    for (uint32_t i = 0;  i < NZ; i++)
       { double *Xi = &(X[i*NX]); 
         double sum = 0;
-        for (int32_t k = 0; k < NX; k++) { sum += C[k]*Xi[k]; }
+        for (uint32_t k = 0;  k < NX; k++) { sum += C[k]*Xi[k]; }
         if (unitTerm) { sum += C[NX]; }
         Y[i] = sum;
       }
@@ -402,11 +402,11 @@ void lif_residual_stats(int32_t NZ, double Z[], double W[], double Y[], double *
   {
     double sumWE = 0;
     double sumW = 0;
-    for (int32_t i = 0; i < NZ; i++) { sumWE += W[i]*(Z[i] - Y[i]); sumW += W[i]; }
+    for (uint32_t i = 0;  i < NZ; i++) { sumWE += W[i]*(Z[i] - Y[i]); sumW += W[i]; }
     double avg = sumWE/sumW;
     demand(sumW > 0, "total weight is zero");
     double sumWD2 = 0;
-    for (int32_t i = 0; i < NZ; i++) { double Di = (Z[i] - Y[i]) - avg;  sumWD2 += W[i]*Di*Di; }
+    for (uint32_t i = 0;  i < NZ; i++) { double Di = (Z[i] - Y[i]) - avg;  sumWD2 += W[i]*Di*Di; }
     double dev = sqrt(sumWD2/sumW);
     (*avgP) = avg;
     (*devP) = dev;
@@ -417,7 +417,7 @@ void lif_write_model(char *fname, int32_t NX, char *tName[], bool_t unitTerm, in
     assert(NC == NX + (unitTerm ? 1 : 0));
     FILE *wr = open_write(fname, TRUE);
     fprintf(wr, "%d\n", NC);
-    for (int32_t k = 0; k < NX; k++) 
+    for (uint32_t k = 0;  k < NX; k++) 
       { fprintf(wr, "%3d %+24.16e", k, C[k]); 
         if (tName != NULL)
           { fprintf(wr, " # %s", tName[k]); }
@@ -435,8 +435,8 @@ void lif_print_model(FILE *wr, int32_t NX, char *tName[], bool_t unitTerm, int32
 
     /* Index sort of {C[0..NX-1]} by absolute value of coefficient (leave {C[NX]} at end): */
     int32_t ix[NC];
-    for (int32_t k = 0; k < NC; k++) { ix[k] = k; }
-    for (int32_t k = 0; k < NX; k++) 
+    for (uint32_t k = 0;  k < NC; k++) { ix[k] = k; }
+    for (uint32_t k = 0;  k < NX; k++) 
       { /* Largest coeffs are {C[ix[i]]} for {i} in {0..k-1}. */
         /* Find largest unsorted coeff: */
         int32_t imax = k;
@@ -447,7 +447,7 @@ void lif_print_model(FILE *wr, int32_t NX, char *tName[], bool_t unitTerm, int32
       }
   
     fprintf(wr, "fitted model:\n");
-    for (int32_t k = 0; k < NC; k++) 
+    for (uint32_t k = 0;  k < NC; k++) 
       { int32_t i = ix[k];
         fprintf(wr, "  %+14.9f", C[i]); 
         if (i < NX)
@@ -466,7 +466,7 @@ void lif_print_model(FILE *wr, int32_t NX, char *tName[], bool_t unitTerm, int32
   
 void lif_write_data(FILE *wr, int32_t NZ, char *ID[], double Z[], double Y[], char *fmt)
   {
-    for (int32_t i = 0; i < NZ; i++)
+    for (uint32_t i = 0;  i < NZ; i++)
       { fprintf(wr, "%s ", ID[i]);
         fprintf(wr, fmt, Z[i]);
         fprintf(wr, " ");
@@ -498,7 +498,7 @@ lif_options_t *lif_parse_options(int32_t argc, char **argv)
     if (argparser_keyword_present(pp, "-termNames"))
       { int32_t NX = o->terms;
         o->termNames = notnull(malloc(NX*sizeof(char*)), "no mem");
-        for (int32_t k = 0; k < NX; k++) 
+        for (uint32_t k = 0;  k < NX; k++) 
           { char *name = argparser_get_next_non_keyword(pp);
             o->termNames[k] = name;
           }

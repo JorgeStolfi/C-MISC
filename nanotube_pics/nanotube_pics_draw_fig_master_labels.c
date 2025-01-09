@@ -33,8 +33,8 @@ void nanotube_pics_draw_fig_master_labels
     
     // Enumerate the valid pairs
     int32_t N = 10;
-    for (int32_t iu = 1; iu < N; iu++) {
-      for (int32_t iv = 0; iv < N; iv++) {
+    for (uint32_t iu = 1;  iu < N; iu++) {
+      for (uint32_t iv = 0;  iv < N; iv++) {
         nanotube_pics_elem_style_t *esty = (iv <= iu ? vatsty : vbtsty);
         double wx = iu*ux + iv*vx; double a2x = a1x + wx;
         double wy = iu*uy + iv*vy; double a2y = a1y + wy;
@@ -56,7 +56,7 @@ void nanotube_pics_draw_fig_master_labels
         
             // Draw the label:
             char *xpair = NULL;
-            asprintf(&xpair, "(%d,%d)", iu, iv);
+            char *xpair = jsprintf("(%d,%d)", iu, iv);
             (void)nanotube_pics_draw_label(ps,sty, a2x,a2y, 0,0,0, xpair, 0.5,-0.7, stage,dim,vntsty);
             free(xpair);
           }

@@ -2,7 +2,7 @@
 #define PROG_DESC "exploring the test-and-complement model of computation"
 #define PROG_VERS "1.1"
 
-/* Last edited on 2015-10-18 02:56:31 by stolfilocal */
+/* Last edited on 2024-12-21 11:30:53 by stolfi */
 
 #define tcoptim_C_COPYRIGHT "Copyright © 2006 by the State University of Campinas (UNICAMP)"
 #define tcoptim_C_AUTHORS "Created 2006-may-20 by Jorge Stolfi, IC-UNICAMP"
@@ -86,6 +86,7 @@
 #include <affirm.h>
 #include <jsfile.h>
 #include <argparser.h>
+#include <jsrandom.h>
 
 #include <tcgates.h>
 #include <tc_opt.h>
@@ -112,8 +113,7 @@ int main (int argc, char **argv)
     
     tc_opt_table_t *tb = tc_opt_table_build(o->m, o->n, o->maxBifuns, o->maxGates);
     
-    char *fname = NULL;
-    asprintf(&fname, "%s-%d-%d-opt.txt", o->outName, o->m, o->n);
+    char *fname = jsprintf("%s-%d-%d-opt.txt", o->outName, o->m, o->n);
     FILE *wr = open_write(fname, TRUE);
     
     tc_opt_table_print_table(wr, tb);

@@ -2,7 +2,7 @@
 #define tmaze_bb_H
 
 /* Topology and geometry of the Blip-Blop maze. */
-/* Last edited on 2023-02-03 23:44:20 by stolfi */
+/* Last edited on 2024-12-21 11:31:22 by stolfi */
 
 #include <stdint.h>
 #include <limits.h>
@@ -11,6 +11,7 @@
 #include <bool.h>
 #include <epswr.h>
 #include <frgb.h>
+#include <jsrandom.h>
 
 #include <tmaze.h>
 

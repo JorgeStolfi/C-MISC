@@ -89,7 +89,7 @@ void irt_read_scene(char *pcodeFile, char *parmsFile, scene_t *sc)
   { irt_read_parm_file(parmsFile, sc);
 
     irt_compute_looks_flags(&(sc->looks));
-    for (int32_t i=0; i<sc->num_lights; i++)
+    for (uint32_t i = 0;  i<sc->num_lights; i++)
       irt_compute_light_parameters(&(sc->light[i]), sc->view.focus);
 
     irt_read_pcode_file(pcodeFile, &(sc->shape.proc));

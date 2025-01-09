@@ -5,7 +5,7 @@
 #define make_test_classif_data_C_COPYRIGHT \
   "Copyright © 2010 by the State University of Campinas (UNICAMP)"
 
-/* Last edited on 2017-06-22 18:25:06 by stolfilocal */
+/* Last edited on 2024-12-21 11:55:46 by stolfi */
 
 #define PROG_HELP \
   "  " PROG_NAME " \\\n" \
@@ -159,7 +159,6 @@
   "\n" \
   argparser_help_info_STANDARD_RIGHTS
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -345,7 +344,7 @@ void output_dataset(rn_classif_dataset_t *D, int classD[], int NC, options_t *o)
   { int cl;
     for (cl = 1; cl <= NC; cl++)
       { char *fname = NULL;
-        asprintf(&fname, "%s-c%03d.dat", o->prefix, cl);
+        char *fname = jsprintf("%s-c%03d.dat", o->prefix, cl);
         FILE *wr = open_write(fname, TRUE);
         rn_classif_dataset_write(wr, D, cl, classD);
         fclose(wr);
@@ -367,8 +366,7 @@ void output_image(rn_classif_problem_t *P, options_t *o)
     double HV = 1.0 + 4*o->noise;  /* Half-extent of imaged area. */
     srandom(o->seed + 314159);
     uint16_image_t *img = rn_classif_compute_image(P->NA, P->NC, P->lab, &ctr, HV, o->image_size, o->image_subsmp, o->noise);
-    char *fname = NULL;
-    asprintf(&fname, "%s.ppm", o->prefix);
+    char *fname = jsprintf("%s.ppm", o->prefix);
     uint16_image_write_pnm_named(fname, img, FALSE, TRUE);
     uint16_image_free(img);
     free(fname);

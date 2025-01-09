@@ -1,7 +1,7 @@
 #define PROG_NAME "ioplot"
 #define PROG_DESC "create a sliced-ham in-out plot in Encapsulated Postscript"
 #define PROG_VERS "2013-10-27"
-/* Last edited on 2024-06-22 17:39:38 by stolfi */
+/* Last edited on 2024-12-21 11:56:05 by stolfi */
 
 #define PROG_COPYRIGHT "© 2005  State University of Campinas (UNICAMP)"
 
@@ -215,7 +215,6 @@
   "\n" \
   argparser_help_info_STANDARD_RIGHTS
 
-#define _GNU_SOURCE
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -722,7 +721,6 @@ bool_t read_item(FILE *rd, int32_t *lineP, /*OUT*/ item_t **itP, int32_t *dpnP, 
       { data_error(*lineP, "unexpected end of file"); }
 
     /* Read label from line: */
-    char *name = NULL;
     size_t len;
     ssize_t nread = getline(&name, &len, rd);
     if (nread < 0)
@@ -833,7 +831,7 @@ void print_tree ( FILE *wr, char *fmt, item_t *it )
 
     void do_print( item_t *t, int32_t dp )
       { while (t != NULL)
-          { for (int32_t k = 0; k < dp; k++) { fprintf(wr, "> "); }
+          { for (uint32_t k = 0;  k < dp; k++) { fprintf(wr, "> "); }
             if (t->sub == NULL)
               { fprintf(wr, fmt, t->val); 
                 fprintf(wr, " %s\n", t->name);
@@ -937,7 +935,7 @@ void plot_slices
     double xlab = xtip - side*o->labelGap; /* Edge of label. */
 
     /* Pass 0 = paint interior, Pass 1 = draw outline, Pass 2 = write labels: */
-    for (int32_t pass = 0; pass <= 2; pass++)
+    for (uint32_t pass = 0;  pass <= 2; pass++)
       {
         auto double do_plot ( item_t *itr, int32_t dp, double ybas );
           /* Plots the tree rooted at {itr}, assumed to be non-NULL and
@@ -985,12 +983,12 @@ void plot_slices
                     double xalign = (side > 0 ? 1.0 : 0.0);
                     if ((o->fmt != NULL) && (strlen(o->fmt) > 0))
                       { char *tval = NULL;
-                        asprintf(&tval, o->fmt, itr->val);
+                        char *tval = jsprintf(o->fmt, itr->val);
                         char *text = NULL;
                         if (side > 0)
-                          { asprintf(&text, "%s %s", itr->name, tval); }
+                          { char *text = jsprintf("%s %s", itr->name, tval); }
                         else
-                          { asprintf(&text, "%s %s", tval, itr->name); }
+                          { char *text = jsprintf("%s %s", tval, itr->name); }
                         epswr_label(eps, text, text, xlab, ylab, 0.0, TRUE, xalign, 0.5, TRUE, FALSE);
                         free(tval); free(text);
                       }
@@ -1224,7 +1222,7 @@ int32_t parse_depth(argparser_t *pp)
 frgb_t parse_frgb ( argparser_t *pp )
   { frgb_t color;
     bool_t invisible = FALSE;
-    for (int32_t i = 0; i < 3; i++)
+    for (uint32_t i = 0;  i < 3; i++)
       { color.c[i] = (float)argparser_get_next_double(pp, -1.0, +1.0);
         if (color.c[i] < 0.0) { invisible = TRUE; }
       }

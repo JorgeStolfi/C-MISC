@@ -200,7 +200,7 @@ int32_t main(int32_t argc, char *argv[])
     uint64_t nIn[2];       /* Count input lines by file */
 
     /* Open files, allocate line buffers, and read first lines */
-    for (int32_t i = 0; i < 2; i++)
+    for (uint32_t i = 0;  i < 2; i++)
       { done[i] = FALSE;
         nIn[i] = 0;
         thisA[i] = 250;
@@ -237,7 +237,7 @@ int32_t main(int32_t argc, char *argv[])
           case  1: if (o->only1) WriteLine(thisL[1], thisN[1], &nOut); break;
         }
         /* Read next lines: */
-        for (int32_t i = 0; i < 2; i++)
+        for (uint32_t i = 0;  i < 2; i++)
           { /* Check if {inFile[i]} needs to be read: */
             if (((cmp <= 0) && (i == 0)) || ((cmp >= 0) && (i == 1)))
               { /* Must read next line from file {inFile[i]} */
@@ -269,7 +269,7 @@ int32_t main(int32_t argc, char *argv[])
       }
 
     /* Close files and print report: */
-    for (int32_t i = 0; i < 2; i++)
+    for (uint32_t i = 0;  i < 2; i++)
       { if (inFile[i] != stdin) { fclose(inFile[i]); }
         if (o->verbose)
           { fprintf(stderr, "file %d: %12ld lines\n", i+1, nIn[i]); }

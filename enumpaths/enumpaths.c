@@ -5,7 +5,7 @@
 #define PROG_C_COPYRIGHT \
   "Copyright © 2009 by the State University of Campinas (UNICAMP)"
 
-/* Last edited on 2018-03-04 23:00:34 by stolfilocal */
+/* Last edited on 2024-12-21 11:56:34 by stolfi */
 
 #define PROG_HELP \
   "  " PROG_NAME " \\\n" \
@@ -47,7 +47,6 @@
   "\n" \
   argparser_help_info_STANDARD_RIGHTS
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>

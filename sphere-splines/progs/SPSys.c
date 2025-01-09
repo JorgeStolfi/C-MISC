@@ -388,7 +388,6 @@ char *SPSys_GenMethodName(SPSys_GenMethod_t mth)
 char *SPSys_LinOptionsText(SPSys_LinOptions_t *lso)
   {
     char *m = SPSys_LinMethodName(lso->mth);
-    char *t = NULL;
     switch(lso->mth)
       {
         case SPSys_LM_NONE:
@@ -402,8 +401,7 @@ char *SPSys_LinOptionsText(SPSys_LinOptions_t *lso)
         default:
           break;
       }
-    char *s = NULL;
-    asprintf(&s, "%s %s -residual %d", m, (t != NULL ? t : ""), lso->residual);
+    char *s = jsprintf("%s %s -residual %d", m, (t != NULL ? t : ""), lso->residual);
     if (t != NULL) { free(t); }
     return s;
   }
@@ -412,7 +410,6 @@ char *SPSys_LinOptionsText(SPSys_LinOptions_t *lso)
 char *SPSys_GenOptionsText(SPSys_GenOptions_t *gso)
   {
     char *m = SPSys_GenMethodName(gso->mth);
-    char *t = NULL;
     switch(gso->mth)
       {
         case SPSys_GM_NONE:
@@ -423,19 +420,17 @@ char *SPSys_GenOptionsText(SPSys_GenOptions_t *gso)
         default:
           break;
       }
-    char *s = NULL;
-    asprintf(&s, "%s %s", m, (t != NULL ? t : ""));
+    char *s = jsprintf("%s %s", m, (t != NULL ? t : ""));
     if (t != NULL) { free(t); }
     return s;
   }
 
 char *SPSys_IterativeOptionsText(int maxIter, double relTol, double absTol, double omega)
   {
-    char *t = NULL;
     if (omega != 0)
-      { asprintf(&t, " %d %24.16e %24.16e -omega %24.16e", maxIter, relTol, absTol, omega); }
+      { char *t = jsprintf(" %d %24.16e %24.16e -omega %24.16e", maxIter, relTol, absTol, omega); }
     else
-      { asprintf(&t, " %d %24.16e %24.16e", maxIter, relTol, absTol); }
+      { char *t = jsprintf(" %d %24.16e %24.16e", maxIter, relTol, absTol); }
     return t;
   }
 

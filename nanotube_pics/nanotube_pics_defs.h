@@ -1,6 +1,5 @@
-// Last edited on 2019-05-13 02:31:05 by jstolfi
+// Last edited on 2024-12-21 11:55:31 by stolfi
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>

@@ -19,7 +19,7 @@ int main (int argc, char **argv)
   { 
     params_t *par = get_parameters();
     double t = 0;
-    for (int32_t kt = 0; kt < niter; kt++)
+    for (uint32_t kt = 0;  kt < niter; kt++)
       { /* Simulate another time step: */
         compute_accelerations(np, chr, pos, acc);
         update_velocities_and_positions(np, pos, vel, acc);
@@ -45,7 +45,7 @@ params_t *get_parameters(void)
   
 void compute_accelerations(int32_t np, double chr[], double pos[], double acc[])
   { 
-    for (int32_t kp = 0; kp < np; kp++)
+    for (uint32_t kp = 0;  kp < np; kp++)
       { /* Compute acceleration of particle {kp}:  */
         acc[kp] = compute_particle_accel(np, chr[kp], pos[kp]);
       }
@@ -64,7 +64,7 @@ void detect_next_collision
     int32_t iNext = -1;
     int32_t jNext = -1;
     double dtNext = +INF;
-    for (int32_t ip = 0; ip < np; ip++)
+    for (uint32_t ip = 0;  ip < np; ip++)
       { for (int32_t jp = i+1; jp < np; jp++)
           { dtij = detect_two_particle_collision
               ( pos[ip], vel[ip], acc[ip],
@@ -76,7 +76,7 @@ void update_velocities_and_positons()
   { 
     detect_next_collision(np, pos, vel, acc, dt, i, j);
 
-    for (int32_t kp = 0; kp < np; kp++)
+    for (uint32_t kp = 0;  kp < np; kp++)
       { 
         /* Simulate motion with time step: */
         vel[kp] = vel[kp] + dt * acc[kp];
@@ -90,7 +90,7 @@ void update_velocities_and_positons()
   }
   
 void update_velocities()
-  { for (int32_t kp = 0; kp < np; kp++)
+  { for (uint32_t kp = 0;  kp < np; kp++)
       { int32_t jp = col[kp];
         if (jp >= 0)
           { /* Simulate collision with particle {jp}: */

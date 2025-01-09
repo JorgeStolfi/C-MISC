@@ -2,7 +2,7 @@
 #define tmaze_gen_H
 
 /* Tools for mazes of a generic given family. */
-/* Last edited on 2023-02-04 06:58:25 by stolfi */
+/* Last edited on 2024-12-21 11:31:47 by stolfi */
 
 /* !!!{Change {tmaze_t} to include a {family} field, then merge this file into {tmaze.h}.} */
 
@@ -13,6 +13,7 @@
 #include <bool.h>
 #include <frgb.h>
 #include <dgraph.h>
+#include <jsrandom.h>
 
 #include <tmaze.h>
 

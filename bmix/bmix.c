@@ -1,4 +1,4 @@
-/* Last edited on 2013-10-31 02:19:12 by stolfilocal */
+/* Last edited on 2024-12-21 11:57:01 by stolfi */
 
 #define PROG_NAME "bmix"
 #define PROG_DESC "Reads and writes two files, swapping their bits according to a key file."
@@ -60,7 +60,6 @@
   "\n" \
   argparser_help_info_STANDARD_RIGHTS
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>

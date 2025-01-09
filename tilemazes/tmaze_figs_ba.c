@@ -1,5 +1,5 @@
 /* See {tmaze_figs_ba.h}. */
-/* Last edited on 2009-11-08 23:05:13 by stolfi */
+/* Last edited on 2024-12-21 11:31:30 by stolfi */
 
 #define _GNU_SOURCE
 #include <stdio.h>
@@ -13,6 +13,7 @@
 
 #include <bool.h>
 #include <jsstring.h>
+#include <jsrandom.h>
 
 #include <tmaze.h>
 #include <tmaze_ba.h>
@@ -90,8 +91,7 @@ void tmaze_figs_plt_ba_component_pattern(char *dir, char *prefix, int k, int whi
         exit(1);
       }
       
-    char *name = NULL;
-    asprintf(&name, "%s-%02d-%02d", prefix, k, which);
+    char *name = jsprintf("%s-%02d-%02d", prefix, k, which);
     tmaze_plot_tileset_proc_t *proc = &tmaze_ba_plot_pattern_tileset;
     tmaze_plot_pattern(txtcat("out/", dir), name, &M, TRUE, TRUE, proc, FALSE, 8.0, 1.0);
     free(name);

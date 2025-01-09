@@ -1,7 +1,6 @@
 /* See {output.h}. */
-/* Last edited on 2023-10-15 03:26:11 by stolfi */
+/* Last edited on 2024-12-21 11:55:08 by stolfi */
 
-#define _GNU_SOURCE
 #include <stdio.h>
 
 #include <output.h>
@@ -27,8 +26,7 @@ void output_wave(wavefront_t *wf, char *outName, int iter)
   {
     /* Open output file: */
     char *iterTag = iteration_tag(iter);
-    char *fname = NULL;
-    asprintf(&fname, "%s-%s.tri", outName, iterTag);
+    char *fname = jsprintf("%s-%s.tri", outName, iterTag);
     FILE *wr = open_write(fname, TRUE);
     
     /* Set sample numbers: */ 
@@ -51,8 +49,7 @@ void output_wave(wavefront_t *wf, char *outName, int iter)
 void output_model(geomodel_t *geo, char *outName)
   {
     /* Open output file: */
-    char *fname = NULL;
-    asprintf(&fname, "%s.geo", outName);
+    char *fname = jsprintf("%s.geo", outName);
     FILE *wr = open_write(fname, TRUE);
     
     /* Write geophysical model to file {wr}: */ 

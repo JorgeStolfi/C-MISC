@@ -149,8 +149,7 @@ int main(int argc, char** argv)
     tmaze_t M = tmaze_make(o->nx, o->ny, o->torus);
     
     /* Compose the output filename prefix: */
-    char *out_name = NULL;
-    asprintf(&out_name, "out/%s/%06d-%06d-%010d-%c-%06d", fam_name, M.nx, M.ny, o->seed, "ot"[M.torus], o->trials);
+    char *out_name = jsprintf("out/%s/%06d-%06d-%010d-%c-%06d", fam_name, M.nx, M.ny, o->seed, "ot"[M.torus], o->trials);
      
     /* Get the total size of the maze {tot_size} and the max component size {max_size}: */
     int max_size = tmaze_gen_max_comp_size(&M, o->family);
@@ -169,7 +168,7 @@ int main(int argc, char** argv)
     int class; /* 0 = small, 1 = large */
     for (class = 0; class <= 1; class++)
       { char *dfile_name = NULL;
-        asprintf(&dfile_name, "%s-%s.act", out_name, (class == 0 ? "small" : "large"));
+        char *dfile_name = jsprintf("%s-%s.act", out_name, (class == 0 ? "small" : "large"));
         FILE *dfile = open_write(dfile_name, TRUE);
         tmaze_gen_print_comp_size_distr(dfile, &M, o->family, ms, ct_avg[class], ct_dev[class]);
         fclose(dfile);

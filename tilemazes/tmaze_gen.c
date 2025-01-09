@@ -1,5 +1,5 @@
 /* See {tmaze_gen.h} */
-/* Last edited on 2009-11-10 00:04:36 by stolfi */
+/* Last edited on 2024-12-21 11:31:43 by stolfi */
 
 #define _GNU_SOURCE
 #include <stdio.h>
@@ -12,6 +12,7 @@
 #include <affirm.h>
 #include <frgb.h>
 #include <dgraph.h>
+#include <jsrandom.h>
 
 #include <tmaze.h>
 

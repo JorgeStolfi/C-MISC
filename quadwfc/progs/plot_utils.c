@@ -115,7 +115,7 @@ void draw_axis
     u = find_ortho_dir(dir);
     r3_cross(dir, &u, &v);
     /* Generate arrowhead as a cone of segments: */  
-    for (int32_t i = 0; i < AxisNBarbs; i++)
+    for (uint32_t i = 0;  i < AxisNBarbs; i++)
       { double alpha = 2*M_PI*((double)i)/((double)AxisNBarbs);
         double c = cos(alpha);
         double s = sin(alpha);
@@ -230,7 +230,7 @@ frgb_t clip_color(frgb_t *c)
   { 
     /* Get maximum coordinate {m}: */
     double m = 0.0;
-    for (int32_t i = 0; i < 3; i++) { double ai = c->c[i];  if (ai > m) { m = ai; } } 
+    for (uint32_t i = 0;  i < 3; i++) { double ai = c->c[i];  if (ai > m) { m = ai; } } 
     
     /* Does it exceed the maximum? */
     if (m <= 1.0)

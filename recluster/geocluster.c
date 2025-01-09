@@ -4,7 +4,7 @@
 
 /* Copyright © 1997 by the State University of Campinas (UNICAMP). */
 /* See the authorship, rights and warranty notices in the PROG_INFO below. */
-/* Last edited on 2008-08-22 13:35:40 by stolfi */
+/* Last edited on 2024-12-21 11:54:46 by stolfi */
 
 #define PROG_HELP \
   "  " PROG_NAME " \\\n" \
@@ -172,7 +172,6 @@
   "\n" \
   argparser_help_info_STANDARD_RIGHTS
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>

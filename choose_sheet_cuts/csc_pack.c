@@ -43,7 +43,7 @@ csc_pack_state_vec_t csc_pack_nodes_into_sheets
     /* Create a vector of packing states, one for eeach sheet: */
     int32_t nsh = shv->ne; /* Number of sheets available, and of their packing states. */
     csc_pack_state_vec_t stv = csc_pack_state_vec_new(nsh);
-    for (int32_t ish = 0; ish < nsh; ish++)
+    for (uint32_t ish = 0;  ish < nsh; ish++)
       { csc_stock_sheet_t shi = shv->e[ish];
         csc_pack_state_t *sti = csc_pack_state_new(shi, scrap_mrg, cut_wd);
         fprintf(stderr, "starting sheet %d\n", ish);
@@ -53,7 +53,7 @@ csc_pack_state_vec_t csc_pack_nodes_into_sheets
     
     /* Pack each item into the first compatible stock sheet where it fits: */
     int32_t nit = itv->ne; /* Number of items to pack. */
-    for (int32_t kit = 0; kit < nit; kit++)
+    for (uint32_t kit = 0;  kit < nit; kit++)
       { sheet_cut_node_t *itk = itv->e[kit];
         assert(itk != NULL);
         assert((itk->pos.c[0] == 0.0) &&(itk->pos.c[1] == 0.0));

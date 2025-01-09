@@ -76,8 +76,7 @@ int main(int argc, char **argv)
     geomodel_t *geo = read_named_geomodel(o->geoName);
       
     /* Open the figure stream: */
-    char *fname = NULL;
-    asprintf(&fname, "%s.inc", o->outName);
+    char *fname = jsprintf("%s.inc", o->outName);
     FILE *fpov = open_write(fname, TRUE);
 
     /* Plot the triangulation: */
@@ -101,8 +100,7 @@ geomodel_t *read_named_geomodel(char *geoName)
       { return NULL; }
     else
       { 
-        char *fname = NULL;
-        asprintf(&fname, "%s.geo", geoName);
+        char *fname = jsprintf("%s.geo", geoName);
         FILE *rd = open_read(fname, TRUE);
         geomodel_t *geo = notnull(malloc(sizeof(geomodel_t)), "no mem");
         (*geo) = read_geomodel(rd);

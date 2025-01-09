@@ -389,8 +389,7 @@ int main(int argn, char **argc)
 void LoadInitialFrame(char *iniName, int j, SPVector a, bool_t verbose)
   { 
     char *frmName = FrameName(iniName, j);
-    char *fileName = NULL;
-    asprintf(&fileName, "%s.tst", frmName);
+    char *fileName = jsprintf("%s.tst", frmName);
     FILE *rd = open_read(fileName, TRUE);
     double t0;
     ReadFrame(rd, a, &t0);
@@ -413,7 +412,7 @@ void OutputFrame
     /* Write frame coefficients to disk: */
     if (writeIt)
       { char *fileName = NULL;
-        asprintf(&fileName, "%s.tst", frmName);
+        char *fileName = jsprintf("%s.tst", frmName);
         FILE *wr = open_write(fileName, TRUE);
         WriteFrame(wr, a, tj);
         fclose(wr);
@@ -467,11 +466,11 @@ void WriteFrame(FILE *wr, SPVector a, double tj)
 char *FrameName(char *outName, int epoch)
   { char *name = NULL;
   if (epoch < 0) 
-    { asprintf(&name, "%s-ini", outName); }
+    { char *name = jsprintf("%s-ini", outName); }
   else if (epoch == INT_MAX)
-    { asprintf(&name, "%s-fin", outName); }
+    { char *name = jsprintf("%s-fin", outName); }
   else
-    { asprintf(&name, "%s-%06d", outName, epoch); }    
+    { char *name = jsprintf("%s-%06d", outName, epoch); }    
     return name;
   }
 

@@ -26,7 +26,7 @@ int32_t gammacorrect(double intensity);
 
 FILE *irt_open_color_image_file(char *outPrefix, char *tag, int32_t width, int32_t height)
   { char *fname = NULL;
-    asprintf(&fname, "%s%s.ppm", outPrefix, tag);
+    char *fname = jsprintf("%s%s.ppm", outPrefix, tag);
     FILE *image_file = open_write(fname, TRUE);
 
     /* Image format is is the "raw bits" ppm format with 8 bits/sample. */
@@ -57,8 +57,7 @@ void irt_close_color_image_file(FILE *image_file)
 
 FILE *irt_open_count_image_file(char *outPrefix, char *tag, int32_t width, int32_t height)
   {
-    char *fname = NULL;
-    asprintf(&fname, "%s%s.pgm", outPrefix, tag);
+    char *fname = jsprintf("%s%s.pgm", outPrefix, tag);
     FILE *image_file = open_write(fname, TRUE);
     
     /* Write header for ascii pgm file format */

@@ -182,7 +182,7 @@ int main (int argc, char **argv)
     
     /* Check for unused plates: */
     int32_t plate_ct = 0; /* Plates that were referenced by the grouping file. */
-    for (int32_t k = 0; k < plv.ne; k++) 
+    for (uint32_t k = 0;  k < plv.ne; k++) 
       { if (plv.e[k] != NULL)
           { fprintf(stderr, "!! warning: plate %s was not used\n", plv.e[k]->tag); }
         else
@@ -196,7 +196,7 @@ int main (int argc, char **argv)
     
     /* Draw the sheets and write them out: */
     FILE* wr_placed = csc_open_file(o->outPrefix, "_layout.txt", TRUE);
-    for (int32_t ist = 0; ist < stv.ne; ist++)
+    for (uint32_t ist = 0;  ist < stv.ne; ist++)
       { csc_pack_state_t *sti = stv.e[ist];
         if (sti->blk != NULL)
           { /* Plot the layout: */
@@ -237,8 +237,7 @@ int main (int argc, char **argv)
   
 FILE* csc_open_file(char *prefix, char *compl, bool_t out)
   { 
-    char *fname = NULL;
-    asprintf(&fname, "%s%s", prefix, compl);
+    char *fname = jsprintf("%s%s", prefix, compl);
     FILE *ff;
     if (out)
       { ff = open_write(fname, TRUE); }

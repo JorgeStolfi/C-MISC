@@ -1,4 +1,4 @@
-/* Last edited on 2012-12-20 22:33:54 by stolfilocal */
+/* Last edited on 2024-12-21 11:55:21 by stolfi */
 /* Plots the smoothness of overlapped combinatorial pulses. */
 
 /* 
@@ -45,7 +45,6 @@
   in general the maxima is at or adjacent to the center
   of the binomial pulses, and the minima halfway between them. */
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -71,7 +70,7 @@ int main(int argc, char **argv)
     int n;
     for (n = nmin; n <= nmax; n++)
       { char *fname = NULL;
-        asprintf(&fname, "out/comb-%04d.txt", n);
+        char *fname = jsprintf("out/comb-%04d.txt", n);
         FILE *wr = open_write(fname, TRUE);
         free(fname);
         gen_plot(wr, n, dmin, dmax);

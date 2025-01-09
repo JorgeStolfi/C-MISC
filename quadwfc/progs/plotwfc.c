@@ -149,7 +149,7 @@ int32_t main(int32_t argn, char **argc)
     
     /* Add caption, if it is the case: */
     epswr_text(eps, o->outName, FALSE, 0.5, TRUE, FALSE);
-    for (int32_t k = 0; k < po->caption.ne; k++)
+    for (uint32_t k = 0;  k < po->caption.ne; k++)
       { epswr_text(eps, po->caption.e[k], FALSE, 0.5, TRUE, FALSE); }
     epswr_end_figure(eps);
     return 0;
@@ -226,8 +226,7 @@ void plot_both_sides
     for (int32_t side = +1; side >= -1; side -= 2)
       { char *sideTag = (side == 1 ? "f" : "b");
         char *sideCaption = (side == 1 ? "Front view" : "Back view");
-        char *fname = NULL;
-        asprintf(&fname, "%s-%s-%s.eps", outPrefix, fileTag, sideTag);
+        char *fname = jsprintf("%s-%s-%s.eps", outPrefix, fileTag, sideTag);
         double figSize = 150.0; /* Plot area width and height (mm). */
         int32_t nCap = (caption != NULL ? caption->ne : 0) + 1;
         epswr_figure_t *eps = new_figure(fname, figSize, nCap);
@@ -242,13 +241,13 @@ void plot_both_sides
         );
         /* Add caption, etc: */
         if (caption != NULL)
-          { for (int32_t k = 0; k < caption->ne; k++)
+          { for (uint32_t k = 0;  k < caption->ne; k++)
               { epswr_text(eps, caption->e[k], FALSE, 0.5, TRUE, FALSE); }
           }
         epswr_text(eps, sideCaption, FALSE, 0.5, TRUE, FALSE);
         /* Reverse position of observer relative to ctr: */
         double obsw = obsx.c.c[0];
-        for (int32_t k = 1; k <= 3; k++) 
+        for (uint32_t k = 1;  k <= 3; k++) 
           { obsx.c.c[k] = 2*obsw*ctr->c.c[k] - obsx.c.c[k]; }
       }
   }

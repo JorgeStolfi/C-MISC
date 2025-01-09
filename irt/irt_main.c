@@ -262,8 +262,7 @@ epswr_figure_t *irt_open_eps_figure(char *outPrefix, int32_t col, int32_t row, c
     double xmin = 0.0, xmax = 1.0;
     double ymin = 0.0, ymax = 1.0;
 
-    char *fname = NULL;
-    asprintf(&fname, "%s-%04d-%04d%s", outPrefix, col, row, tag);
+    char *fname = jsprintf("%s-%04d-%04d%s", outPrefix, col, row, tag);
     int32_t capLines = 0; 
     double capFontHeight = 10;
     bool_t epsf_verbose = FALSE;

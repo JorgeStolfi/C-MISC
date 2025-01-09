@@ -1,5 +1,5 @@
 /* See {tmaze_ba.h} */
-/* Last edited on 2023-02-03 23:41:35 by stolfi */
+/* Last edited on 2024-12-21 11:31:08 by stolfi */
 
 #define _GNU_SOURCE
 #include <stdio.h>
@@ -10,6 +10,7 @@
 #include <bool.h>
 #include <affirm.h>
 #include <epswr.h>
+#include <jsrandom.h>
 
 #include <tmaze_ba.h>
 

@@ -4,7 +4,7 @@
 
 #define pc_decomp_C_COPYRIGHT \
   "Copyright © 2023 by the State University of Campinas (UNICAMP)"
-/* Last edited on 2023-02-25 15:20:22 by stolfi */
+/* Last edited on 2024-12-01 00:23:34 by stolfi */
     
 #define PROG_HELP \
   "  " PROG_NAME " \\\n" \
@@ -191,7 +191,6 @@
 #define stringify(x) strngf(x)
 #define strngf(x) #x
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -210,19 +209,21 @@
 #include <fget.h>
 #include <fget_data.h>
 
+vec_typedef(fdtype_vec_t, fdype_vec, fget_data_type_t);
+
 typedef struct jpc_options_t
-  { int64_vec_t dataColumns; /* Columns of input file with the data point coordinates. */
-    int32_t keyColumn;       /* Column of input file with the point's key, or -1 if none. */
-    int32_t weightColumn;    /* Column of input file with the point's weight, or -1 if none. */
-    double noise;            /* Threshold for component magnitude. */
-    char *centerFile;        /* Name of barycenter output file, or {NULL}. */
-    char *covarFile;         /* Name of  output file, or {NULL}. */
-    char *compFile;          /* Name of  output file, or {NULL}. */
-    char *decompFile;        /* Name of  output file, or {NULL}. */
-    char *format;            /* Format for point coordinates. */
-    bool_t verbose;          /* True to print diagnostics. */
+  { int64_vec_t dataColumns;  /* Columns of input file with the data point coordinates. */
+    int32_t keyColumn;        /* Column of input file with the point's key, or -1 if none. */
+    int32_t weightColumn;     /* Column of input file with the point's weight, or -1 if none. */
+    double noise;             /* Threshold for component magnitude. */
+    char *centerFile;         /* Name of barycenter output file, or {NULL}. */
+    char *covarFile;          /* Name of  output file, or {NULL}. */
+    char *compFile;           /* Name of  output file, or {NULL}. */
+    char *decompFile;         /* Name of  output file, or {NULL}. */
+    char *format;             /* Format for point coordinates. */
+    bool_t verbose;           /* True to print diagnostics. */
     /* Derived column data: */
-    int8_vec_t field_type;   /* Type of each data field. */
+    fdtype_vec_t field_type;  /* Type of each data field. */
   } jpc_options_t;
   /* Arguments from command line. */
   
@@ -374,7 +375,7 @@ int32_t main (int32_t argc, char **argv)
  
 void jpc_write_barycenter(char *fname, char *format, int32_t nv, double d[])
   { FILE *wr = open_write(fname, TRUE);
-    for (int32_t jv = 0; jv < nv; jv++) 
+    for (uint32_t jv = 0;  jv < nv; jv++) 
       { fprintf(wr, format, d[jv]);
         if (jv > 0) { fputc(' ', wr); }
       }
@@ -384,8 +385,8 @@ void jpc_write_barycenter(char *fname, char *format, int32_t nv, double d[])
       
 void jpc_write_covariance_matrix(char *fname, int32_t nv, double A[])
   { FILE *wr = open_write(fname, TRUE);
-    for (int32_t kv = 0; kv < nv; kv++) 
-      { for (int32_t jv = 0; jv < nv; jv++) 
+    for (uint32_t kv = 0;  kv < nv; kv++) 
+      { for (uint32_t jv = 0;  jv < nv; jv++) 
           { fprintf(wr, "%24.14e", A[kv*nv + jv]);
             if (jv > 0) { fputc(' ', wr); }
           }
@@ -396,8 +397,8 @@ void jpc_write_covariance_matrix(char *fname, int32_t nv, double A[])
       
 void jpc_write_principal_components(char *fname, char *format, int32_t ne, int32_t nv, double E[], double e[])
   { FILE *wr = open_write(fname, TRUE);
-    for (int32_t ie = 0; ie < ne; ie++) 
-      { for (int32_t jv = 0; jv < nv; jv++) 
+    for (uint32_t ie = 0;  ie < ne; ie++) 
+      { for (uint32_t jv = 0;  jv < nv; jv++) 
           { fprintf(wr, "%+15.12f", E[ie*nv + jv]);
             if (jv > 0) { fputc(' ', wr); }
           }
@@ -410,18 +411,18 @@ void jpc_write_principal_components(char *fname, char *format, int32_t ne, int32
 
 void jpc_write_decomposition(char *fname, char *format, int32_t nd, int32_t nv, int32_t ne, double C[], double P[], double R[])
   { FILE *wr = open_write(fname, TRUE);
-    for (int32_t id = 0; id < nd; id++) 
-      { for (int32_t ie = 0; ie < ne; ie++) 
+    for (uint32_t id = 0;  id < nd; id++) 
+      { for (uint32_t ie = 0;  ie < ne; ie++) 
           { fprintf(wr, format, C[id*ne + ie]);
             if (ie > 0) { fputc(' ', wr); }
           }
         fputs("  ", wr);
-        for (int32_t jv = 0; jv < nv; jv++) 
+        for (uint32_t jv = 0;  jv < nv; jv++) 
           { fprintf(wr, format, P[id*nv + jv]);
             if (jv > 0) { fputc(' ', wr); }
           }
         fputs("  ", wr);
-        for (int32_t jv = 0; jv < nv; jv++) 
+        for (uint32_t jv = 0;  jv < nv; jv++) 
           { fprintf(wr, format, R[id*nv + jv]);
             if (jv > 0) { fputc(' ', wr); }
           }
@@ -449,7 +450,7 @@ void jpc_read_data
     /* Note that there may be no weight of key. */
     int32_t nf = o->field_type.ne; 
     assert(nf >= nv); 
-    int8_t *type = o->field_type.e;
+    fget_data_type_t *type = o->field_type.e;
     
     /* Allocate data arrays: */
     int32_t nd0 = 2048; /* Initial allocation; may be expanded. */
@@ -477,7 +478,7 @@ void jpc_read_data
         
         /* Get the data point: */
         double *Di = &(D.e[id*nv]);
-        for (int32_t jv = 0; jv < nv; jv++) 
+        for (uint32_t jv = 0;  jv < nv; jv++) 
           { int32_t kf = (int32_t)(o->dataColumns.e[jv] - 1);
             double Dij = num[kf];
             demand((! isnan(Dij)) && isfinite(Dij), "invalid data point coordinate");
@@ -503,7 +504,7 @@ void jpc_read_data
           }
         else
           { char *Ki = NULL;
-            asprintf(&Ki, "P%06d", id);
+            char *Ki = jsprintf("P%06d", id);
           }
         K.e[id] = Ki;
 
@@ -525,7 +526,7 @@ void jpc_compute_barycenter(int32_t nd, double w[], int32_t nv, double D[], doub
   {
     double d[nv];
     double sum_w = 0;
-    for (int32_t kv = 0; kv < nv; kv++)
+    for (uint32_t kv = 0;  kv < nv; kv++)
       { double sum_wD = 1.0e-308;
         for (int32_t id = 0; id < nd; id ++) 
           { double wi = w[id];
@@ -601,27 +602,27 @@ void jpc_build_model
       { demand(ne == nv + 1, "{ne} should be {nv+1}");
         if (verbose) { fprintf(stderr, "removing variable averages...\n"); }
         /* Compute the weighted sums of {D[k],Z} in {Xave[k],Zave}: */
-        for (int32_t k = 0; k < nv; k++) { Xave[k] = 0; }
+        for (uint32_t k = 0;  k < nv; k++) { Xave[k] = 0; }
         Zave = 0;
         double sumW = 0;
-        for (int32_t id = 0; id < nd; id++)
+        for (uint32_t id = 0;  id < nd; id++)
           { double Wi = w[id];
             demand(Wi >= 0, "invalid weight {w[id]}");
             double *Xi = &(D[id*nv]); 
-            for (int32_t k = 0; k < nv; k++) 
+            for (uint32_t k = 0;  k < nv; k++) 
               { Xave[k] += Wi*Xi[k]; }
             Zave += Wi*Z[id];
             sumW += Wi;
           }
         /* Convert weighted sums to weighted averages: */
         if (sumW > 0)
-          { for (int32_t k = 0; k < nv; k++) { Xave[k] /= sumW; }
+          { for (uint32_t k = 0;  k < nv; k++) { Xave[k] /= sumW; }
             Zave /= sumW;
           }
         /* Subtract averages from all variables: */
-        for (int32_t id = 0; id < nd; id++)
+        for (uint32_t id = 0;  id < nd; id++)
           { double *Xi = &(D[id*nv]); 
-            for (int32_t k = 0; k < nv; k++) { Xi[k] -= Xave[k]; }
+            for (uint32_t k = 0;  k < nv; k++) { Xi[k] -= Xave[k]; }
             Z[id] -= Zave;
           }
       }
@@ -636,7 +637,7 @@ void jpc_build_model
     rmxn_zero(nv, nv, A);
     
     /* Accumulate the matrix and vector of the least squares system: */
-    for (int32_t id = 0; id < nd; id++)
+    for (uint32_t id = 0;  id < nd; id++)
       { double *Xi = &(D[id*nv]); 
         jpc_accum_system(Z[id], w[id], nv, Xi, A, B);
       }
@@ -644,14 +645,15 @@ void jpc_build_model
     
     if (verbose) { fprintf(stderr, "solving system...\n"); }
     double tiny = 1.0e-8;
-    int32_t rank = gsel_solve(nv, nv, A, 1, B, E, tiny);
+    uint32_t rank;
+    gausol_solve(nv, nv, A, 1, B, E, TRUE,TRUE, tiny, NULL, &rank);
     if (rank < nv) { fprintf(stderr, "!! warning: system rank = %d\n", rank); }
     if (verbose) { rmxn_gen_print(stderr, nv, 1, E, "%+18.9f", "  ","\n  ","\n", "[ "," "," ]"); }
     
     if (unitTerm)
       { if (verbose) { fprintf(stderr, "adding variable averages to indep term...\n"); }
         double Cunit = Zave;
-        for (int32_t k = 0; k < nv; k++) { Cunit -= E[k]*Xave[k]; }
+        for (uint32_t k = 0;  k < nv; k++) { Cunit -= E[k]*Xave[k]; }
         E[ne-1] = Cunit;
       }
     
@@ -661,10 +663,10 @@ void jpc_build_model
 void jpc_apply_model(int32_t nd, int32_t nv, double D[], bool_t unitTerm, int32_t ne, double E[], double Y[])
   { 
     assert(ne == nv + (unitTerm ? 1 : 0));
-    for (int32_t id = 0; id < nd; id++)
+    for (uint32_t id = 0;  id < nd; id++)
       { double *Xi = &(D[id*nv]); 
         double sum = 0;
-        for (int32_t k = 0; k < nv; k++) { sum += E[k]*Xi[k]; }
+        for (uint32_t k = 0;  k < nv; k++) { sum += E[k]*Xi[k]; }
         if (unitTerm) { sum += E[nv]; }
         Y[id] = sum;
       }
@@ -674,11 +676,11 @@ void jpc_residual_stats(int32_t nd, double Z[], double w[], double Y[], double *
   {
     double sumWD = 0;
     double sumW = 0;
-    for (int32_t id = 0; id < nd; id++) { sumWD += w[id]*(Z[id] - Y[id]); sumW += w[id]; }
+    for (uint32_t id = 0;  id < nd; id++) { sumWD += w[id]*(Z[id] - Y[id]); sumW += w[id]; }
     double avg = sumWD/sumW;
     demand(sumW > 0, "total weight is zero");
     double sumWD2 = 0;
-    for (int32_t id = 0; id < nd; id++) { double Di = (Z[id] - Y[id]) - avg;  sumWD2 += w[id]*Di*Di; }
+    for (uint32_t id = 0;  id < nd; id++) { double Di = (Z[id] - Y[id]) - avg;  sumWD2 += w[id]*Di*Di; }
     double dev = sqrt(sumWD2/sumW);
     (*avgP) = avg;
     (*devP) = dev;
@@ -689,7 +691,7 @@ void jpc_write_model(char *fname, int32_t nv, char *tName[], bool_t unitTerm, in
     assert(ne == nv + (unitTerm ? 1 : 0));
     FILE *wr = open_write(fname, TRUE);
     fprintf(wr, "%d\n", nv);
-    for (int32_t k = 0; k < nv; k++) 
+    for (uint32_t k = 0;  k < nv; k++) 
       { fprintf(wr, "%3d %+24.16e", k, E[k]); 
         if (tName != NULL)
           { fprintf(wr, " # %s", tName[k]); }
@@ -707,8 +709,8 @@ void jpc_print_model(FILE *wr, int32_t nv, char *tName[], bool_t unitTerm, int32
 
     /* Index sort of {E[0..nv-1]} by absolute value of coefficient (leave {E[nv]} at end): */
     int32_t ix[ne];
-    for (int32_t k = 0; k < ne; k++) { ix[k] = k; }
-    for (int32_t k = 0; k < nv; k++) 
+    for (uint32_t k = 0;  k < ne; k++) { ix[k] = k; }
+    for (uint32_t k = 0;  k < nv; k++) 
       { /* Largest coeffs are {E[ix[id]]} for {id} in {0..k-1}. */
         /* Find largest unsorted coeff: */
         int32_t imax = k;
@@ -719,7 +721,7 @@ void jpc_print_model(FILE *wr, int32_t nv, char *tName[], bool_t unitTerm, int32
       }
   
     fprintf(wr, "fitted model:\n");
-    for (int32_t k = 0; k < ne; k++) 
+    for (uint32_t k = 0;  k < ne; k++) 
       { int32_t id = ix[k];
         fprintf(wr, "  %+14.9f", E[id]); 
         if (id < nv)
@@ -738,15 +740,15 @@ void jpc_print_model(FILE *wr, int32_t nv, char *tName[], bool_t unitTerm, int32
     
 void jpc_accum_system(double Zi, double Wi, int32_t nv, double Xi[], double *A, double *B)
   { 
-    for (int32_t k = 0; k < nv; k++)
+    for (uint32_t k = 0;  k < nv; k++)
       { B[k] += Wi*Zi*Xi[k];
-        for (int32_t jv = 0; jv < nv; jv++) { A[k*nv + jv] += Wi*Xi[k]*Xi[jv]; }
+        for (uint32_t jv = 0;  jv < nv; jv++) { A[k*nv + jv] += Wi*Xi[k]*Xi[jv]; }
       }
   }
   
 void jpc_write_data(FILE *wr, int32_t nd, char *K[], double Z[], double Y[], char *fmt)
   {
-    for (int32_t id = 0; id < nd; id++)
+    for (uint32_t id = 0;  id < nd; id++)
       { fprintf(wr, "%s ", K[id]);
         fprintf(wr, fmt, Z[id]);
         fprintf(wr, " ");
@@ -772,26 +774,28 @@ jpc_options_t *jpc_parse_options(int32_t argc, char **argv)
 
     /* Parse keyword parameters: */
 
-    /* Get indices of data file colums where the varaibles are: */
-    int32_t nv_max = jpc_MAX_VARS;
-    int32_t nf_max = jpc_MAX_FIELDS;
-    o->dataColumns = argparser_get_int_list(pp, 1000, nv_max, "-dataColumns", 1, nf_max);
-    int32_t nv = o->dataColumns.ne;  /* Number of variables. */
+    /* Get indices of data file colums where the variables are: */
+    uint32_t nv_max = jpc_MAX_VARS;
+    uint32_t nf_max = jpc_MAX_FIELDS;
+    o->dataColumns = argparser_get_int_list(pp, 1000, nv_max, "-dataColumns", 1, (int32_t)nf_max);
+    uint32_t nv = o->dataColumns.ne;  /* Number of variables. */
     if (nv == 0) { argparser_error(pp, "must specify at least one data column"); }
       
     /* Clear out the data file column types: */
-    o->type = int8_vec_new(nf_max);
-    for (kf = 0; kf < nf_max; kf++) { o->type.e[kf] = 0; }
+    o->type = fdtype_vec_new(nf_max);
+    for (uint32_t kf = 0; kf < nf_max; kf++) { o->type.e[kf] = fget_data_type_NOT; }
     
-    /* Set type = 2 for all the columns that contain variables. Remember largest col: */
-    int32_t nf = 0; /* Number of data file cols actually used. */
-    for (kv = 0; kv < nv; kv++) 
-      { defcol(o->dataColumns.e[kv], 2, FALSE, o->type.e, &nf); }
+    /* Set type = numeric for all the columns that contain variables. Remember largest col: */
+    uint32_t nf = 0; /* Number of data file cols actually used. */
+    for (uint32_t kv = 0; kv < nv; kv++) 
+      { int32_t kf = o->dataColumns.e[kv];
+        if (kf > 0) { defcol(kf, fget_data_type_NUM, FALSE, o->type.e, &nf); }
+      }
    
     /* Get the weight column, if any: */
     if (argparser_keyword_present(pp, "-weightColumn"))
       { o->weightColumn = (int32_t)argparser_get_next_int(pp, 1, jpc_MAX_FIELDS); 
-        defcol(o->weightColumn, 2, TRUE, o->type.e, &nf);
+        defcol(o->weightColumn, fget_data_type_NUM, TRUE, o->type.e, &nf);
       }
     else
       { o->weightColumn = -1; };
@@ -799,7 +803,7 @@ jpc_options_t *jpc_parse_options(int32_t argc, char **argv)
     /* Get the point key column, if any: */
     if (argparser_keyword_present(pp, "-keyColumn"))
       { o->keyColumn = (int32_t)argparser_get_next_int(pp, 1, jpc_terms_MAX);
-        defcol(o->keyColumn, 1, FALSE, o->type.e, &nf);
+        defcol(o->keyColumn, fget_data_type_ALF, FALSE, o->type.e, &nf);
       }
     else
       { o->keyColumn = -1; };
@@ -844,11 +848,14 @@ jpc_options_t *jpc_parse_options(int32_t argc, char **argv)
     
     /* ---------------------------------------------------------------------- */
       
-    void defcol(int64_t col, int8_t tkf,  int8_t type[], int32_t *nf_P)
+    void defcol(uint64_t col, fget_data_type_t tkf,  fget_data_type_t type[], uint32_t *nf_P)
       { 
-        int32_t kf = (int32_t)(col - 1);
-        assert((kf >= 0) && (kf < nf_max));
+        demand(col >= 1, "invalid column");
+        uint32_t kf = (uint32_t)(col - 1);
+        assert(kf < nf_max);
         fget_data_set_field_type(kf, tkf, rep_ok, nf_max, type);
         if (kf >= (*nf_P)) { (*nf_P) = kf + 1; }
       }
   }
+
+vec_typeimpl(fdtype_vec_t, fdype_vec, fget_data_type_t);

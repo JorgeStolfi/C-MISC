@@ -1,15 +1,18 @@
 /* SPMakeTriang -- Create spherical triangulations. */
-/* Last edited on 2006-03-19 12:49:32 by stolfi */
+/* Last edited on 2024-12-21 11:29:31 by stolfi */
 
-#include <SPTriang.h>
-#include <SPDelaunay.h>
-#include <SPOptions.h>
-#include <r3.h>
-#include <SPBasic.h>
-#include <bool.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+#include <bool.h>
+#include <r3.h>
+#include <jsrandom.h>
+
+#include <SPBasic.h>
+#include <SPOptions.h>
+#include <SPDelaunay.h>
+#include <SPTriang.h>
 
 /* Creates triangulations for testing purposes.  The user may select
   between a few fixed geometries (a regular tetrahedron, a regular 

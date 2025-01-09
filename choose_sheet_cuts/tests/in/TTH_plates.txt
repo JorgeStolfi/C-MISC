@@ -1,1 +1,1 @@
-../../../../../../posters/test_tube_holder/out/pieces.txt
+posters/test_tube_holder/out/pieces.txt

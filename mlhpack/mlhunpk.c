@@ -1,5 +1,6 @@
+/* Last edited on 2024-12-25 09:57:39 by stolfi */
+
 /* 
-  Last edited on 2009-02-10 09:31:49 by stolfi
   
   Uncompress files that were compressed with "mlhpack".
   
@@ -29,6 +30,9 @@
       comentáramos#ead4#comentar
       comentáreis#ead5#comentar
       comentaram#ead6#comentar
+     
+AUTHOR
+    J. Stolfi, DCC/Unicamp, june 1995.
 */
 
 #include <mlhpack.h>

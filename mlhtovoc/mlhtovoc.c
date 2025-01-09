@@ -1,3 +1,8 @@
+#define PROG_NAME "mlhtovoc"
+#define PROG_DESC "convert the Melhoramentos vocabulary to \".voc\" format"
+
+/* Last edited on 2024-12-25 09:51:30 by stolfi */
+
 /* 
   Programa para o pre-processamento do vocabulario da
   Melhoramentos versão KLS-0.
@@ -60,6 +65,9 @@
     <saida>.voa com as entradas analíticas, 
     <saida>.vos com as entradas sintéticas.
     <saida>.vms com as mensagens de erro.
+     
+AUTHOR
+    J. Stolfi, DCC/Unicamp, june 1995.
 */
 
 #include <string.h>

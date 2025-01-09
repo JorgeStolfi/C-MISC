@@ -4,7 +4,7 @@
 
 #define mandunfold_C_COPYRIGHT "Copyright © 2008 by the State University of Campinas (UNICAMP)"
 
-/* Last edited on 2008-05-23 16:01:28 by stolfi */
+/* Last edited on 2024-12-21 11:55:40 by stolfi */
 
 #define PROG_HELP \
   "  " PROG_NAME " \\\n" \
@@ -91,7 +91,6 @@
   "\n" \
   argparser_help_info_STANDARD_RIGHTS
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -215,7 +214,7 @@ int main(int argc, char** argv)
     
     /* Open the {W} file and output the PGM header: */
     char *Wname = NULL;
-    asprintf(&Wname, "%s-W.pgm", o->outName);
+    char *Wname = jsprintf("%s-W.pgm", o->outName);
     FILE *Wfile = open_write(Wname, TRUE);
     fprintf(Wfile, "P2\n");
     fprintf(Wfile, "%d %d %d\n", Wncols, Wnrows, PGM_MAXVAL);
@@ -281,7 +280,7 @@ int main(int argc, char** argv)
     
     /* Open the {M} file and output the PGM header: */
     char *Mname = NULL;
-    asprintf(&Mname, "%s-M.pgm", o->outName);
+    char *Mname = jsprintf("%s-M.pgm", o->outName);
     FILE *Mfile = open_write(Mname, TRUE);
     fprintf(Mfile, "P2\n");
     fprintf(Mfile, "%d %d %d\n", Mncols, Mnrows, PGM_MAXVAL);

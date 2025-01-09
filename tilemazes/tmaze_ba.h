@@ -2,7 +2,7 @@
 #define tmaze_ba_H
 
 /* Topology and geometry of the Brasilia Airport maze. */
-/* Last edited on 2023-02-03 23:42:48 by stolfi */
+/* Last edited on 2024-12-21 11:31:12 by stolfi */
 
 #include <stdint.h>
 #include <limits.h>
@@ -10,6 +10,7 @@
 
 #include <bool.h>
 #include <epswr.h>
+#include <jsrandom.h>
 
 #include <tmaze.h>
 

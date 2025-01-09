@@ -1,10 +1,9 @@
-/* Last edited on 2011-11-02 03:23:00 by stolfi */
+/* Last edited on 2024-12-21 11:56:08 by stolfi */
 
 #define PROG_NAME "intvsolver"
 #define PROG_DESC "Interval-based solver for algebraic equations and inequations."
 #define PROG_VERS "1.0"
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -276,7 +275,7 @@ ives_variable_t *ives_add_variable(char *name, ives_variable_t **var)
 {
   ives_variable_t *tail = (*var);
   int vix = (tail == NULL ? 0 : tail->vix + 1); /* Sequential variable index. */
-  if (name == NULL) { asprintf(&name, "@%d", vix); }
+  if (name == NULL) { char *name = jsprintf("@%d", vix); }
   /* New variable: */
   ives_variable_t *vnew = notnull(malloc(sizeof(ives_variable_t)), "no mem");
   (*vnew) = (ives_variable_t)

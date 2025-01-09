@@ -31,7 +31,7 @@ double nanotube_pics_draw_key_line
     
     // Write the value and equals sign:
     char *xval = NULL;
-    asprintf(&xval, " = %.*f", digs, val);
+    char *xval = jsprintf(" = %.*f", digs, val);
     wd = nanotube_pics_draw_label(ps,sty, cx,cy, 0,0,0, xval, 1.0,0.0, stage,dim,ensty);
     free(xval);
     cx = cx - wd;

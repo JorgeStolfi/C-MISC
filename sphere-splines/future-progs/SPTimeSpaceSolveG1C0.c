@@ -473,8 +473,7 @@ int main(int argn, char **argc)
   
 void LoadInitialFrame(char *frmName, SPVector a, bool_t verbose)
   { 
-    char *fileName = NULL;
-    asprintf(&fileName, "%s.cof", frmName);
+    char *fileName = jsprintf("%s.cof", frmName);
     FILE *rd = open_read(fileName, TRUE);
     SPVector ar = SPVector_Read(rd);
     affirm(ar.ne == a.ne, "size mismatch");
@@ -510,7 +509,7 @@ void OutputFrame
     /* Write frame coefficients to disk: */
     if (writeIt)
       { char *fileName = NULL;
-        asprintf(&fileName, "%s.cof", frmName);
+        char *fileName = jsprintf("%s.cof", frmName);
         FILE *wr = open_write(fileName, TRUE);
         SPVector_Write(wr, a);
         fclose(wr);
@@ -564,11 +563,11 @@ void OutputFrame
 char *FrameName(char *outName, int epoch)
   { char *name = NULL;
   if (epoch < 0) 
-    { asprintf(&name, "%s-ini", outName); }
+    { char *name = jsprintf("%s-ini", outName); }
   else if (epoch == INT_MAX)
-    { asprintf(&name, "%s-fin", outName); }
+    { char *name = jsprintf("%s-fin", outName); }
   else
-    { asprintf(&name, "%s-%06d", outName, epoch); }    
+    { char *name = jsprintf("%s-%06d", outName, epoch); }    
     return name;
   }
 

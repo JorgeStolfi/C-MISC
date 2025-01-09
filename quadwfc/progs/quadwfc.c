@@ -71,7 +71,7 @@ int32_t main (int32_t argc, char **argv)
   // wavefront_t wf = init_wf(&orig, 2500, geo.md[0].v_P, 100);
   
   output_wave(&wf, o->outName, -1);
-  for (int32_t i = 1; i <= o->maxIter; i++)
+  for (uint32_t i = 1;  i <= o->maxIter; i++)
     {
       wave_prop(&wf,o->timeStep, &(geo), o->edgeLength);
       plot_wave(&wf, o->outName, i);

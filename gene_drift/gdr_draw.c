@@ -104,7 +104,7 @@ drtree_node_t *gdr_draw_get_nodes_from_sim_state(gdr_sim_state_t *st, int32_t y0
     demand(y1 > y0, "invalid year range");
     int32_t ni = st->ni; /* Number of individuals created. */
     drtree_node_t *dt = (drtree_node_t*)notnull(malloc(ni*sizeof(drtree_node_t)), "no mem");
-    for (int32_t iq = 0; iq < ni; iq++)
+    for (uint32_t iq = 0;  iq < ni; iq++)
       { drtree_node_t *q = &(dt[iq]);
         int32_t ybr = st->ybr.e[iq];
         int32_t ydt = st->ydt.e[iq];

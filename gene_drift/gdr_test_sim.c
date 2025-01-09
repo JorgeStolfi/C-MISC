@@ -122,7 +122,7 @@ int32_t main(int32_t argc, char **argv)
     /* Test simulation, tallying child count frequencies: */
     int32_t ybrMin = 2*dmp->fMax + 1;
     int32_t ybrMax = ny-1-dmp->fMax;
-    for (int32_t t = 0; t < o->nTests; t++)
+    for (uint32_t t = 0;  t < o->nTests; t++)
       { gdr_sim_run(st);
         gdr_sim_accumulate_child_count_histogram(st, ybrMin, ybrMax, &(cCount), &(cMax_obs));
         if (t == 0) { gdr_sim_write_cohort_sizes("out/gdr-tsi", "A", 0, ny, st->nbr); }

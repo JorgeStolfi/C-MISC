@@ -2,7 +2,7 @@
 #define tmaze_H
 
 /* Basic tools for tiled mazes and maze patterns. */
-/* Last edited on 2023-02-03 23:31:59 by stolfi */
+/* Last edited on 2024-12-21 11:31:03 by stolfi */
 
 /* !!! Rename {...cell_and...} to {...cell_position_and...} to distinguish from cell_index !!! */
 /* !!! Unify tmaze_t and tmaze_pattern_t !!! */
@@ -13,6 +13,7 @@
 
 #include <bool.h>
 #include <epswr.h>
+#include <jsrandom.h>
 
 /* MAZE TILES */
 

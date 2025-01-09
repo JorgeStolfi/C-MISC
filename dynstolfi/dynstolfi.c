@@ -318,8 +318,7 @@ int main(int argc, char* argv[])
  f(&xmax,&ymax,HICORNER);
 
  /* Graphics window setup: */
- char *title = NULL;
- asprintf(&title, "%s (^%d) [%g %g]×[%g %g]", fname,ngen,xmin,xmax,ymin,ymax); 
+ char *title = jsprintf("%s (^%d) [%g %g]×[%g %g]", fname,ngen,xmin,xmax,ymin,ymax); 
  gpopen(title);
  gpwindow(xmin,xmax,ymin,ymax);
  gppalette(0,"black");

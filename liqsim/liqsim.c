@@ -1,6 +1,5 @@
-/* Last edited on 2023-02-12 07:52:15 by stolfi */
+/* Last edited on 2024-12-21 11:55:54 by stolfi */
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <argparser.h>
 #include <argparser_geo.h>

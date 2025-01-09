@@ -239,7 +239,7 @@ int32_t main(int32_t argc, char **argv)
     
     double_vec_t cProb[2];  /* Nominal child probabilities for each sex {s}. */
     double_vec_t cFreq[2];  /* Observed child count frequencies for each sex {s}. */
-    for (int32_t s = 0; s < 2; s++) 
+    for (uint32_t s = 0;  s < 2; s++) 
       { 
         fprintf(stderr, "  ### sex %d ##################################################\n", s);
         gdr_demo_parms_t *dmp = o->demoParms[s];
@@ -259,7 +259,7 @@ int32_t main(int32_t argc, char **argv)
         int32_t ybrMin = 2*st->fMax;            /* Try to avoid the initial transient. */  
         int32_t ybrMax = ny - 1 - st->fMax - 1; /* Avoid final period with unrestricted births. */
 
-        for (int32_t r = 0; r < nr; r++) 
+        for (uint32_t r = 0;  r < nr; r++) 
           { /* Run the simulation once for {st.ny} years: */
             if (debug) { fprintf(stderr, "=== run %d ===\n", r); }
             gdr_sim_run(st);
@@ -303,7 +303,7 @@ int32_t main(int32_t argc, char **argv)
     gdr_main_write_tex_parms_file
       ( o, cProb, cFreq, nrSample, rsl_sv );
 
-    for (int32_t s = 0; s < 2; s++) 
+    for (uint32_t s = 0;  s < 2; s++) 
       { free(nsl_sv[s]); 
         free(cProb[s].e);
         free(cFreq[s].e);
@@ -322,16 +322,16 @@ void gdr_main_save_counts
   )
   {
     demand((r >= 0) && (r < nr), "invalid column index {r}");
-    for (int32_t y = 0; y < ny; y++) 
+    for (uint32_t y = 0;  y < ny; y++) 
       { sv[y*nr + r] = vec[y]; }
   }
 
 void gdr_main_dump_saved_counts(char *name, int32_t s, int32_t ny, int32_t nr, int32_t sv[])
   {
     fprintf(stderr, "  --- %s_sv[%d] ---\n", name, s);
-    for (int32_t y = 0; y < ny; y++)
+    for (uint32_t y = 0;  y < ny; y++)
       { fprintf(stderr, "     %4d ", y);
-        for (int32_t r = 0; r < nr; r++)
+        for (uint32_t r = 0;  r < nr; r++)
           { fprintf(stderr, " %8d", sv[y*nr + r]); }
         fprintf(stderr, "\n");
       }
@@ -348,7 +348,7 @@ void gdr_main_check_limits(int32_t ny, int32_t nr, int32_t nbt[])
     demand(ny <= gdr_lineage_num_years_MAX, "too many years");
     demand(nr <= gdr_lineage_num_runs_MAX, "too many runs");
     demand(nr <= INT32_MAX/ny/2, "too many table entries");
-    for (int32_t y = 0; y < ny; y++) 
+    for (uint32_t y = 0;  y < ny; y++) 
       { if (debug) { fprintf(stderr, "    nbt[%d] = %d\n", y, nbt[y]); }
         demand(nbt[y] <= nbtMax, "too many births");
       }
@@ -381,8 +381,7 @@ void gdr_main_write_tex_parms_file
     gdr_lineage_find_notable_ratio_parameters(ny, nr, rsl_sv, &gcPlat, &rslPlat);
 
     /* Open the file: */
-    char *fname = NULL;
-    asprintf(&fname, "%s-%s-parms.tex", o->outPrefix, tag);
+    char *fname = jsprintf("%s-%s-parms.tex", o->outPrefix, tag);
     FILE *wr = open_write(fname, TRUE);
     free(fname);
     
@@ -456,8 +455,8 @@ gdr_main_options_t *gdr_parse_options(int32_t argc, char **argv)
     o->yStop = (int32_t)argparser_get_next_int(pp, o->yStart+2, yStopMax);
 
     /* The keyword "-demoParms" must appear exactly twice, once for each sex: */
-    for (int32_t s = 0; s < 2; s++) { o->demoParms[s] = NULL; }
-    for (int32_t ks = 0; ks < 2; ks++)
+    for (uint32_t s = 0;  s < 2; s++) { o->demoParms[s] = NULL; }
+    for (uint32_t ks = 0;  ks < 2; ks++)
       { argparser_get_keyword(pp, "-demoParms");
         int32_t s = (int32_t)argparser_get_next_int(pp, 0, 1);
         if (o->demoParms[s] != NULL) 

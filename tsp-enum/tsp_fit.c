@@ -1,5 +1,5 @@
 /* See tsp_fit.h */
-/* Last edited on 2023-03-31 04:19:19 by stolfi */
+/* Last edited on 2024-11-23 06:20:14 by stolfi */
 
 #define _GNU_SOURCE
 #include <stdio.h>
@@ -11,6 +11,7 @@
 
 #include <bool.h>
 #include <jsmath.h>
+#include <ball.h>
 #include <sign.h>
 #include <affirm.h>
 #include <minu_brent.h>

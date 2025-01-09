@@ -64,11 +64,11 @@ void gdr_lineage_compute_surviving_counts(gdr_sim_state_t *st, int32_t nsl[])
 
     /* Clear {nsl}: */
     if (debug) { fprintf(stderr, "    initializing {nsl}\n"); }
-    for (int32_t y = 0; y < ny; y++) { nsl[y] = 0; }
+    for (uint32_t y = 0;  y < ny; y++) { nsl[y] = 0; }
     
     /* Count individuals with surviving lineages for the years that they count for: */
     if (debug) { fprintf(stderr, "    scanning individuals\n"); }
-    for (int32_t i = 0; i < ni; i++) 
+    for (uint32_t i = 0;  i < ni; i++) 
       { int32_t nchi = st->nch.e[i]; /* Number of children. */
         int32_t ybri = st->ybr.e[i]; /* Year of birth. */
         int32_t ydti = st->ydt.e[i]; /* Year of birth. */
@@ -130,7 +130,7 @@ void gdr_lineage_count_surviving_descendants(gdr_sim_state_t *st, int32_t sud[],
 
     /* Set {sud[i]=1} for individuals actually alive on last year, others zero: */
     if (debug) { fprintf(stderr, "      initializing\n"); }
-    for (int32_t i = 0; i < ni; i++) 
+    for (uint32_t i = 0;  i < ni; i++) 
       { bool_t alive;
         int32_t ybri = st->ybr.e[i];  /* Year of birth. */
         int32_t ydti = st->ydt.e[i];  /* Year of death. */
@@ -183,8 +183,8 @@ void gdr_lineage_compute_sex_ratio_table
     double rsl_sv[]
   )
   {
-    for (int32_t y = 0; y < ny; y++)
-      { for (int32_t r = 0; r < nr; r++)
+    for (uint32_t y = 0;  y < ny; y++)
+      { for (uint32_t r = 0;  r < nr; r++)
           { int32_t k = y*nr + r;
             double nsl0k = (double)(nsl_sv0[k]); assert(nsl0k > 0.0);
             double nsl1k = (double)(nsl_sv1[k]); assert(nsl1k > 0.0);
@@ -204,10 +204,10 @@ void gdr_lineage_find_notable_ratio_parameters
     /* Compute the median {rslMed[0..ny-1]} for all years, find true max: */
     double rslMed[ny];    /* Medians. */
     double rslMax = 0.0;  /* Median with max abs value. */
-    for (int32_t y = 0; y < ny; y++)
+    for (uint32_t y = 0;  y < ny; y++)
       { /* Get sex lineage fractions of year {y}, sorted: */
         double rslg[nr]; /* Copy of row {y} of table. */
-        for (int32_t r = 0; r < nr; r++) { rslg[r] = rsl_sv[nr*y + r]; }
+        for (uint32_t r = 0;  r < nr; r++) { rslg[r] = rsl_sv[nr*y + r]; }
         gdr_demo_sort_doubles(nr, rslg);
         double med = gdr_demo_find_quantile(nr, rslg, 0.50);
         rslMed[y] = med;
@@ -252,25 +252,25 @@ void gdr_lineage_write_counts_median_range
     int32_t pop_sv[]
   )
   { char *fname = NULL;
-    asprintf(&fname, "%s-%s-%d-nlins.txt", outPrefix, tag, s);
+    char *fname = jsprintf("%s-%s-%d-nlins.txt", outPrefix, tag, s);
     FILE *wr = open_write(fname, TRUE);
     free(fname);
 
     /* Run quantile fractions and their column headers: */ 
-    for (int32_t y = 0; y < ny; y++)
+    for (uint32_t y = 0;  y < ny; y++)
       { 
         /* Write external year: */
         fprintf(wr, "%+6d", yStart + y);
         
         /* Write quantiles of population: */
         double pops[nr]; /* Copy of row {y} of {pop_sv}. */
-        for (int32_t r = 0; r < nr; r++) 
+        for (uint32_t r = 0;  r < nr; r++) 
           { pops[r] = (double)pop_sv[nr*y + r]; }
         gdr_write_quantiles(wr, nr, pops, 1);
         
         /* Get lineage counts of year {y}, sorted: */
         double psls[nr]; /* Row {y} of {nsl_sv} as percentage of {pop_sv}. */
-        for (int32_t r = 0; r < nr; r++) 
+        for (uint32_t r = 0;  r < nr; r++) 
           { psls[r] = 100*(double)nsl_sv[nr*y + r]/(double)pop_sv[nr*y + r]; }
         gdr_write_quantiles(wr, nr, psls, 6);
 
@@ -289,23 +289,22 @@ void gdr_lineage_write_sex_ratio_samples
     double rsl_sv[]
   )
   {
-    char *fname = NULL;
-    asprintf(&fname, "%s-%s-rsamp.txt", outPrefix, tag);
+    char *fname = jsprintf("%s-%s-rsamp.txt", outPrefix, tag);
     FILE *wr = open_write(fname, TRUE);
     free(fname);
   
     /* Choose the indices {which[0..nrSample]}:*/
     int32_t which[nr]; /* Indices of runs to write. */
-    for (int32_t r = 0; r < nr; r++) { which[r] = r; }
-    for (int32_t q = 0; q < nrSample; q++) 
+    for (uint32_t r = 0;  r < nr; r++) { which[r] = r; }
+    for (uint32_t q = 0;  q < nrSample; q++) 
       { int32_t j = int32_abrandom(q, nr-1);
         if (j != q) { int32_t t = which[q]; which[q] = which[j]; which[j] = t; }
       }
 
-    for (int32_t q = 0 ; q < nrSample; q++)
+    for (uint32_t q = 0;  q < nrSample; q++)
       { int32_t r = which[q];
         assert((r >= 0) && (r <nr));
-        for (int32_t y = 0; y < ny; y++)
+        for (uint32_t y = 0;  y < ny; y++)
           { double rsl_gr = rsl_sv[y*nr + r];
             /* Perturbe values slightly: */
             rsl_gr += dabrandom(-0.01, +0.01);
@@ -325,18 +324,18 @@ void gdr_lineage_write_sex_ratio_median_range
     double rsl_sv[]
   )
   { char *fname = NULL;
-    asprintf(&fname, "%s-%s-ratio.txt", outPrefix, tag);
+    char *fname = jsprintf("%s-%s-ratio.txt", outPrefix, tag);
     FILE *wr = open_write(fname, TRUE);
     free(fname);
 
-    for (int32_t y = 0; y < ny; y++)
+    for (uint32_t y = 0;  y < ny; y++)
       { 
         /* Write external year: */
         fprintf(wr, "%+6d ", yStart + y);
 
         /* Get sex lineage fractions of year {y}, sorted: */
         double rsls[nr]; /* Copy of row {y} of table. */
-        for (int32_t r = 0; r < nr; r++) { rsls[r] = rsl_sv[nr*y + r]; }
+        for (uint32_t r = 0;  r < nr; r++) { rsls[r] = rsl_sv[nr*y + r]; }
         gdr_write_quantiles(wr, nr, rsls, 3);
         fprintf(wr, "\n");
       }
@@ -350,7 +349,7 @@ void gdr_write_quantiles(FILE *wr, int32_t nr, double vals[], int32_t prec)
 
     gdr_demo_sort_doubles(nr, vals);
     fprintf(wr, " ");
-    for (int32_t q = 0; q < nq; q++) 
+    for (uint32_t q = 0;  q < nq; q++) 
       { double nsl_qt = gdr_demo_find_quantile(nr, vals, frac[q]);
         fprintf(wr, " %10.*f", prec, nsl_qt);
       }

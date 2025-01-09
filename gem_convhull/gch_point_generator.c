@@ -1,9 +1,12 @@
-/* Last edited on 2014-07-22 12:55:44 by stolfilocal */
+/* Last edited on 2024-12-21 10:50:26 by stolfi */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
-int main(int argc, char **argv)
+#include <jsrandom.h>
+
+int32_t main(int32_t argc, char **argv)
   {
     if (argc != 5)
       { fprintf(stderr,"usage: %s <filename> <numPoints> <dim> <maxCoord>", argv[0]);
@@ -11,9 +14,9 @@ int main(int argc, char **argv)
       }
 
     char *fname = argv[1];
-    int numPoints = atoi(argv[2]);
-    int dim = atoi(argv[3]);
-    int maxCoord = atoi(argv[4]);
+    int32_t numPoints = atoi(argv[2]);
+    int32_t dim = atoi(argv[3]);
+    int32_t maxCoord = atoi(argv[4]);
 
     /* Writes to file "{fname}" a list of {numPoints} points
       of {R^{dim}} with random integer coordinates uniformly
@@ -24,11 +27,10 @@ int main(int argc, char **argv)
 
     fprintf(fp, "%d %d\n", dim, numPoints);
 
-    int i, j;
-    for (i = 0; i < numPoints; i++)
-      { for (j = 0; j < dim; j++)
+    for (int32_t i = 0; i < numPoints; i++)
+      { for (int32_t j = 0; j < dim; j++)
           { if (j != 0) fprintf(fp, " ");
-            int val = (int)((((double)rand()*2.0)/(double)RAND_MAX - 1.0)*maxCoord);
+            int32_t val = int32_abrandom(-maxCoord, +maxCoord);
             fprintf(fp, "%d", val);
           }
         fprintf(fp, "\n");

@@ -153,7 +153,7 @@ nanotube_pics_style_t *nanotube_pics_def_style(double xtot, double ytot)
     sty->bdsty.font  = "ArialItalic"; 
     sty->bdsty.fontsize  = 22;          
 
-    for (int32_t k = 0; k < 2; k++)
+    for (uint32_t k = 0;  k < 2; k++)
       { 
         sty->atsty[k].lw  = 2.5*px;         
         sty->atsty[k].rdot = 30*px;

@@ -255,8 +255,7 @@ void process_global_model(options_t *o, int32_t np, int32_t *ix, vtx_t *p, doubl
 void process_asymptotic_model(options_t *o, int32_t ns, sign_t dir, int32_t np, int32_t *ix, vtx_t *p, double *Z)
   { 
     char *hilo = (dir > 0 ? "lo" : "hi");
-    char *title = NULL;
-    asprintf(&title, "asymptotic model for %d out of %d samples at %s end", ns, np, hilo);
+    char *title = jsprintf("asymptotic model for %d out of %d samples at %s end", ns, np, hilo);
     
     fprintf(stderr, "%s: Fitting %s\n", __FUNCTION__, title); 
     int32_t nv = o->nv;
@@ -413,7 +412,7 @@ void enum_perms(int32_t nv, bool_t tour, int32_t npmax, int32_t *np, vtx_t **p)
       }
 
     /* Initial perm (identity): */
-    for (int32_t i = 0; i < nv; i++) { v[i] = (vtx_t)i; }
+    for (uint32_t i = 0;  i < nv; i++) { v[i] = (vtx_t)i; }
 
     /* Enumerate desired perms: */
     while (ngen < (*np))
@@ -471,8 +470,7 @@ void write_perm(FILE *wr, int32_t nv, vtx_t *v)
 
 FILE *open_plot_file(char *tag, options_t *o, char *title)
   {
-    char *fname = NULL;
-    affirm(asprintf(&fname, "%s-%s.dat", o->outName, tag) > 0, "no mem");
+    ??affirm(char *fname = jsprintf("%s-%s.dat", o->outName, tag) > 0, "no mem");
     FILE *wr = open_write(fname, TRUE);
     free(fname);
     

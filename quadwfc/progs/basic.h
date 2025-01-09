@@ -1,11 +1,8 @@
 /* Basic types and procedures. */
-/* Last edited on 2008-07-14 22:20:28 by stolfi */
+/* Last edited on 2024-12-21 11:55:12 by stolfi */
 
 #ifndef basic_H
 #define basic_H
-
-#define _GNU_SOURCE
-/* To get {asprintf}. */
 
 #include <affirm.h>
 #include <bool.h>

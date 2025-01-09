@@ -5,7 +5,7 @@
 #define tmaze_test_C_COPYRIGHT \
   "Copyright © 2009 by the State University of Campinas (UNICAMP)"
 
-/* Last edited on 2023-02-03 23:33:56 by stolfi */
+/* Last edited on 2024-12-21 11:32:01 by stolfi */
 
 #define PROG_HELP \
   "  " PROG_NAME " \\\n" \
@@ -133,6 +133,7 @@
 #include <jsfile.h>
 #include <argparser.h>
 #include <dgraph.h>
+#include <jsrandom.h>
 
 #include <tmaze.h>
 #include <tmaze_gen.h>
@@ -177,8 +178,7 @@ int32_t main(int32_t argc, char** argv)
     tmaze_t M = tmaze_make(o->nx, o->ny, o->torus);
 
     /* Compose the output filename prefix: */
-    char *out_name = NULL;
-    asprintf(&out_name, "out/%s/%06d-%06d-%010d-%c", fam_name, M.nx, M.ny, o->seed, "ot"[M.torus]);
+    char *out_name = jsprintf("out/%s/%06d-%06d-%010d-%c", fam_name, M.nx, M.ny, o->seed, "ot"[M.torus]);
 
     /* Get the maze's size and the max component size: */
     int32_t max_size = tmaze_gen_max_comp_size(&M, o->family);
@@ -193,7 +193,7 @@ int32_t main(int32_t argc, char** argv)
     /* Print out the maze, if so requested: */
     if (o->print)
       { char *pfile_name = NULL;
-        asprintf(&pfile_name, "%s.grf", out_name);
+        char *pfile_name = jsprintf("%s.grf", out_name);
         FILE *pfile = open_write(pfile_name, TRUE);
         tmaze_gen_print(pfile, &M, o->family);
         fclose(pfile);
@@ -211,7 +211,7 @@ int32_t main(int32_t argc, char** argv)
      /* Dump the graph, if so requested: */
     if (o->graph)
       { char *gfile_name = NULL;
-        asprintf(&gfile_name, "%s.grf", out_name);
+        char *gfile_name = jsprintf("%s.grf", out_name);
         FILE *gfile = open_write(gfile_name, TRUE);
         dgraph_write(gfile, &G);
         fclose(gfile);
@@ -227,8 +227,7 @@ int32_t main(int32_t argc, char** argv)
         assert(ms <= max_size);
 
         /* Write the counts: */
-        char *cfile_name = NULL;
-        asprintf(&cfile_name, "%s.cts", out_name);
+        char *cfile_name = jsprintf("%s.cts", out_name);
         FILE *cfile = open_write(cfile_name, TRUE);
         tmaze_gen_print_comp_size_counts(cfile, &M, o->family, ms, ct);
         free(ct);

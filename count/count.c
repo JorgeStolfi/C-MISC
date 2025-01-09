@@ -4,7 +4,7 @@
 
 #define ct_C_COPYRIGHT \
   "Copyright © 2023 by the State University of Campinas (UNICAMP)"
-/* Last edited on 2023-10-15 03:39:21 by stolfi */
+/* Last edited on 2024-12-21 11:56:52 by stolfi */
 
 #define PROG_HELP \
   "  " PROG_NAME " \\\n" \
@@ -99,7 +99,6 @@
   "\n" \
   argparser_help_info_STANDARD_RIGHTS
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>

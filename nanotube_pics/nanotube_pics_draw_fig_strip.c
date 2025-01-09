@@ -10,11 +10,10 @@ void nanotube_pics_draw_fig_strip(int32_t n, int32_t m)
     double ytot = 120*mm; 
     nanotube_pics_style_t *sty = nanotube_pics_def_style(xtot,ytot);
     
-    char *fname = NULL;
     if (m == 0)
-      { asprintf(&fname, "out/nanotube_strip_%+03d_%03d.eps", n, m); }
+      { char *fname = jsprintf("out/nanotube_strip_%+03d_%03d.eps", n, m); }
     else
-      { asprintf(&fname, "out/nanotube_strip_%+03d_%+03d.eps", n, m); }
+      { char *fname = jsprintf("out/nanotube_strip_%+03d_%+03d.eps", n, m); }
     PSStream *ps = nanotube_pics_fig_open(sty, fname); 
     
     // Dimensions of lattice cell (2 atoms):

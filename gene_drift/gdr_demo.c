@@ -55,7 +55,7 @@ double_vec_t gdr_demo_compute_child_count_distr(gdr_demo_parms_t *dmp)
     
     /* Compute raw exponential distrib with {cProb.e[1]=1}, mean children count {cAvg}: */
     double p = 1.0;
-    for (int32_t c = 1; c <= cMax; c++)
+    for (uint32_t c = 1;  c <= cMax; c++)
       { cProb.e[c] = p;
         p = p * dmp->cAlpha;
       }
@@ -63,16 +63,16 @@ double_vec_t gdr_demo_compute_child_count_distr(gdr_demo_parms_t *dmp)
     double unit = pow(0.1, dmp->cPrec);
       
     /* Hope that it converges: */
-    for (int32_t iter = 0; iter < 5; iter++)
+    for (uint32_t iter = 0;  iter < 5; iter++)
       { /* Compute mean child count {sum_dmp}: */
         double sum_dmp = 1.0e-200;
-        for (int32_t c = 1; c <= cMax; c++) { sum_dmp += c*cProb.e[c]; }
+        for (uint32_t c = 1;  c <= cMax; c++) { sum_dmp += c*cProb.e[c]; }
 
         /* Rescale {cProb.e[1..cMax]} so that the mean is 1: */
-        for (int32_t c = 1; c <= cMax; c++) { cProb.e[c] /= sum_dmp; }
+        for (uint32_t c = 1;  c <= cMax; c++) { cProb.e[c] /= sum_dmp; }
         
         /* Round to multiple of {unit}, avoiding zero: */
-        for (int32_t c = 1; c <= cMax; c++) 
+        for (uint32_t c = 1;  c <= cMax; c++) 
           { double p = floor(cProb.e[c]/unit + 0.5)*unit;
             if (p == 0) { p = unit; }
             cProb.e[c] = p;
@@ -81,7 +81,7 @@ double_vec_t gdr_demo_compute_child_count_distr(gdr_demo_parms_t *dmp)
     
     /* Set {cProb[0]} so that the sum is 1: */
     double sum_p = 0;
-    for (int32_t c = 1; c <= cMax; c++) { sum_p += cProb.e[c]; }   
+    for (uint32_t c = 1;  c <= cMax; c++) { sum_p += cProb.e[c]; }   
     assert((sum_p > 0) && (sum_p < 1.0));
     cProb.e[0] = 1.0 - sum_p;
     
@@ -114,7 +114,7 @@ void gdr_demo_throw_children
     /* Choose the number of children according to {cProb}: */
     int32_t cNum = 0; /* Default if toss fails. */
     double coin = drandom();
-    for (int32_t c = 0; c <= cMax; c++)
+    for (uint32_t c = 0;  c <= cMax; c++)
       { if (coin  < cProb->e[c]) { cNum = c; break; }
         coin = coin - cProb->e[c];
       }
@@ -124,8 +124,8 @@ void gdr_demo_throw_children
     if (cNum < aNum)
       { /* Choose distinct ages at random: */
         int32_t aDom[aNum];
-        for (int32_t ka = 0; ka < aNum; ka++) { aDom[ka] = fMin + ka; }
-        for (int32_t kc = 0; kc < cNum; kc++)
+        for (uint32_t ka = 0;  ka < aNum; ka++) { aDom[ka] = fMin + ka; }
+        for (uint32_t kc = 0;  kc < cNum; kc++)
           { int32_t ka = int32_abrandom(kc, aNum-1);
             cAge[kc] = aDom[ka];
             if (ka != kc) { aDom[ka] = aDom[kc]; }
@@ -133,12 +133,12 @@ void gdr_demo_throw_children
       }
     else if (cNum > aNum)
       { /* Choose ages at random, don't care if distinct: */
-        for (int32_t kc = 0; kc < cNum; kc++)
+        for (uint32_t kc = 0;  kc < cNum; kc++)
           { cAge[kc] = int32_abrandom(fMin, fMax); }
       }
     else /* {cNum == aNum} */
       { /* Choose one child per year: */
-        for (int32_t kc = 0; kc < cNum; kc++)
+        for (uint32_t kc = 0;  kc < cNum; kc++)
           { cAge[kc] = fMin + kc; }
       }
     
@@ -156,8 +156,7 @@ void gdr_demo_write_child_distr_tex_table
     int32_t cFreqPrec
   )
   {
-    char *fname = NULL;
-    asprintf(&fname, "%s-%s-%d-probs.tex", outPrefix, tag, s);
+    char *fname = jsprintf("%s-%s-%d-probs.tex", outPrefix, tag, s);
     FILE *wr = open_write(fname, TRUE);
     free(fname);
     
@@ -178,7 +177,7 @@ void gdr_demo_write_child_distr_tex_table
     fprintf(wr, "  \\cline{1-1} \\cline{2-3} \\cline{4-5}\n");
     fprintf(wr, "  \\vstr $c$ & $\\prb_%d(c)$ & $\\frq_%d(c)$ & $\\Prb_%d(c)$ & $\\Frq_%d(c)$ \\\\\n", s, s, s, s);
     fprintf(wr, "  \\cline{1-1} \\cline{2-3} \\cline{4-5}\n");
-    for (int32_t c = 0; c <= cMax; c++) 
+    for (uint32_t c = 0;  c <= cMax; c++) 
       { fprintf(wr,  "  %3d", c);
         wrpr(cProb, c, cProbPrec);
         wrpr(cFreq, c, cFreqPrec);
@@ -197,7 +196,7 @@ void gdr_demo_write_child_distr_tex_table
         double pc = (c < (int32_t)cDistr->ne ? cDistr->e[c] : 0.0);
         /* Format {pc} with {prec} decimal digits: */
         char *xpr = NULL;
-        asprintf(&xpr, "%*.*f", prec+2, prec, pc);
+        char *xpr = jsprintf("%*.*f", prec+2, prec, pc);
 
         /* Check if it prints as zero, if so print "~" instead: */
         char *q = xpr;
@@ -226,7 +225,7 @@ void gdr_demo_exponential_distr(int32_t iMin, int32_t iMax, double alpha, double
   {
     demand((0 <= iMin) && (iMin <= iMax), "invalid {iMin,iMax}");
     double_vec_expand(iProb, iMax+1);
-    for (int32_t i = 0; i < iMin; i++)
+    for (uint32_t i = 0;  i < iMin; i++)
       { iProb->e[i] = 0.0; }
     double p = 1.0;
     for (int32_t i = iMin; i <= iMax; i++)
@@ -240,17 +239,17 @@ void gdr_demo_distr_normalize_sum(double val, double_vec_t *iProb)
   {
     demand(val > 0.0, "invalid target sum {val}");
     double sum = 0.0;
-    for (int32_t i = 0; i < (int32_t)iProb->ne; i++) { sum += iProb->e[i]; }
+    for (uint32_t i = 0;  i < (int32_t)iProb->ne; i++) { sum += iProb->e[i]; }
     demand(sum > 0.0, "distribution is all zeros");
     double scale = val/sum;
-    for (int32_t i = 0; i < (int32_t)iProb->ne; i++) { iProb->e[i] *= scale; }
+    for (uint32_t i = 0;  i < (int32_t)iProb->ne; i++) { iProb->e[i] *= scale; }
   }
 
 void gdr_demo_distr_round_off(double unit, double_vec_t *iProb)
   {
     bool_t debug = FALSE;
     
-    for (int32_t i = 0; i < (int32_t)iProb->ne; i++)
+    for (uint32_t i = 0;  i < (int32_t)iProb->ne; i++)
       { double p = iProb->e[i];
         double p_round = floor(p/unit + 0.5)*unit;
         if (debug) { fprintf(stderr, "    raw %3d = %18.16f rounded %18.16f\n", i, p, p_round); } 
@@ -267,7 +266,7 @@ void gdr_demo_distr_check(double_vec_t *cProb, int32_t cMax, double avg, int32_t
     demand(cProb->ne == cMax + 1, "inconsistent {cProb.ne,cMax}");
     double sum_p = 0;
     double sum_pc = 0;
-    for (int32_t c = 0; c <= cMax; c++)
+    for (uint32_t c = 0;  c <= cMax; c++)
       { double p = cProb->e[c];
         demand((p >= 0.0) && (p <= 1.0), "invalid {cProb[c]}");
         sum_p += p;
@@ -308,7 +307,7 @@ double_vec_t gdr_demo_freqs_from_counts(int32_t nr, int64_t rCount[])
     
     /* Compute sum of entries: */
     int64_t sum = 0;
-    for (int32_t r = 0; r < nr; r++) 
+    for (uint32_t r = 0;  r < nr; r++) 
       { if (debug) { fprintf(stderr, "       r = %3d = %12ld\n", r, rCount[r]); }
         sum += rCount[r];
       }
@@ -316,7 +315,7 @@ double_vec_t gdr_demo_freqs_from_counts(int32_t nr, int64_t rCount[])
     
     /* Convert counts to frequencies: */
     double_vec_t rFreq = double_vec_new(nr);
-    for (int32_t r = 0; r < nr; r++) 
+    for (uint32_t r = 0;  r < nr; r++) 
       { rFreq.e[r] = ((double)(rCount[r]))/((double)sum); }
     double_vec_trim(&(rFreq), nr); /* Paranoia. */
 
@@ -372,7 +371,7 @@ void gdr_demo_show_distr(char *title, int32_t s, double_vec_t *iProb, double_vec
     if (iFreq != NULL) { fprintf(stderr, " %10s", "--------"); }
     fprintf(stderr, "\n");
 
-    for (int32_t i = 0; i <= iMax; i++)
+    for (uint32_t i = 0;  i <= iMax; i++)
       { fprintf(stderr, "  %3d", i);
         wrt(iProb, i);
         wrt(iFreq, i);
@@ -404,14 +403,14 @@ void gdr_demo_show_distr(char *title, int32_t s, double_vec_t *iProb, double_vec
     void wrt_sum(double_vec_t *vec)
       { if (vec == NULL) { return; }
         double sum = 0.0; 
-        for (int32_t i = 0; i < (int32_t)vec->ne; i++) { sum += vec->e[i]; }
+        for (uint32_t i = 0;  i < (int32_t)vec->ne; i++) { sum += vec->e[i]; }
         fprintf(stderr, " %10.6f", sum);
       }
       
     void wrt_ave(double_vec_t *vec)
       { if (vec == NULL) { return; }
         double ave = 0.0; 
-        for (int32_t i = 0; i < (int32_t)vec->ne; i++) { ave += i * vec->e[i]; }
+        for (uint32_t i = 0;  i < (int32_t)vec->ne; i++) { ave += i * vec->e[i]; }
         fprintf(stderr, " %10.6f", ave);
       }
   }
@@ -444,7 +443,7 @@ void gdr_demo_sort_doubles(int32_t n, double x[])
     
     qsort(x, n, sizeof(double), &cmp);
     /* Paranoia: */
-    for (int32_t r = 1; r < n; r++) { assert(x[r-1] <= x[r]); }
+    for (uint32_t r = 1;  r < n; r++) { assert(x[r-1] <= x[r]); }
     return;
     
     int cmp(const void *a, const void *b)

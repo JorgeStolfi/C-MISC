@@ -2,10 +2,9 @@
 #define PROG_DESC "computes optimum approximation of a Gaussian by narrower Gaussians"
 #define PROG_VERS "1.0"
 
-/* Last edited on 2024-11-08 18:40:18 by stolfi */
+/* Last edited on 2024-12-21 11:56:19 by stolfi */
 /* Created on 2007-07-11 by J. Stolfi, UNICAMP */
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -387,7 +386,7 @@ int main(int argc, char **argv)
 void gto_compute_samples_and_weights(int32_t M, double xmax, double xsmp[], double wsmp[])
   {
     double sum_w = 0.0;
-    for (int32_t i = 0; i < M; i++)
+    for (uint32_t i = 0;  i < M; i++)
       { xsmp[i] = xmax*((2.0*i)/(M-1) - 1.0);
         wsmp[i] = 1.0;
         assert(wsmp[i] >= 0.0);
@@ -395,7 +394,7 @@ void gto_compute_samples_and_weights(int32_t M, double xmax, double xsmp[], doub
       }
     /* Normalize the weights to unit sum, just for plot's sake: */
     int32_t Nsig = -1; /* Number of significative samples. */
-    for (int32_t i = 0; i < M; i++) 
+    for (uint32_t i = 0;  i < M; i++) 
       { wsmp[i] /= sum_w;
         if ((wsmp[i] >= 1.0e-15) && (i >= Nsig)) { Nsig = i+1; }
       }
@@ -404,7 +403,7 @@ void gto_compute_samples_and_weights(int32_t M, double xmax, double xsmp[], doub
 
 void gto_compute_H_values(int32_t M, double xsmp[], double Hval[])
   {
-    for (int32_t i = 0; i < M; i++) { Hval[i] = gauss_distr_PDF(xsmp[i], 0, 1); }
+    for (uint32_t i = 0;  i < M; i++) { Hval[i] = gauss_distr_PDF(xsmp[i], 0, 1); }
   }
 
 void gto_find_optimum_parms
@@ -495,7 +494,7 @@ void gto_find_optimum_parms
       { 
         int32_t kt = 0; /* Next SVE parameter to define. */
         if (debug_map) { fprintf(stderr, "map (N=%d): ", pt->N); }
-        for (int32_t k = 0; k <= pt->N; k++)
+        for (uint32_t k = 0;  k <= pt->N; k++)
           { /* Map the mean {A[k]} if not fixed: */
             interval_t *rAk = &(o->rangeA[k]);
             double loA = rAk->end[0];
@@ -530,7 +529,7 @@ void gto_find_optimum_parms
     void unmap_parms(double xt[], gto_parms_t *pt)
       { int32_t kt = 0; /* Next SVE parameter to unmap. */
         if (debug_map) { fprintf(stderr, "unmap (N=%d): ", pt->N); }
-        for (int32_t k = 0; k <= pt->N; k++)
+        for (uint32_t k = 0;  k <= pt->N; k++)
           { /* Map the mean {A[k]} if not fixed: */
             interval_t *rAk = &(o->rangeA[k]);
             double loA = rAk->end[0];
@@ -572,7 +571,7 @@ void gto_find_optimum_parms
 void gto_pick_initial_A_D_guesses(gto_options_t *o, gto_parms_t *p)
   { int32_t N = o->nTerms;
     p->N = N;
-    for (int32_t k = 0; k <= N; k++)
+    for (uint32_t k = 0;  k <= N; k++)
       { /* Pick {A[k],D[k]} in the middle of their ranges: */
         p->D[k] = interval_mid(&(o->rangeD[k]));
         p->A[k] = interval_mid(&(o->rangeA[k]));
@@ -590,7 +589,7 @@ void gto_check_constraints(gto_options_t *o, gto_parms_t *p)
     
     /* Check the coefficients {p.C[0..N]}: */
     double Ctot = 0.0;
-    for (int32_t k = 0; k <= N; k++)
+    for (uint32_t k = 0;  k <= N; k++)
       { double Ck = p->C[k];
         if ((k == 0) && o->noMiddle) { assert((! isnan(Ck)) && (Ck == 0.0)); }
         Ctot += (k == 0 ? 1.0 : 2.0) * Ck; /* Note: may become {NAN}. */
@@ -599,7 +598,7 @@ void gto_check_constraints(gto_options_t *o, gto_parms_t *p)
     assert(isnan(Ctot) || (fabs(Ctot - 1.0) <= 1.0e-14));
     
     /* Check the deviations {p.D[0..N]}: */
-    for (int32_t k = 0; k <= N; k++)
+    for (uint32_t k = 0;  k <= N; k++)
       { double Dk = p->D[k];
         assert(! isnan(Dk));
         interval_t rDk = o->rangeD[k];
@@ -612,7 +611,7 @@ void gto_check_constraints(gto_options_t *o, gto_parms_t *p)
     assert(p->A[0] == 0.0); /* The mean {p.A[0]} must always be zero ... */
     assert((o->rangeA[0].end[0] == 0) && (o->rangeA[0].end[1] == 0)); /* ... and fixed there. */
     
-    for (int32_t k = 1; k <= N; k++)
+    for (uint32_t k = 1;  k <= N; k++)
       { double Ak = p->A[k];
         assert(! isnan(Ak));
         /* Check the minimum separation: */
@@ -629,7 +628,7 @@ void gto_check_constraints(gto_options_t *o, gto_parms_t *p)
 
 int32_t gto_count_non_lin_parameters(int32_t N, interval_t rangeA[], interval_t rangeD[])
   { int32_t sve_n = 0;
-    for (int32_t k = 0; k <= N; k++)
+    for (uint32_t k = 0;  k <= N; k++)
       { interval_t *rAk = &(rangeA[k]);
         double loA = rAk->end[0];
         double hiA = rAk->end[1];
@@ -705,7 +704,7 @@ void gto_compute_C_coeffs
     
     /* Define the weights {V[0..N]} of the unit-sum constraint: */
     double V[N+1]; /* {V[k]} is the weight of {C[k]} in the unit-sum constraint. */
-    for (int32_t k = 0; k <= N; k++) { V[k] = (k == 0 ? 1.0 : 2.0 ); }
+    for (uint32_t k = 0;  k <= N; k++) { V[k] = (k == 0 ? 1.0 : 2.0 ); }
       
     /* Determiner the free (non-fixed, non-zero) coeffs {c[0..N0]}: */
     int32_t k0 = (noMiddle ? 1 : 0); /* Free coeff {c[r]} is {C[k0+r]}. */
@@ -716,19 +715,19 @@ void gto_compute_C_coeffs
     double *g[N0+1];  /* Sampled basis elements of free coeffs. */
 
     /* Evaluate the basis functions {G[0..N]} at the sampling args: */ 
-    for (int32_t r = 0; r <= N0; r++) { g[r] = notnull(malloc(M*sizeof(double)), "no mem"); }
-    for (int32_t i = 0; i < M; i++)
+    for (uint32_t r = 0;  r <= N0; r++) { g[r] = notnull(malloc(M*sizeof(double)), "no mem"); }
+    for (uint32_t i = 0;  i < M; i++)
       { /* Evaluate the original basis functions {G[0..N]} at the sampling points: */
         gto_eval_basis(xsmp[i], N, p->A, p->D, Gxi);
         /* Store them in {g[0..N0]}: */
-        for (int32_t r = 0; r <= N0; r++) { g[r][i] = Gxi[r+k0]; }
+        for (uint32_t r = 0;  r <= N0; r++) { g[r][i] = Gxi[r+k0]; }
       }
       
     /* Build the least squares system: */
     int32_t N1 = N0+1; /* Number of free coeffs. */
     double *lsq_A = notnull(malloc(N1*N1*sizeof(double)), "no mem");
     double *lsq_B = notnull(malloc(N1*sizeof(double)), "no mem");
-    for (int32_t r = 0; r < N1; r++) 
+    for (uint32_t r = 0;  r < N1; r++) 
       { for (int32_t t = r; t < N1; t++)
           { double Art = gto_inner_cum_prod(M, g[r], g[t], wsmp);
             lsq_A[r*N1 + t] = Art;
@@ -744,13 +743,13 @@ void gto_compute_C_coeffs
     lsq_solve_system(N1, 1, lsq_A, lsq_B, 1,v, &One, lsq_U, NULL, FALSE);
 
     /* Copy {c[0..N0]} to {C[k0..N-1]}: */
-    for (int32_t r = 0; r <= N0; r++) { p->C[r+k0] = lsq_U[r]; }
+    for (uint32_t r = 0;  r <= N0; r++) { p->C[r+k0] = lsq_U[r]; }
 
     /* Set {C[0] = 0} if so requested: */
     if (noMiddle) { p->C[0] = 0.0; }
 
     /* Release storage: */
-    for (int32_t r = 0; r <= N0; r++) { free(g[r]); }
+    for (uint32_t r = 0;  r <= N0; r++) { free(g[r]); }
     free(lsq_A); free(lsq_B); free(lsq_U);
   }
 
@@ -767,7 +766,7 @@ double gto_mean_sqr_mismatch
     gto_compute_F_values(p->N, p->A, p->D, p->C, M, xsmp, Fval);
     /* Compute the errors {F-H}: */
     double Ferr[M]; /* Values of {F-H} at sample arguments. */
-    for (int32_t i = 0; i < M; i++) { Ferr[i] = Fval[i] - Hval[i]; }
+    for (uint32_t i = 0;  i < M; i++) { Ferr[i] = Fval[i] - Hval[i]; }
     /* Average the squared error: */
     return gto_inner_cum_prod(M, Ferr, Ferr, wsmp);
   }
@@ -783,10 +782,10 @@ void gto_compute_F_values
   )
   {  
     double Gx[N+1];
-    for (int32_t i = 0; i < M; i++)
+    for (uint32_t i = 0;  i < M; i++)
       { gto_eval_basis(xsmp[i], N, A, D, Gx);
         double Fx = 0.0;
-        for (int32_t k = 0; k <= N; k++) { Fx += C[k]*Gx[k]; }
+        for (uint32_t k = 0;  k <= N; k++) { Fx += C[k]*Gx[k]; }
         Fval[i] = Fx;
       }
   }
@@ -801,7 +800,7 @@ void gto_eval_basis
   { double distr[2*N+1];
     gto_eval_distrs(x, N, A, D, distr);
     Gx[0] = distr[N];
-    for (int32_t k = 1; k <= N; k++)
+    for (uint32_t k = 1;  k <= N; k++)
       { Gx[k] = distr[N-k] + distr[N+k]; }
   }
 
@@ -814,7 +813,7 @@ void gto_eval_distrs
   )
   { assert (A[0] == 0.0);
     distr[N] = gauss_distr_PDF(x, 0.0, D[0]);
-    for (int32_t k = 1; k <= N; k++)
+    for (uint32_t k = 1;  k <= N; k++)
       { distr[N-k] = gauss_distr_PDF(x, -A[k], D[k]);
         distr[N+k] = gauss_distr_PDF(x, +A[k], D[k]);
       }
@@ -841,7 +840,7 @@ double gto_inner_cum_prod
 
 void gto_print_parms(FILE *wr, int32_t ind, char *label, gto_parms_t *p, double goal)
   { fprintf(stderr, "%*s--- %s ------------------------------\n", ind, "", label);
-    for (int32_t k = 0; k <= p->N; k++)
+    for (uint32_t k = 0;  k <= p->N; k++)
       { fprintf(wr, "%*s  C[%d] = %+20.16f", ind, "", k, p->C[k]);
         fprintf(wr, " A[%d] = %23.16f D[%d] = %23.16f\n", k, p->A[k], k, p->D[k]);
       }
@@ -865,7 +864,7 @@ void gto_plot_funcs
     double *Fval = notnull(malloc(M*sizeof(double)), "no mem"); /* Sampled values of {F}. */
     double distr[2*N+1]; /* Temp: values of the distributions. */
     gto_compute_F_values(N, p->A, p->D, p->C, M, xsmp, Fval); 
-    for (int32_t i = 0; i < M; i++)
+    for (uint32_t i = 0;  i < M; i++)
       { double xi = xsmp[i];
         double wi = wsmp[i];
         fprintf(wr, "%5d %+12.8f %16.12f", i, xi, wi);
@@ -947,7 +946,7 @@ void gto_parse_range_options
     assert(vmax - vmin >= 2.0*range_MIN);
     
     /* Set all to {NAN} to detect duplicates: */
-    for (int32_t k = 0; k <= nTerms_MAX; k++) { range[k] = (interval_t){{ NAN, NAN }}; }
+    for (uint32_t k = 0;  k <= nTerms_MAX; k++) { range[k] = (interval_t){{ NAN, NAN }}; }
     
     /* Parse the {key} ranges: */
     while (argparser_keyword_present(pp, key))
@@ -971,7 +970,7 @@ void gto_tweak_A_ranges(argparser_t *pp, int32_t N, interval_t rangeA[], double 
     interval_t newA[nTerms_MAX + 1]; /* Adjusted parameter ranges. */
     /* Ensure lower bounds are properly spaced: */
     newA[0].end[0] = 0.0; 
-    for (int32_t k = 1; k <= N; k++)
+    for (uint32_t k = 1;  k <= N; k++)
       { double vlo = newA[k-1].end[0] + minSepA;
         newA[k].end[0] = fmax(vlo, rangeA[k].end[0]);
       }
@@ -983,7 +982,7 @@ void gto_tweak_A_ranges(argparser_t *pp, int32_t N, interval_t rangeA[], double 
       }
       
     /* Check changes and validity, and return result: */
-    for (int32_t k = 0; k <= N; k++)
+    for (uint32_t k = 0;  k <= N; k++)
       { interval_t rAk = rangeA[k];
         assert(rAk.end[0] <= rAk.end[1]);
         bool_t fixed = (rAk.end[0] == rAk.end[0]); /* User specified that parameter is fixed. */
@@ -1022,7 +1021,7 @@ void gto_tweak_A_ranges(argparser_t *pp, int32_t N, interval_t rangeA[], double 
   
   /* Check that non-trivial ranges remain significant even if {A[k-1]} is maximum: */
   assert((rangeA[0].end[0] == 0) && (rangeA[0].end[1] == 0));
-  for (int32_t k = 1; k <= N; k++)
+  for (uint32_t k = 1;  k <= N; k++)
     { interval_t rAk = rangeA[k];
       assert(rAk.end[0] <= rAk.end[1]);
       if (rAk.end[0] < rAk.end[1])

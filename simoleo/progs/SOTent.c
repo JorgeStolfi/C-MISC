@@ -1,5 +1,5 @@
 /* See SOTent.h */
-/* Last edited on 2007-01-04 04:36:20 by stolfi */
+/* Last edited on 2024-12-21 11:27:23 by stolfi */
 
 #include <SOGrid.h>
 #include <SOBasic.h>
@@ -7,6 +7,7 @@
 
 #include <dg_grid.h>
 #include <nat.h>
+#include <jsrandom.h>
 
 #include <math.h>
 

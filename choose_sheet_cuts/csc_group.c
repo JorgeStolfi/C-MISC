@@ -73,7 +73,7 @@ sheet_cut_node_vec_t csc_group_read_items
     /* Debugging stuff: */
     bool_t debug = FALSE;
     char *dbpref = NULL;
-    if (debug) { asprintf(&dbpref, "%*scsc_read_and_pack_items[%d]:", 2*level, "", level); }
+    if (debug) { char *dbpref = jsprintf("%*scsc_read_and_pack_items[%d]:", 2*level, "", level); }
     
     /* Vector of top-blocks created: */
     sheet_cut_node_vec_t topv = sheet_cut_node_vec_new(20); 
@@ -176,7 +176,7 @@ sheet_cut_node_t *csc_group_nodes
     demand(nit > 0, "group cannot be empty");
     sheet_cut_node_t* blk = NULL;
     double cur_cx = 0; /* Abscissa of next child. */
-    for (int32_t kit = 0; kit < nit; kit++)
+    for (uint32_t kit = 0;  kit < nit; kit++)
       { sheet_cut_node_t *itk = itv->e[kit];
         assert(itk != NULL);
         assert((itk->pos.c[0] == 0.0) &&(itk->pos.c[1] == 0.0));
@@ -192,7 +192,7 @@ sheet_cut_node_t *csc_group_nodes
 sheet_cut_node_t* csc_find_and_delete_plate(char *tag, sheet_cut_node_vec_t *plv)
   {
     sheet_cut_node_t *plr = NULL;
-    for (int32_t k = 0; k < plv->ne; k++)
+    for (uint32_t k = 0;  k < plv->ne; k++)
       { sheet_cut_node_t *plk = plv->e[k];
         if ((plk != NULL) && (strcmp(plk->tag, tag) == 0))
           { if (plr != NULL) 

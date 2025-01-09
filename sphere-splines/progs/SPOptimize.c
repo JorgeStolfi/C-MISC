@@ -1,16 +1,19 @@
 /* See SPOptimize.h */
-/* Last edited on 2007-01-13 22:07:42 by stolfi */
+/* Last edited on 2024-12-21 11:30:20 by stolfi */
 
-#include <SPOptimize.h>
-#include <SPBasic.h>
-#include <vec.h>
-#include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+
+#include <vec.h>
 #include <rn.h>
 #include <affirm.h>
 #include <nat.h>
 #include <bool.h>
+#include <jsrandom.h>
+
+#include <SPOptimize.h>
+#include <SPBasic.h>
 
 void SPOptimize_Method1
   ( double func(double_vec_t x),

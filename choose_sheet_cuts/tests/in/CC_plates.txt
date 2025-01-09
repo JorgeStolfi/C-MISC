@@ -1,1 +1,1 @@
-../../../../../../posters/closet_closet/out/pieces.txt
+posters/closet_closet/out/pieces.txt

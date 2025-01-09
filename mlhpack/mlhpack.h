@@ -1,7 +1,6 @@
 /* Common declarations for mlhpack.c and mlhunpk.c */
-/* Last edited on 2009-02-10 08:58:58 by stolfi */
+/* Last edited on 2024-12-21 11:55:36 by stolfi */
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

@@ -2,7 +2,7 @@
 #define PROG_DESC "computes optimum weights for 2-downsampling and 2-upsampling"
 #define PROG_VERS "1.0"
 
-/* Last edited on 2023-11-26 07:12:40 by stolfi */
+/* Last edited on 2024-12-01 00:26:44 by stolfi */
 /* Created on 2007-07-11 by J. Stolfi, UNICAMP */
 
 #define _GNU_SOURCE
@@ -19,7 +19,7 @@
 #include <wt_table_binomial.h>
 #include <rn.h>
 #include <rmxn.h>
-#include <gauss_elim.h>
+#include <gausol_solve.h>
 
 /* FILTERS FOR 2-DOWNSAMPLING AND 2-UPSAMPLING
 
@@ -284,7 +284,8 @@ void find_specific_upsampling(void)
     fprintf(stderr, "determinant = %15.8f\n", rmxn_det(nw,M));
     
     double w[nw];
-    int32_t r1 = gsel_solve(nw, nw, M, 1, b, w, 0.0);
+    uint32_t r1;
+    gausol_solve(nw, nw, M, 1, b, w, TRUE,TRUE, 0.0, NULL, &r1);
     affirm(r1 == nw, "system is indeterminate/impossible");
     fprintf(stderr, "\n");
     print_filter_weights(stderr, "w", nw, w);
@@ -321,7 +322,8 @@ void find_best_weights(opt_params_t *o)
     double b[ne]; /* System's RHS. */
     double s[ne]; /* Solution (weights and Lagrange multipliers). */
     build_system(o, M,b,s);
-    int32_t r2 = gsel_solve(ne, ne, M, 1, b, s, 0.0);
+    uint32_t r2;
+    gausol_solve(ne, ne, M, 1, b, s, TRUE,TRUE, 0.0, NULL, &r2);
     affirm(r2 == ne, "system is indeterminate/impossible");
     
     print_solution(stdout,o,s);

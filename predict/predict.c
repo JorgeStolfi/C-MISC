@@ -3,13 +3,13 @@
 #define PROG_VERS "1.1"
 
 /* Copyright © 2008 by the State University of Campinas (UNICAMP). */
-/* Last edited on 2023-02-25 15:39:02 by stolfi */
+/* Last edited on 2024-12-01 00:41:00 by stolfi */
 
 
 #include <bool.h>
 #include <affirm.h>
 #include <rmxn.h>
-#include <gauss_elim.h>
+#include <gausol_solve.h>
 #include <rn.h>
 #include <jsfile.h>
 #include <vec.h>
@@ -116,7 +116,7 @@ void find_compact_pulse(int ns, int nt, double X[])
     B[iu] = 1;
     
     /* Solve the system: */
-    int r1 = gsel_solve(rows, cols, A, 1, B, X, 0.0);
+    int r1 = gausol_solv(rows, cols, A, 1, B, X, TRUE,TRUE, 0.0, NULL,NULL);
     demand(r1 == rows, "indeterminate system");
     
     int iter;
@@ -125,13 +125,14 @@ void find_compact_pulse(int ns, int nt, double X[])
         rn_gen_print(stderr, ns, X, "%20.16f", "X =\n  ", "\n  ", "\n");
 
         /* Compute the residual error: */
-        gsel_residual(rows, cols, A, 1, B, X, R);
+        gausol_residual(rows, cols, A, 1, B, X, R);
 
         /* Print the residual: */
         rn_gen_print(stderr, rows, R, "%20.16f", "R =\n  ", "\n  ", "\n");
 
         /* Solve the residual system: */
-        int r2 = gsel_solve(rows, cols, A, 1, R, Y, 0.0);
+        uint32_t r2;
+        gausol_solve(rows, cols, A, 1, R, Y, TRUE,TRUE, 0.0, NULL, &r2);
         demand(r2 == rows, "indeterminate system");
 
         /* Print correction: */

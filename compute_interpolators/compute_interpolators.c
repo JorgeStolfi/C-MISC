@@ -2,10 +2,9 @@
 #define PROG_DESC "computes coeffs of interpolating splines"
 #define PROG_VERS "1.0"
 
-/* Last edited on 2013-10-26 00:04:56 by stolfilocal */
+/* Last edited on 2024-12-21 11:56:46 by stolfi */
 /* Created on 2007-07-11 by J. Stolfi, UNICAMP */
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -16,7 +15,7 @@
 #include <jsmath.h>
 #include <rn.h>
 #include <rmxn.h>
-#include <gauss_elim.h>
+#include <gausol_solve.h>
 
 typedef struct spline_t
   { int m;        /* Total support width. */
@@ -210,13 +209,13 @@ void spline_print(FILE *wr, char *tag, int c, double h, spline_t *S)
     fprintf(wr, "# %s-spline with %d pieces of degree %d, hopefully of order %d\n", tag, S->m, S->g, c);
     int r;
     char *ctag = NULL;
-    asprintf(&ctag, (c < 0 ? "%c" : "%d"), (c < 0 ? 'n' : c));
+    char *ctag = jsprintf((c < 0 ? "%c" : "%d"), (c < 0 ? 'n' : c));
     char *ptag = NULL;
-    asprintf(&ptag, "%s%s", tag, ctag);
+    char *ptag = jsprintf("%s%s", tag, ctag);
     for (r = 0; r <= c+1; r++)
       { 
         char *dtag = NULL;
-        asprintf(&dtag, "D%d%s", r, ptag);
+        char *dtag = jsprintf("D%d%s", r, ptag);
         /* Print the pieces: */ 
         spline_print_pieces(wr, dtag, r, S);
         spline_print_whole(wr, dtag, S->m, r, h);
@@ -226,7 +225,7 @@ void spline_print(FILE *wr, char *tag, int c, double h, spline_t *S)
     free(ctag);
     free(ptag);
     char *wtag = NULL;
-    asprintf(&wtag, (c < 0 ? "w%s%c" : "w%s%d"), tag, (c < 0 ? 'n' : c));
+    char *wtag = jsprintf((c < 0 ? "w%s%c" : "w%s%d"), tag, (c < 0 ? 'n' : c));
     spline_print_weights(wr, wtag, S, h);
     free(wtag);
   }
@@ -629,7 +628,8 @@ spline_t *iO_spline_from_system(int ne, int nv, int w, int g, double M[], double
         double *Mtb = rn_alloc(nv);
         rmxn_tr_mul(ne, nv, nv, M, M, MtM);
         rmxn_map_row(ne, nv, b, M, Mtb);
-        int r = gsel_solve(nv, nv, MtM, 1, Mtb, z, 0.0);
+        uint32_t r;
+        gausol_solve(nv, nv, MtM, 1, Mtb, z, TRUE,TRUE, 0.0, NULL, &r);
         free(MtM); free(Mtb);
         if (r < nv)
           { fprintf(stderr, "LSQ system is not definite, r = %d\n", r); 
@@ -640,7 +640,8 @@ spline_t *iO_spline_from_system(int ne, int nv, int w, int g, double M[], double
     else
       { assert(ne == nv);
         fprintf(stderr, "solving the system with ne = nv = %d\n", ne); 
-        int r = gsel_solve(ne, nv, M, 1, b, z, 0.0);
+        uint32_t r;
+        gausol_solve(ne, nv, M, 1, b, z, TRUE,TRUE, 0.0, NULL, &r);
         if (r < nv)
           { fprintf(stderr, "system is not definite, r = %d\n", r); 
             free(M); free(b); free(z);
@@ -650,7 +651,7 @@ spline_t *iO_spline_from_system(int ne, int nv, int w, int g, double M[], double
     /* Check is all eqs were satisfied: */
     fprintf(stderr, "computing the residual\n"); 
     double *e = rn_alloc(ne);
-    gsel_residual(ne, nv, M, 1, b, z, e);
+    gausol_residual(ne, nv, M, 1, b, z, e);
     int bad = 0;
     double tol = 1.0e-8;
     int ie;

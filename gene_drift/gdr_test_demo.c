@@ -73,7 +73,7 @@ int32_t main(int32_t argc, char **argv)
     srand(417); srandom(417);
     
     /* Test parenting distribution functions for both sexes: */
-    for (int32_t s = 0; s < 2; s++) 
+    for (uint32_t s = 0;  s < 2; s++) 
       { 
         /* Get parameters for sex {s}: */
         gdr_demo_parms_t *dmp_goal = o->demoParms[s]; /* Goal parameters. */
@@ -131,7 +131,7 @@ gdr_tdm_options_t *gdr_tdm_options_parse(int32_t argc, char **argv)
     gdr_tdm_options_t *o = notnull(malloc(sizeof(gdr_tdm_options_t)), "no mem");
 
     /* The keyword "-demoParms" must appear exactly twice, once for each sex: */
-    for (int32_t s = 0; s < 2; s++)
+    for (uint32_t s = 0;  s < 2; s++)
       { argparser_get_keyword(pp, "-demoParms");
         o->demoParms[s] = gdr_demo_options_parse(pp);
       }

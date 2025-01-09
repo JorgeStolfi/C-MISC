@@ -4,7 +4,7 @@
 
 #define PROG_C_COPYRIGHT "Copyright © 2009 Universidade Estadual de Campinas (UNICAMP)."
 
-/* Last edited on 2009-10-31 00:21:29 by stolfi */
+/* Last edited on 2024-12-21 11:55:03 by stolfi */
 
 #define PROG_HELP \
   "  " PROG_NAME " \\\n" \
@@ -250,7 +250,6 @@
 #define int64_NONE (~ 0LL)
   /* A 64-bit integer value used to represent "no number". */
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -879,8 +878,7 @@ char *clocks_diff_string(clocks_t *c)
     double u = user_cpu_time_usec() - c->utime;
     double s = system_cpu_time_usec() - c->stime;
     double M = 1.0e6; /* One second. */
-    char *tim = NULL;
-    asprintf(&tim, "(%.3f usr, %.3f sys, %.3f tot)", u/M, s/M, r/M);
+    char *tim = jsprintf("(%.3f usr, %.3f sys, %.3f tot)", u/M, s/M, r/M);
     return tim;
   }
 

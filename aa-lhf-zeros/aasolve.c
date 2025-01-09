@@ -1,7 +1,6 @@
 /* zeros of function R^N -> R^M */
-/* Last edited on 2009-02-10 16:44:22 by stolfi */
+/* Last edited on 2024-12-21 11:57:11 by stolfi */
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <math.h>
 #include <assert.h>

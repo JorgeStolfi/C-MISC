@@ -443,8 +443,7 @@ int main(int argn, char **argc)
 void LoadInitialFrame(char *iniName, int j, SPVector a)
   { 
     char *frmTag = fmt_int(j, 6);
-    char *fileName = NULL;
-    asprintf(&fileName, "%s-%s.tst", iniName, frmTag);
+    char *fileName = jsprintf("%s-%s.tst", iniName, frmTag);
     FILE *rd = open_read(fileName, TRUE);
     double t0;
     ReadFrame(rd, a, &t0);
@@ -582,7 +581,7 @@ void OutputState
     /* Write frame coefficients to disk: */
     if (writeIt)
       { char *fileName = NULL;
-        asprintf(&fileName, "%s-%s.tst", o->outName, frmTag);
+        char *fileName = jsprintf("%s-%s.tst", o->outName, frmTag);
         FILE *wr = open_write(fileName, TRUE);
         WriteFrame(wr, a, tj);
         fclose(wr);
@@ -657,7 +656,7 @@ void WriteFrame(FILE *wr, SPVector a, double tj)
 
 char *FrameName(char *outName, int epoch)
   { char *name = NULL;
-    asprintf(&name, "%s-%06d", outName, epoch);
+    char *name = jsprintf("%s-%06d", outName, epoch);
     return name;
   }
 

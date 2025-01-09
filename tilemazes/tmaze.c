@@ -229,7 +229,7 @@ void tmaze_make_dir(char *dir, char *sub)
     mkdir(dir, 0777);
     if ((sub != NULL) && (strlen(sub) != 0) && (strcmp(sub, ".") != 0))
       { char *dirsub = NULL;
-        asprintf(&dirsub, "%s/%s", dir, sub);
+        char *dirsub = jsprintf("%s/%s", dir, sub);
         mkdir(dirsub, 0777);
         free(dirsub);
       }

@@ -175,7 +175,7 @@ gdr_sim_state_t *gdr_sim_state_new
     /* Will be indexed {0..ny-1}: */
     st->lib = (int32_t *)notnull(malloc(ny*sizeof(int32_t)), "no mem"); /* First indiv in cohort. */
     st->nbr = (int32_t *)notnull(malloc(ny*sizeof(int32_t)), "no mem"); /* Size of cohort. */
-    for (int32_t y = 0; y < ny; y++)
+    for (uint32_t y = 0;  y < ny; y++)
       { st->lib[y] = -1; 
         st->nbr[y] = 0;
       }
@@ -214,7 +214,7 @@ int32_t *gdr_sim_compute_target_year_cohort_sizes(int32_t ny, int32_t iniSize, i
     demand((iniSize > 0) && (finSize > 0), "year sizes must be positive");
     int32_t *nbt = (int32_t *)notnull(malloc(ny*sizeof(int32_t)), "no mem");
     double rat = ((double)finSize)/((double)iniSize);
-    for (int32_t y = 0; y < ny; y++)
+    for (uint32_t y = 0;  y < ny; y++)
       { nbt[y] = (int32_t)floor(0.5 + iniSize*exp(y*log(rat)/ny)); }
     return nbt;
   }
@@ -232,7 +232,7 @@ void gdr_sim_run(gdr_sim_state_t *st)
     assert(st->nbr[0] == st->nbt[0]);
     
     /* Subsequent years: */
-    for (int32_t y = 1; y < ny; y++)
+    for (uint32_t y = 1;  y < ny; y++)
       { /* Simulate evolution from year {y-1} to year {y}: */
         gdr_sim_one_year(st);
       }
@@ -250,7 +250,7 @@ void gdr_sim_create_initial_population(gdr_sim_state_t *st)
     
     /* Clear all individual tables: */
     st->ni = 0;
-    for (int32_t y = 0; y < st->ny; y++) { st->nbr[y] = 0; st->lib[y] = -1; }
+    for (uint32_t y = 0;  y < st->ny; y++) { st->nbr[y] = 0; st->lib[y] = -1; }
     
     /* Make year 0 the current one: */
     st->yCur = 0;
@@ -272,7 +272,7 @@ void gdr_sim_create_initial_population(gdr_sim_state_t *st)
           { /* Find max {aMax} of {cAge[0..cNum-1]}: */
             if (debug) { fprintf(stderr, "         cAge ="); }
             int32_t aMax = -1;
-            for (int32_t ka = 0; ka < cNum; ka++) 
+            for (uint32_t ka = 0;  ka < cNum; ka++) 
               { if (debug) { fprintf(stderr, " %d", cAge[ka]); }
                 if (cAge[ka] > aMax) { aMax = cAge[ka]; }
               }
@@ -405,7 +405,7 @@ void gdr_sim_expand_individual
     if (debug) { fprintf(stderr, "        trying to add %d children\n", cNum); }
     int32_t j0 = st->ni;  /* Index of first child of {i}, if any. */
     int32_t j1 = j0 - 1;  /* Index of last child of {i}, or {-1} if none. */
-    for (int32_t kc = 0; kc < cNum; kc++)
+    for (uint32_t kc = 0;  kc < cNum; kc++)
       { int32_t ybrj = st->ybr.e[i] + cAge[kc]; /* Year when child should be born. */
         bool_t ok = (ybrj < 0) || (ybrj >= st->ny) || (st->nbr[ybrj] < st->nbt[ybrj]);
         if (ok)
@@ -476,7 +476,7 @@ void gdr_sim_adjust_cohort_size(gdr_sim_state_t *st, int32_t y)
         /* Collect the cohort individuals {h[0..nh-1]}: */
         int32_t h[nh]; /* Indices of individuals in cohort {y}. */
         int32_t i = st->lib[y]; /* Next individual in cohort. */
-        for (int32_t kh = 0; kh < nh; kh++)
+        for (uint32_t kh = 0;  kh < nh; kh++)
           { assert((i >= 0) & (i < st->ni)); /* Individual must exist. */
             assert(st->ybr.e[i] == y); /* Must be of the right cohort. */
             h[kh] = i;
@@ -518,7 +518,7 @@ void gdr_sim_accumulate_child_count_histogram
     int32_t cm = (*cMax_obs_P);
     if (debug) { fprintf(stderr, "        cm = %d cCount.ne = %d\n", cm, cCount->ne); }
     assert(cm <= (int32_t)cCount->ne-1);
-    for (int32_t i = 0; i < ni; i++)
+    for (uint32_t i = 0;  i < ni; i++)
       { int32_t nchi = st->nch.e[i];
         if (nchi != -1)
           { /* Individual is expanded: */
@@ -557,7 +557,7 @@ int64_vec_t gdr_sim_compute_child_count_histogram(gdr_sim_state_t *st, int32_t y
 void gdr_sim_compare_child_count_histograms(char *title, int64_vec_t *cCount_a, int64_vec_t *cCount_b)
   { int32_t c_max = (int32_t)imax(cCount_a->ne, cCount_b->ne) - 1;
     fprintf(stderr, "        comparing histograms of child counts %d..%d %s:\n", 0, c_max, title);
-    for (int32_t c = 0; c <= c_max; c++)
+    for (uint32_t c = 0;  c <= c_max; c++)
       { int64_t cta = (c < (int32_t)cCount_a->ne ? cCount_a->e[c] : 0);
         int64_t ctb = (c < (int32_t)cCount_b->ne ? cCount_b->e[c] : 0);
         fprintf(stderr, "          %3d %6ld %6ld\n", c, cta, ctb);
@@ -571,10 +571,10 @@ void gdr_sim_compute_populations(gdr_sim_state_t *st, int32_t pop[])
     demand(st->yCur == ny-1, "state is not final"); 
     
     /* Clear population counts: */
-    for (int32_t y = 0; y < ny; y++) { pop[y] = 0; }
+    for (uint32_t y = 0;  y < ny; y++) { pop[y] = 0; }
     
     /* Scan individuals: */
-    for (int32_t i = 0; i < ni; i++)
+    for (uint32_t i = 0;  i < ni; i++)
       { int32_t nchi = st->nch.e[i];
         if (nchi != -1)
           { /* Individual is expanded: */
@@ -605,12 +605,11 @@ void gdr_sim_write_cohort_sizes
     int32_t nbr[]
   )
   {
-    char *fname = NULL;
-    asprintf(&fname, "%s-%s-births.txt", outPrefix, tag);
+    char *fname = jsprintf("%s-%s-births.txt", outPrefix, tag);
     FILE *wr = open_write(fname, TRUE);
     free(fname);
     
-    for (int32_t y = 0; y < ny; y++)
+    for (uint32_t y = 0;  y < ny; y++)
       { fprintf(wr, "%+6d %10d\n", yStart+y, nbr[y]); }
     fclose(wr);
   }
@@ -629,7 +628,7 @@ void gdr_sim_check_main_loop_invariant(gdr_sim_state_t *st, int32_t yCur)
     demand(ny >= 2, "bad {ny}");
     
     demand(st->nbt != NULL, "{nbt} is {NULL}");
-    for (int32_t y = 0; y < ny; y++) 
+    for (uint32_t y = 0;  y < ny; y++) 
       { demand(st->nbt[y] >= 1, "invalid {nbt[y]}"); }
     
     int32_t cMax = st->cProb->ne - 1;
@@ -648,9 +647,9 @@ void gdr_sim_check_main_loop_invariant(gdr_sim_state_t *st, int32_t yCur)
     demand(st->psy.ne >= ni, "invalid {psy.ne}");
     int32_t *nch_act = in_alloc(ni); /* Actual child counts. */
     int32_t *lch_act = in_alloc(ni); /* Actual last child index. */
-    for (int32_t i = 0; i < ni; i++) { nch_act[i] = 0; lch_act[i] = -1; }
+    for (uint32_t i = 0;  i < ni; i++) { nch_act[i] = 0; lch_act[i] = -1; }
     int32_t ni_main = 0; /* Count of individuals born in {0..ny-1}. */
-    for (int32_t i = 0; i < ni; i++)
+    for (uint32_t i = 0;  i < ni; i++)
       { int32_t ybri = st->ybr.e[i];
         int32_t ydti = st->ydt.e[i];
         int32_t nchi = st->nch.e[i];
@@ -687,7 +686,7 @@ void gdr_sim_check_main_loop_invariant(gdr_sim_state_t *st, int32_t yCur)
       }
 
     /* Check children counts: */
-    for (int32_t i = 0; i < ni; i++)
+    for (uint32_t i = 0;  i < ni; i++)
       { int32_t nchi = st->nch.e[i];
         if (nchi == -1)
           { /* Unexpanded, should have no children: */
@@ -703,7 +702,7 @@ void gdr_sim_check_main_loop_invariant(gdr_sim_state_t *st, int32_t yCur)
       
     /* Check yearbook: */
     int32_t ni_book = 0; /* Individuals in yearbook. */
-    for (int32_t y = 0; y < ny; y++)
+    for (uint32_t y = 0;  y < ny; y++)
       { int32_t nbry = st->nbr[y] ;
         demand((nbry >= 0) && (nbry <= ni_main), "invalid {nbr[y]}");
         int32_t nbr_obs = 0; /* Count of indivs in list of year {y}. */

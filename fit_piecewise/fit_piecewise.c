@@ -4,7 +4,7 @@
 
 #define fit_piecewise_C_COPYRIGHT \
   "Copyright © 2013 by the State University of Campinas (UNICAMP)"
-/* Last edited on 2023-10-14 21:08:51 by stolfi */
+/* Last edited on 2024-12-21 11:56:27 by stolfi */
     
 /* !!! Provide optional format strings for {X}, {W}, {Z}. !!! */
 /* !!! Use {(X[i]-XC)/XR} instead of just {(X[i]-XC)/XR} as the poly argument. !!! */
@@ -170,7 +170,6 @@
 #define stringify(x) strngf(x)
 #define strngf(x) #x
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>

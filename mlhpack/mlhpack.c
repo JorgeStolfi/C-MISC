@@ -1,5 +1,5 @@
+/* Last edited on 2024-12-25 09:56:26 by stolfi */
 /* 
-  Last edited on 2009-02-10 09:12:27 by stolfi
 
   Compress vocabulary files, squeezing out common prefixes.
   
@@ -53,7 +53,10 @@
   Setting the separator to '\n' is allowed and has the effect
   of treting the entire line as a single field. (How to get
   the '\n' past the shell is YOUR problem.) 
-   
+      
+AUTHOR
+    J. Stolfi, DCC/Unicamp, june 1995.
+  
 */
 
 #include <mlhpack.h>

@@ -1,6 +1,9 @@
-/* Last edited on 2011-08-03 23:51:57 by stolfilocal  */
+/* Last edited on 2024-12-21 11:27:11 by stolfi  */
+
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <jsrandom.h>
 
 int main(int k, char**a) {
   int N=atoi(a[1]),G=atoi(a[2]),F=atoi(a[3]),T=atoi(a[4]);

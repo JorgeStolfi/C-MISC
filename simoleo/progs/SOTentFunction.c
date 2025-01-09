@@ -1,16 +1,18 @@
 /* See SOTentFunction.h */
-/* Last edited on 2023-02-12 07:50:50 by stolfi */
+/* Last edited on 2024-12-21 11:27:46 by stolfi */
 
-#include <SOTentFunction.h>
-#include <SOFunction.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+#include <jsrandom.h>
+#include <nget.h>
+#include <fget.h>
+#include <filefmt.h>
 
 #include <dg_grid.h>
 
-#include <filefmt.h>
-#include <fget.h>
-#include <nget.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <SOFunction.h>
+#include <SOTentFunction.h>
     
 #define T SOTentFunction
 

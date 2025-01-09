@@ -186,7 +186,7 @@ int32_t main(int32_t argc, char **argv)
     int32_t pop[ny];     /* {pop[y]} is the population for year {y}, for some sex {s} and run {r}. */ 
     int32_t nsl[ny];     /* {nsl[y]} is the surv lineage count for year {y}, for some sex {s} and run {r}. */ 
     
-    for (int32_t s = 0; s < 2; s++) 
+    for (uint32_t s = 0;  s < 2; s++) 
       { 
         fprintf(stderr, "  ### sex %d ##################################################\n", s);
 
@@ -232,7 +232,7 @@ int32_t main(int32_t argc, char **argv)
         fprintf(stderr, "  ############################################################\n");
       }
 
-    for (int32_t s = 0; s < 2; s++) 
+    for (uint32_t s = 0;  s < 2; s++) 
       { 
         
       }
@@ -242,10 +242,9 @@ int32_t main(int32_t argc, char **argv)
 
 char *gdr_test_draw_file_prefix(char *outPrefix, char *tag, int32_t s, int32_t id)
   { 
-    char *sx = NULL; if (s >= 0) { asprintf(&sx, "-%d", s); } else { sx = ""; }
-    char *idx = NULL; if (id >= 0) { asprintf(&idx, "-%02d", id); } else { idx = ""; }
-    char *prefix = NULL;
-    asprintf(&prefix, "%s-%s%s%s", outPrefix, tag, sx, idx);
+    char *sx = NULL; if (s >= 0) { char *sx = jsprintf("-%d", s); } else { sx = ""; }
+    char *idx = NULL; if (id >= 0) { char *idx = jsprintf("-%02d", id); } else { idx = ""; }
+    char *prefix = jsprintf("%s-%s%s%s", outPrefix, tag, sx, idx);
     if (s >= 0) { free(sx); }
     if (id >= 0) { free(idx); }
     return prefix;
@@ -270,7 +269,7 @@ void gdr_test_draw_plot_state
 void gdr_test_draw_dump_counts(char *name, int32_t s, int32_t ny, int32_t count[])
   {
     fprintf(stderr, "  --- %s sex %d ---\n", name, s);
-    for (int32_t y = 0; y < ny; y++)
+    for (uint32_t y = 0;  y < ny; y++)
       { fprintf(stderr, "     %4d ", y);
         fprintf(stderr, " %8d", count[y]);
         fprintf(stderr, "\n");
@@ -286,7 +285,7 @@ void gdr_test_draw_check_limits(int32_t ny, int32_t nbt[])
     int32_t nbtMax = INT32_MAX/ny/100;
     if (debug) { fprintf(stderr, "    ny = %d nbtMax = %d\n", ny, nbtMax); }
     demand(ny <= gdr_lineage_num_years_MAX, "too many years");
-    for (int32_t y = 0; y < ny; y++) 
+    for (uint32_t y = 0;  y < ny; y++) 
       { if (debug) { fprintf(stderr, "    nbt[%d] = %d\n", y, nbt[y]); }
         demand(nbt[y] <= nbtMax, "too many births");
       }
@@ -317,8 +316,8 @@ gdr_test_draw_options_t *gdr_parse_options(int32_t argc, char **argv)
     o->yStop = (int32_t)argparser_get_next_int(pp, o->yStart+2, yStopMax);
 
     /* The keyword "-demoParms" must appear exactly twice, once for each sex: */
-    for (int32_t s = 0; s < 2; s++) { o->demoParms[s] = NULL; }
-    for (int32_t ks = 0; ks < 2; ks++)
+    for (uint32_t s = 0;  s < 2; s++) { o->demoParms[s] = NULL; }
+    for (uint32_t ks = 0;  ks < 2; ks++)
       { argparser_get_keyword(pp, "-demoParms");
         int32_t s = (int32_t)argparser_get_next_int(pp, 0, 1);
         if (o->demoParms[s] != NULL) 

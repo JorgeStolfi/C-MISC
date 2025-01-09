@@ -1,7 +1,6 @@
 /* See SPApprox.h */
-/* Last edited on 2008-05-24 12:24:54 by stolfi */
+/* Last edited on 2024-12-21 11:54:53 by stolfi */
 
-#define _GNU_SOURCE
 #include <SPApprox.h>
 
 #include <SPMatrix.h>
@@ -192,14 +191,14 @@ SPFunction *SPApprox_BuildFunction
     SPFunction *g = SPFunction_LinComb(u.e, basis);
     
     /* Write solution to disk: */
-    { char *fileName = NULL; asprintf(&fileName, "%s-app.sfn", solName);
+    { char *fileName = NULL; char *fileName = jsprintf("%s-app.sfn", solName);
       FILE *wr = open_write(fileName, TRUE);
       g->m->write(g, wr); 
       fclose(wr); free(fileName);
     }
     
     /* Write coefficients to disk: */
-    { char *fileName = NULL; asprintf(&fileName, "%s-app.cof", solName);
+    { char *fileName = NULL; char *fileName = jsprintf("%s-app.cof", solName);
       FILE *wr = open_write(fileName, TRUE);
       SPVector_Write(wr, u);
       fclose(wr); free(fileName);

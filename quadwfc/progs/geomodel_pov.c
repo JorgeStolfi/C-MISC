@@ -31,12 +31,9 @@ void pov_geomodel(FILE *fpov, geomodel_t *geo, double radius)
     int irf;
     for (irf = 0; irf < geo->nrf; irf++)
       { reflector_t *rf = &(geo->rf[irf]);
-        char *txv = NULL;
-        asprintf(&txv, "tx_rf_v[%d]", irf); 
-        char *txe = NULL;
-        asprintf(&txe, "tx_rf_e[%d]", irf); 
-        char *txf = NULL;
-        asprintf(&txf, "tx_rf_f[%d]", irf); 
+        char *txv = jsprintf("tx_rf_v[%d]", irf); 
+        char *txe = jsprintf("tx_rf_e[%d]", irf); 
+        char *txf = jsprintf("tx_rf_f[%d]", irf); 
         pov_reflector(fpov, rf, radius, txv, txe, txf);
         free(txv); free(txe); free(txf);
       }

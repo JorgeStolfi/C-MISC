@@ -1,5 +1,5 @@
 /* Solves the Helmholtz eqn by multiscale iteration. */
-/* Last edited on 2023-10-15 03:25:24 by stolfi */
+/* Last edited on 2024-12-21 11:54:49 by stolfi */
 
 #define PROG_NAME "SPMultiSolve"
 
@@ -110,7 +110,6 @@
   
 */
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <math.h>
 #include <string.h>

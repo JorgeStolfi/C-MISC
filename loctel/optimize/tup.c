@@ -29,11 +29,11 @@ dpair_vec_t st_vertex_phone_distances(Map *m, double maxDist, phone_vec_t *ph)
     int32_t nH = 0;
     
     st_map_init_costs(m, d, e, c);
-    for(int32_t pj = 0; pj < ph->ne; pj++)
+    for (uint32_t pj = 0;  pj < ph->ne; pj++)
       { phone_t *pph = &(ph->e[pj]);
         int32_t pi = pph->vertex;
         st_map_compute_costs(m, pi, (float)maxDist, r, &nr, d, e, c);
-        for (int32_t k = 0; k < nr; k++)
+        for (uint32_t k = 0;  k < nr; k++)
           { int32_t ui = r[k];
             dpair_vec_expand(&H, nH);
             H.e[nH] = (dpair_t){ ui, pj, d[ui] };

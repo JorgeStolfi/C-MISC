@@ -31,10 +31,10 @@ csc_stock_sheet_vec_t csc_stock_sheet_parse_options(argparser_t *pp)
         r2_t size;
         size.c[0] = argparser_get_next_double(pp, 10.0, 10000.0);
         size.c[1] = argparser_get_next_double(pp, 10.0, 10000.0);
-        for (int32_t k = 0; k < nr; k++)
+        for (uint32_t k = 0;  k < nr; k++)
           { csc_stock_sheet_vec_expand(&(shv), ns); 
             char *tagk = NULL;
-            asprintf(&tagk, "%s.%d", tag, k+1);
+            char *tagk = jsprintf("%s.%d", tag, k+1);
             shv.e[ns] = (csc_stock_sheet_t){ .tag = tagk, .size = size, .mat = mat, .thk = thk };
             ns++;
           }
